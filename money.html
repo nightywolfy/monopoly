@@ -1,0 +1,50 @@
+<html lang="en">
+<head>
+
+<style>
+
+
+.moneyOverlay {
+    position: absolute;
+    padding: 10px 18px;
+    font-weight: bold;
+    border: 2px solid gold;
+    border-radius: 10px;
+    font-size: 2em;
+    background: black;
+    min-width: 160px;
+    text-align: center;
+}
+
+
+#money-p1-overlay { left: calc(38% + 12.6px); top: 22%; color: #ff6666; }
+#money-p2-overlay { left: calc(38% + 12.6px); top: 37%; color: #66ccff; } 
+#money-p3-overlay { left: calc(38% + 12.6px); top: 52%; color: orange; }
+#money-p4-overlay { left: calc(38% + 12.6px); top: 67%; color: #00ff66; }
+</style>
+</head>
+
+<div id="money-p1-overlay" class="moneyOverlay">Player1: $0</div>
+<div id="money-p2-overlay" class="moneyOverlay">Player2: $0</div>
+<div id="money-p3-overlay" class="moneyOverlay">Player3: $0</div>
+<div id="money-p4-overlay" class="moneyOverlay">Player4: $0</div>
+
+
+<script>
+ 
+    // Refresh money
+async function refreshMoney() {
+    try {
+        const data = await (await fetch('/money.json?t=' + Date.now())).json();
+        document.getElementById('money-p1-overlay').textContent = 'Player1: $' + data.p1;
+        document.getElementById('money-p2-overlay').textContent = 'Player2: $' + data.p2;
+        document.getElementById('money-p3-overlay').textContent = 'Player3: $' + data.p3;
+        document.getElementById('money-p4-overlay').textContent = 'Player4: $' + data.p4;
+    } catch (e) { console.error(e); }
+}
+refreshMoney();
+setInterval(refreshMoney, 3000);
+    
+</script>
+
+</html>
