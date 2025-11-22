@@ -331,12 +331,8 @@ function createBot(nick, defaultTarget, options = {}) {
 
 // --- Create bots ---
 const bots = {
-  player1bot: createBot('player1bot','diceman'),
-  player2bot: createBot('player2bot','diceman'),
-  player3bot: createBot('player3bot','##rento'),
-  player4bot: createBot('player4bot','##rento'),
-  player5bot: createBot('player5bot','##rento'),
-  player6bot: createBot('player6bot','##rento')
+
+  player7bot: createBot('player7bot','##rento')
 };
 
 // --- Endpoint for A-Q buttons / simple web form ---
@@ -434,5 +430,5 @@ async function gracefulShutdown(sig) {
 ['SIGINT','SIGTERM'].forEach(sig => process.on(sig, () => gracefulShutdown(sig)));
 
 // --- Start server ---
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
