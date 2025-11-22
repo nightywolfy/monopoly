@@ -464,7 +464,7 @@ function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
     boardImg.src = 'https://yegorc.net/rento/map.webp?t=' + Date.now();
 }
-setInterval(refreshBoardImage, 30000);
+setInterval(refreshBoardImage, 300000);
 
 async function refreshPieces() {
     try {
@@ -507,7 +507,7 @@ async function refreshPieces() {
     }
 }
 
-setInterval(refreshPieces, 4000);
+setInterval(refreshPieces, 60000);
 
 // Refresh money
 async function refreshMoney() {
@@ -520,7 +520,7 @@ async function refreshMoney() {
     } catch (e) { console.error(e); }
 }
 refreshMoney();
-setInterval(refreshMoney, 4000);
+setInterval(refreshMoney, 60000);
 
 // Houses & hotels
 async function refreshElements(type, url, positions, imgSrc) {
