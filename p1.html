@@ -180,7 +180,7 @@ html, body {
 
 <div id="boardContainer">
     <div id="board">
-        <img id="boardImg" src="map.webp" alt="Monopoly Board">
+        <img id="boardImg" src="https://yegorc.net/rento/map.webp" alt="Monopoly Board">
         <div id="boardButtons"></div>
 
         <!-- Player pieces -->
@@ -462,7 +462,7 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
 // Refresh board image
 function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
-    boardImg.src = 'map.webp?t=' + Date.now();
+    boardImg.src = 'https://yegorc.net/rento/map.webp?t=' + Date.now();
 }
 setInterval(refreshBoardImage, 30000);
 
