@@ -331,8 +331,12 @@ function createBot(nick, defaultTarget, options = {}) {
 
 // --- Create bots ---
 const bots = {
-
-  player7bot: createBot('player7bot','##rento')
+  player1bot: createBot('player1bot','diceman'),
+  player2bot: createBot('player2bot','diceman'),
+  player3bot: createBot('player3bot','##rento'),
+  player4bot: createBot('player4bot','##rento'),
+  player5bot: createBot('player5bot','##rento'),
+  player6bot: createBot('player6bot','##rento')
 };
 
 // --- Endpoint for A-Q buttons / simple web form ---
