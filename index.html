@@ -196,16 +196,16 @@ html, body {
         <div id="money-p4-overlay" class="moneyOverlay">Player4: $0</div>
 
         <!-- Properties/Rules links -->
-        <a href="properties.jpg" target="_blank">
-            <img src="properties.jpg" style="position:absolute; left:calc(31.5% - 30px); top:68%; transform:translate(-50%, -50%); width:120px; z-index:20;">
+        <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" target="_blank">
+            <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" style="position:absolute; left:calc(31.5% - 30px); top:68%; transform:translate(-50%, -50%); width:120px; z-index:20;">
         </a>
-        <a href="rules.jpg" target="_blank">
-            <img src="rules.jpg" style="position:absolute; left:calc(16% + 110px); top:50%; transform:translate(-50%, -50%); width:120px; z-index:21;">
+        <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
+            <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="position:absolute; left:calc(16% + 110px); top:50%; transform:translate(-50%, -50%); width:120px; z-index:21;">
         </a>
-<audio id="sndBuild2" src="build2.mp3" preload="auto"></audio>
-<audio id="sndBuild3" src="build3.mp3" preload="auto"></audio>
-<audio id="sndDestroy2" src="destroy2.mp3" preload="auto"></audio>
-<audio id="sndDestroy3" src="destroy3.mp3" preload="auto"></audio>
+<audio id="sndBuild2" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/build2.mp3" preload="auto"></audio>
+<audio id="sndBuild3" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/build3.mp3" preload="auto"></audio>
+<audio id="sndDestroy2" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy2.mp3" preload="auto"></audio>
+<audio id="sndDestroy3" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy3.mp3" preload="auto"></audio>
 <div id="modeToggle">
 <!-- First 8 buttons -->
 <div>
@@ -304,7 +304,7 @@ html, body {
 <div id="controlsContainer">
 <div id="controlsInner">
 <iframe name="hiddenFrame" style="display:none;"></iframe>
-<audio id="buttonClickSound" src="click.mp3" preload="auto"></audio>
+<audio id="buttonClickSound" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/click.mp3" preload="auto"></audio>
 <!-- Top buttons (original DB–RE + others) -->
 <div id="topButtons" style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px; justify-content:center; align-items:center;">
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player9bot"><input type="hidden" name="msg" value="!dice1-p1"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D1</button></form>
@@ -402,6 +402,12 @@ function playSound(filename) {
     new Audio(filename).play().catch(()=>{});
 }
 
+// Sound URLs
+const soundURLs = {
+    redeem: 'https://raw.githubusercontent.com/nightywolfy/monopoly/main/redeem.mp3',
+    mortgage: 'https://raw.githubusercontent.com/nightywolfy/monopoly/main/mortgage.mp3'
+};
+
 // Generate board buttons
 allSpaces.forEach(spaceNum => {
     const coords = boardSpaces.find(b => b.number === spaceNum);
@@ -415,12 +421,12 @@ allSpaces.forEach(spaceNum => {
     btn.style.top = `${coords.y}px`;
 
     if (group1.includes(spaceNum)) {
-        btn.style.width = '55px';
-        btn.style.height = '55px';
+        btn.style.width = '50px';
+        btn.style.height = '50px';
         btn.style.fontSize = '0.85em';
     } else if (group2.includes(spaceNum)) {
-        btn.style.width = '55px';
-        btn.style.height = '55px';
+        btn.style.width = '50px';
+        btn.style.height = '50px';
         btn.style.fontSize = '0.75em';
     } else {
         btn.style.width = '45px';
@@ -436,7 +442,7 @@ allSpaces.forEach(spaceNum => {
 
     btn.addEventListener('click', () => {
         socket.emit('sendMessage', { bot: 'player9bot', msg: `!${currentMode} ${spaceNum}` });
-        playSound(`${currentMode}.mp3`);
+        playSound(soundURLs[currentMode]);
     });
 
     boardButtonsContainer.appendChild(btn);
@@ -501,7 +507,7 @@ async function refreshPieces() {
     }
 }
 
-setInterval(refreshPieces, 3000);
+setInterval(refreshPieces, 4000);
 
 // Refresh money
 async function refreshMoney() {
@@ -514,7 +520,7 @@ async function refreshMoney() {
     } catch (e) { console.error(e); }
 }
 refreshMoney();
-setInterval(refreshMoney, 3000);
+setInterval(refreshMoney, 4000);
 
 // Houses & hotels
 async function refreshElements(type, url, positions, imgSrc) {
@@ -538,8 +544,8 @@ async function refreshElements(type, url, positions, imgSrc) {
   } catch (e) { console.error(`Error loading ${type}:`, e); }
 }
 
-setInterval(() => refreshElements('hotel', '/hotels.json', buildingPositions, 'hotel.webp'), 99000);
-setInterval(() => refreshElements('house', '/houses.json', buildingPositions, 'house.webp'), 99000);
+setInterval(() => refreshElements('hotel', '/hotels.json', buildingPositions, 'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'), 99000);
+setInterval(() => refreshElements('house', '/houses.json', buildingPositions, 'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'), 99000);
 
 </script>
 </body>
