@@ -123,7 +123,7 @@ function updatePiece(player, x, y) {
 // --- IRC Bot Factory (stable) ---
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
-  const host = options.host || 'irc.ipv6.libera.chat';
+  const host = options.host || 'irc.libera.chat';
   const port = options.port || 6667;
   const secure = !!options.secure;
   const nickServ = options.nickServ || null;
@@ -390,12 +390,12 @@ function createBot(nick, defaultTarget, options = {}) {
 
 // --- Create bots ---
 const bots = {
-  player1bot: createBot('player1bot','diceman'),
-  player2bot: createBot('player2bot','diceman'),
-  player3bot: createBot('player3bot','##rento'),
-  player4bot: createBot('player4bot','##rento'),
-  player5bot: createBot('player5bot','##rento'),
-  player6bot: createBot('player6bot','##rento')
+  player5bot: createBot('player5bot','diceman'),
+  player6bot: createBot('player7bot','diceman'),
+  player7bot: createBot('player7bot','##rento'),
+  player8bot: createBot('player8bot','##rento'),
+  player9bot: createBot('player9bot','##rento'),
+  player10bot: createBot('player10bot','##rento')
 };
 
 // --- Endpoint for A-Q buttons / simple web form ---
