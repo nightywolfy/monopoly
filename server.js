@@ -50,14 +50,24 @@ function safeWriteJSON(file, data) {
 const moneyFile = path.join(__dirname, 'money.json');
 const hotelsFile = path.join(__dirname, 'hotels.json');
 const housesFile = path.join(__dirname, 'houses.json');
+const piecesFile = path.join(__dirname, 'pieces.json'); 
 
 let money = safeReadJSON(moneyFile, { p1: 10, p2: 10, p3: 10, p4: 10 });
 let hotels = safeReadJSON(hotelsFile, {});
 let houses = safeReadJSON(housesFile, {});
 
-const saveMoney = () => safeWriteJSON(moneyFile, money);
+
+let pieces = safeReadJSON(piecesFile, {
+  red:    { x: 825, y: 755 },
+  blue:   { x: 825, y: 755 },
+  yellow: { x: 825, y: 755 },
+  green:  { x: 825, y: 755 }
+});
+
+const saveMoney  = () => safeWriteJSON(moneyFile, money);
 const saveHotels = () => safeWriteJSON(hotelsFile, hotels);
 const saveHouses = () => safeWriteJSON(housesFile, houses);
+const savePieces = () => safeWriteJSON(piecesFile, pieces);
 
 const boardSpaces = [
   { number: 0,  x: 825, y: 755 }, { number: 1,  x: 730, y: 775 },
@@ -83,14 +93,6 @@ const boardSpaces = [
 ];
 
 
-// --- Pieces ---
-let pieces = {
-  red:    { x: boardSpaces[0].x, y: boardSpaces[0].y },
-  blue:   { x: boardSpaces[0].x, y: boardSpaces[0].y },
-  yellow: { x: boardSpaces[0].x, y: boardSpaces[0].y },
-  green:  { x: boardSpaces[0].x, y: boardSpaces[0].y }
-};
-
 // --- Player color mapping ---
 const colorMap = { p1: 'red', p2: 'blue', p3: 'yellow', p4: 'green' };
 
@@ -110,13 +112,16 @@ function safeEmit(event, data) {
   try { io.emit(event, data); } catch (err) { console.error(`[Socket] Emit failed (${event}):`, err); }
 }
 
-// --- Update piece ---
+// --- Update piece --- (UPDATED to save to pieces.json)
 function updatePiece(player, x, y) {
   const color = colorMap[player];
   if (!color) return;
+
   const current = pieces[color];
   if (current && current.x === x && current.y === y) return;
+
   pieces[color] = { x, y };
+  savePieces();                          // <-- NEW
   safeEmit('piecesUpdate', pieces);
 }
 
