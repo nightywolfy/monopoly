@@ -1,7 +1,7 @@
 {
   "name": "monopoly",
   "version": "1.0.0",
-  "description": "Monopoly Node.js app",
+  "type": "module",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

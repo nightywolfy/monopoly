@@ -55,8 +55,6 @@ const piecesFile = path.join(__dirname, 'pieces.json');
 let money = safeReadJSON(moneyFile, { p1: 10, p2: 10, p3: 10, p4: 10 });
 let hotels = safeReadJSON(hotelsFile, {});
 let houses = safeReadJSON(housesFile, {});
-
-
 let pieces = safeReadJSON(piecesFile, {
   red:    { x: 825, y: 755 },
   blue:   { x: 825, y: 755 },
@@ -149,20 +147,13 @@ function createBot(nick, defaultTarget, options = {}) {
     sendInterval = setInterval(() => {
       if (!sendQueue.length || !isConnected) return;
       const { msg, target } = sendQueue.shift();
-      try {
-        client.say(target, msg);
-      } catch (err) {
-        console.error(`[${nick}] safeSay send error:`, err);
-      }
+      try { client.say(target, msg); } catch (err) { console.error(`[${nick}] safeSay send error:`, err); }
     }, SEND_INTERVAL_MS);
   }
   startSendLoop();
 
-  function stopSendLoop() {
-    if (sendInterval) {
-      clearInterval(sendInterval);
-      sendInterval = null;
-    }
+ function stopSendLoop() {
+    if (sendInterval) { clearInterval(sendInterval); sendInterval = null; }
   }
 
   function safeSay(target, msg) {
@@ -173,21 +164,14 @@ function createBot(nick, defaultTarget, options = {}) {
     sendQueue.push({ target, msg: clean });
   }
 
-  // --- Connect logic with guards and exponential backoff ---
+ // --- Connect logic ---
   const connectBot = () => {
     if (destroyed) return;
     if (isConnecting || isConnected) return;
     isConnecting = true;
 
     try {
-      client.connect({
-        host,
-        port,
-        nick,
-        secure,
-        timeout: 20000, // fail fast on bad connect
-        auto_reconnect: false // we manage reconnects manually
-      });
+      client.connect({ host, port, nick, secure, timeout: 20000, auto_reconnect: false });
     } catch (err) {
       console.error(`${nick} connection error:`, err);
       isConnecting = false;
@@ -197,58 +181,32 @@ function createBot(nick, defaultTarget, options = {}) {
   };
   connectBot();
 
-  // --- Event handlers ---
+ // --- Event handlers ---
   client.on('registered', () => {
     reconnectDelay = 9000;
     isConnecting = false;
     isConnected = true;
-    console.log(`${nick} registered on ${host}:${port}`);
-
-    // try join in a safe way
-    try {
-      if (defaultTarget) client.join(defaultTarget);
-      console.log(`${nick} joined ${defaultTarget}`);
-    } catch (err) {
-      console.error(`${nick} join error:`, err);
-    }
-
-    // optional nickserv identify if provided
-    if (nickServ && nickServ.identifyCommand) {
-      safeSay(defaultTarget, nickServ.identifyCommand);
-    }
+    // Removed connection log
+    if (defaultTarget) { try { client.join(defaultTarget); } catch { } }
+    if (nickServ && nickServ.identifyCommand) { safeSay(defaultTarget, nickServ.identifyCommand); }
   });
 
   client.on('close', (hadError) => {
-    console.warn(`${nick} disconnected (hadError=${hadError}). Reconnecting in ${reconnectDelay / 1000}s...`);
     isConnected = false;
     isConnecting = false;
-
-    // clear outstanding queue to avoid memory growth, but keep recently queued messages
     if (sendQueue.length > 2000) sendQueue.length = 0;
-
-    setTimeout(() => {
-      reconnectDelay = Math.min(reconnectDelay * 2, maxDelay);
-      connectBot();
-    }, reconnectDelay);
+    setTimeout(() => { reconnectDelay = Math.min(reconnectDelay * 2, maxDelay); connectBot(); }, reconnectDelay);
   });
 
-  client.on('raw', (event) => {
-    // debug hook point: console.log(`[${nick}] RAW:`, event);
-  });
-
-  client.on('error', (err) => {
-    // irc-framework errors sometimes carry nested info
-    console.error(`Error for ${nick}:`, err && err.stack ? err.stack : err);
-  });
+  client.on('error', (err) => { console.error(`Error for ${nick}:`, err && err.stack ? err.stack : err); });
 
   client.on('message', (event) => {
     try {
-      if (!event || !event.message) return;
+      if (!event?.message) return;
       const raw = String(event.message).trim();
       if (!raw.startsWith('!')) return;
 
-      // split multiple commands safely (commands separated by " !")
-      const commands = raw.split(' !').map((c, i) => (i > 0 ? '!' + c : c));
+      const commands = raw.split(' !').map((c,i) => i>0?'!'+c:c);
 
       for (const fullCmd of commands) {
         if (!fullCmd) continue;
@@ -362,45 +320,19 @@ function createBot(nick, defaultTarget, options = {}) {
     }
   });
 
- // external API to say messages
-  function say(target, msg) {
-    safeSay(target, msg);
-  }
+  function say(target,msg){ safeSay(target,msg); }
+  function destroy(){ destroyed=true; isConnecting=false; isConnected=false; stopSendLoop(); try{client.quit('shutdown',true);}catch{} }
 
-  // expose a destroy to stop reconnects & intervals
-  function destroy() {
-    destroyed = true;
-    isConnecting = false;
-    isConnected = false;
-    stopSendLoop();
-    try {
-      client.quit('shutdown', true);
-    } catch (err) {
-      // ignore
-    }
-  }
-
-  // Return public API
-  return {
-    client,
-    defaultTarget,
-    say,
-    connect: connectBot,
-    destroy,
-    getState: () => ({ nick, isConnected, reconnectDelay })
-  };
+  return { client, defaultTarget, say, connect:connectBot, destroy, getState:()=>({nick,isConnected,reconnectDelay}) };
 }
+
 
 
 
 // --- Create bots ---
 const bots = {
-  player1bot: createBot('player1bot','diceman'),
-  player2bot: createBot('player2bot','diceman'),
-  player3bot: createBot('player3bot','##rento'),
-  player4bot: createBot('player4bot','##rento'),
-  player5bot: createBot('player5bot','##rento'),
-  player6bot: createBot('player6bot','##rento')
+
+  player7bot: createBot('player7bot','##rento')
 };
 
 // --- Endpoint for A-Q buttons / simple web form ---
