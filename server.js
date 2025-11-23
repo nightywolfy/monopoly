@@ -269,8 +269,8 @@ function createBot(nick, defaultTarget, options = {}) {
           }
 
           case '!clearall': {
-            hotels={}; houses={};
-            updateBuildings(hotels,[]); updateBuildings(houses,[]);
+            updateBuildings(hotels, Object.keys(hotels).map(Number), true);
+            updateBuildings(houses, Object.keys(houses).map(Number), true);
             safeSay(defaultTarget,'All hotels and houses cleared.');
             break;
           }
