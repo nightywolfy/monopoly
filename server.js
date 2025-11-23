@@ -18,7 +18,7 @@ app.set('trust proxy', true);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100kb' }));
 
-// --- File helpers with safe atomic writes ---
+// --- File helpers ---
 function safeReadJSON(file, fallback = {}) {
   try {
     if (!existsSync(file)) return fallback;
@@ -45,6 +45,7 @@ const moneyFile = path.join(__dirname, 'money.json');
 const hotelsFile = path.join(__dirname, 'hotels.json');
 const housesFile = path.join(__dirname, 'houses.json');
 const piecesFile = path.join(__dirname, 'pieces.json');
+const displayFile = path.join(__dirname, 'display.json');
 
 let money = safeReadJSON(moneyFile, { p1: 10, p2: 10, p3: 10, p4: 10 });
 let hotels = safeReadJSON(hotelsFile, {});
@@ -55,11 +56,13 @@ let pieces = safeReadJSON(piecesFile, {
   yellow: { x: 825, y: 755 },
   green: { x: 825, y: 755 }
 });
+let display = safeReadJSON(displayFile, { text: "" });
 
 const saveMoney = () => safeWriteJSON(moneyFile, money);
 const saveHotels = () => safeWriteJSON(hotelsFile, hotels);
 const saveHouses = () => safeWriteJSON(housesFile, houses);
 const savePieces = () => safeWriteJSON(piecesFile, pieces);
+const saveDisplay = () => safeWriteJSON(displayFile, display);
 
 const boardSpaces = [
   { number: 0, x: 825, y: 755 }, { number: 1, x: 730, y: 775 },
@@ -93,7 +96,11 @@ function initializeDefaults() {
     if (hotels[i] === undefined) hotels[i] = false;
     if (houses[i] === undefined) houses[i] = false;
   }
-  saveMoney(); saveHotels(); saveHouses();
+  for (const color of Object.values(colorMap)) {
+    if (!pieces[color]) pieces[color] = { x: 825, y: 755 };
+  }
+  if (!display.text) display.text = "";
+  saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay();
 }
 initializeDefaults();
 
@@ -102,7 +109,7 @@ function safeEmit(event, data) {
   try { io.emit(event, data); } catch (err) { console.error(`[Socket] Emit failed (${event}):`, err); }
 }
 
-// --- Update piece ---
+// --- Update helpers that only emit on change ---
 function updatePiece(player, x, y) {
   const color = colorMap[player];
   if (!color) return;
@@ -113,20 +120,44 @@ function updatePiece(player, x, y) {
   safeEmit('piecesUpdate', pieces);
 }
 
+function updateDisplay(newText) {
+  if (display.text === newText) return;
+  display.text = newText;
+  saveDisplay();
+  safeEmit('displayUpdate', display);
+}
+
+function updateMoney(player, amount) {
+  if (!colorMap[player] || money[player] === amount) return;
+  money[player] = amount;
+  saveMoney();
+  safeEmit('moneyUpdate', money);
+}
+
+function updateBuildings(targetObj, spaces, unset = false) {
+  let changed = false;
+  spaces.forEach(space => {
+    if (space < 0 || space > 39) return;
+    if (targetObj[space] !== !unset) { targetObj[space] = !unset; changed = true; }
+  });
+  if (!changed) return false;
+  if (targetObj === hotels) saveHotels(); else saveHouses();
+  safeEmit(targetObj === hotels ? 'hotelsUpdate' : 'housesUpdate', targetObj);
+  return true;
+}
+
 // --- IRC Bot Factory ---
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
-  const host = options.host || 'irc.libera.chat';
+  const host = options.host || 'irc.ipv6.libera.chat';
   const port = options.port || 6667;
   const secure = !!options.secure;
   const nickServ = options.nickServ || null;
 
-  let reconnectDelay = 9000; 
-  const maxDelay = 60000;
+  let reconnectDelay = 9000;
   let isConnecting = false;
   let isConnected = false;
   let destroyed = false;
-
   const sendQueue = [];
   let sendInterval = null;
   const SEND_INTERVAL_MS = 900;
@@ -136,14 +167,11 @@ function createBot(nick, defaultTarget, options = {}) {
     sendInterval = setInterval(() => {
       if (!sendQueue.length || !isConnected) return;
       const { msg, target } = sendQueue.shift();
-      try { client.say(target, msg); } catch (err) { console.error(`[${nick}] safeSay send error:`, err); }
+      try { client.say(target, msg); } catch (err) { console.error(`[${nick}] send error:`, err); }
     }, SEND_INTERVAL_MS);
   }
   startSendLoop();
-
-  function stopSendLoop() {
-    if (sendInterval) { clearInterval(sendInterval); sendInterval = null; }
-  }
+  function stopSendLoop() { if (sendInterval) { clearInterval(sendInterval); sendInterval = null; } }
 
   function safeSay(target, msg) {
     if (!msg || typeof msg !== 'string') return;
@@ -152,7 +180,7 @@ function createBot(nick, defaultTarget, options = {}) {
     sendQueue.push({ target, msg: clean });
   }
 
-  const connectBot = () => {
+  function connectBot() {
     if (destroyed || isConnecting || isConnected) return;
     isConnecting = true;
     try {
@@ -160,10 +188,10 @@ function createBot(nick, defaultTarget, options = {}) {
     } catch (err) {
       console.error(`${nick} connection error:`, err);
       isConnecting = false;
-      reconnectDelay = Math.min(reconnectDelay * 2, maxDelay);
+      reconnectDelay = Math.min(reconnectDelay * 2, 60000);
       setTimeout(connectBot, reconnectDelay);
     }
-  };
+  }
   connectBot();
 
   client.on('registered', () => {
@@ -178,17 +206,16 @@ function createBot(nick, defaultTarget, options = {}) {
     isConnected = false;
     isConnecting = false;
     if (sendQueue.length > 2000) sendQueue.length = 0;
-    setTimeout(() => { reconnectDelay = Math.min(reconnectDelay * 2, maxDelay); connectBot(); }, reconnectDelay);
+    setTimeout(() => { reconnectDelay = Math.min(reconnectDelay * 2, 60000); connectBot(); }, reconnectDelay);
   });
 
-  client.on('error', (err) => { console.error(`Error for ${nick}:`, err?.stack || err); });
+  client.on('error', (err) => console.error(`Error for ${nick}:`, err?.stack || err));
 
   client.on('message', (event) => {
     try {
       if (!event?.message) return;
       const raw = String(event.message).trim();
       if (!raw.startsWith('!')) return;
-
       const commands = raw.split(' !').map((c,i) => i>0?'!'+c:c);
 
       for (const fullCmd of commands) {
@@ -200,86 +227,74 @@ function createBot(nick, defaultTarget, options = {}) {
         switch (cmd) {
           case '!set': {
             if (args[0]?.toLowerCase() !== 'all' || args.length !== Object.keys(colorMap).length + 1) {
-              safeSay(defaultTarget, `Error: Usage \`!set all <amounts for ${Object.keys(colorMap).length} players>\``);
+              safeSay(defaultTarget, `Usage: !set all <amounts for ${Object.keys(colorMap).length} players>`);
               break;
             }
-            const amounts = args.slice(1).map(a => {
-              const n = parseInt(a, 10);
-              return isNaN(n) ? null : n;
-            });
-            if (amounts.includes(null)) { safeSay(defaultTarget, 'Error: All amounts must be valid numbers.'); break; }
-            const players = Object.keys(colorMap);
-            for (let i = 0; i < players.length; i++) money[players[i]] = Math.max(-999, Math.min(9999, amounts[i]));
-            saveMoney();
-            safeEmit('moneyUpdate', money);
+            const amounts = args.slice(1).map(a => parseInt(a, 10));
+            if (amounts.some(a => isNaN(a))) { safeSay(defaultTarget, 'All amounts must be valid numbers.'); break; }
+            Object.keys(colorMap).forEach((p,i) => updateMoney(p, Math.max(-999, Math.min(9999, amounts[i]))));
             break;
           }
 
           case '!mv': {
             const [target, ...spacesStr] = args;
-            if (target?.toLowerCase() !== 'all') {
-              safeSay(defaultTarget, `Error: Only \`!mv all <spaces for ${Object.keys(colorMap).length} players>\` is allowed`);
-              break;
-            }
+            if (target?.toLowerCase() !== 'all') { safeSay(defaultTarget, 'Only !mv all ... allowed'); break; }
             const players = Object.keys(colorMap);
-            if (spacesStr.length !== players.length) { safeSay(defaultTarget, `Error: You must provide exactly ${players.length} spaces`); break; }
-            for (let i = 0; i < players.length; i++) {
+            if (spacesStr.length !== players.length) { safeSay(defaultTarget, `Must provide exactly ${players.length} spaces`); break; }
+            players.forEach((p,i) => {
               const space = parseInt(spacesStr[i], 10);
-              if (isNaN(space) || space < 0 || space >= boardSpaces.length) { safeSay(defaultTarget, `Error: Invalid space "${spacesStr[i]}" for ${players[i]}`); continue; }
-              const { x, y } = boardSpaces[space];
-              updatePiece(players[i], x, y);
-            }
+              if (isNaN(space) || space < 0 || space >= boardSpaces.length) { safeSay(defaultTarget, `Invalid space "${spacesStr[i]}"`); return; }
+              const { x,y } = boardSpaces[space]; updatePiece(p,x,y);
+            });
             break;
           }
 
           case '!mv2': {
-            const [player, xStr, yStr] = args;
-            const x = parseInt(xStr, 10);
-            const y = parseInt(yStr, 10);
-            if (!colorMap[player]) { safeSay(defaultTarget, `Error: Unknown player "${player}"`); break; }
-            if (isNaN(x) || isNaN(y)) { safeSay(defaultTarget, `Error: Invalid coordinates "${xStr}, ${yStr}"`); break; }
-            updatePiece(player, x, y);
+            const [player,xStr,yStr] = args;
+            const x=parseInt(xStr,10), y=parseInt(yStr,10);
+            if (!colorMap[player] || isNaN(x)||isNaN(y)) { safeSay(defaultTarget, 'Invalid player or coordinates'); break; }
+            updatePiece(player,x,y);
             break;
           }
 
-          // --- Hotels / Houses ---
           case '!hotel': case '!uhotel': case '!house': case '!uhouse': {
             const unset = cmd.startsWith('!u');
             const isHotel = cmd.includes('hotel');
             const targetObj = isHotel ? hotels : houses;
-
-            const spaces = args.map(a => parseInt(a, 10)).filter(n => !isNaN(n) && n >= 0 && n <= 39);
-            if (spaces.length === 0) break;
-
-            spaces.forEach(space => { targetObj[space] = !unset; });
-
-            if (isHotel) saveHotels(); else saveHouses();
-            safeEmit(isHotel ? 'hotelsUpdate' : 'housesUpdate', targetObj);
-
-            safeSay(defaultTarget, `${unset ? 'Removed' : 'Set'} ${isHotel ? 'hotel(s)' : 'house(s)'} on spaces: ${spaces.join(', ')}`);
+            const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
+            if (spaces.length===0) break;
+            const changed = updateBuildings(targetObj, spaces, unset);
+            if (changed) safeSay(defaultTarget, `${unset?'Removed':'Set'} ${isHotel?'hotel(s)':'house(s)'} on spaces: ${spaces.join(', ')}`);
             break;
           }
 
           case '!clearall': {
-            hotels = {}; houses = {};
-            saveHotels(); saveHouses();
-            safeEmit('hotelsUpdate', hotels); safeEmit('housesUpdate', houses);
-            safeSay(defaultTarget, 'All hotels and houses cleared.');
+            hotels={}; houses={};
+            updateBuildings(hotels,[]); updateBuildings(houses,[]);
+            safeSay(defaultTarget,'All hotels and houses cleared.');
+            break;
+          }
+
+          case '!display': {
+            const msgText = args.join(' ').trim().replace(/^"(.*)"$/,'$1');
+            if (!msgText) { safeSay(defaultTarget,'Usage: !display <text>'); break; }
+            updateDisplay(msgText);
+            safeSay(defaultTarget, `Display updated: "${msgText}"`);
             break;
           }
 
           default: break;
         }
       }
-    } catch (err) { console.error(`Command processing error for ${nick}:`, err?.stack || err); }
+    } catch(err) { console.error(`Command error ${nick}:`, err?.stack||err); }
   });
 
   function say(target,msg){ safeSay(target,msg); }
   function destroy(){ destroyed=true; isConnecting=false; isConnected=false; stopSendLoop(); try{client.quit('shutdown',true);}catch{} }
-
   return { client, defaultTarget, say, connect:connectBot, destroy, getState:()=>({nick,isConnected,reconnectDelay}) };
 }
 
+// --- Create bots ---
 const bots = {
   player11bot: createBot('player11bot','diceman'),
   player22bot: createBot('player22bot','diceman'),
@@ -290,78 +305,71 @@ const bots = {
 };
 
 // --- Forum Buttons ---
-app.post('/send-irc', (req, res) => {
-  try {
-    const { bot, msg } = req.body || req.body;
-    if (!bot || !msg) return res.status(400).send('Missing bot or message');
-    if (!bots[bot]) return res.status(400).send('Unknown bot');
-    bots[bot].say(bots[bot].defaultTarget, String(msg));
+app.post('/send-irc',(req,res)=>{
+  try{
+    const {bot,msg}=req.body||{};
+    if(!bot||!msg) return res.status(400).send('Missing bot or message');
+    if(!bots[bot]) return res.status(400).send('Unknown bot');
+    bots[bot].say(bots[bot].defaultTarget,String(msg));
     return res.redirect('/');
-  } catch (err) {
-    console.error('/send-irc error:', err);
-    return res.status(500).send('Server error');
-  }
+  }catch(err){ console.error('/send-irc error:',err); return res.status(500).send('Server error'); }
 });
 
 // --- Socket.IO ---
-io.on('connection', (socket) => {
-  try {
-    const ip = socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim() || socket.handshake.address;
+io.on('connection',(socket)=>{
+  try{
+    const ip = socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`Frontend connected from IP: ${ip}`);
 
-    socket.on('sendMessage', (payload) => {
-      if (!payload || typeof payload !== 'object') return;
-      const bot = payload.bot;
-      const msg = payload.msg;
-      if (!bots[bot] || typeof msg !== 'string') return;
-      const cleanMsg = msg.trim().slice(0, 200).replace(/\n/g, ' ');
-      if (cleanMsg) bots[bot].say(bots[bot].defaultTarget, cleanMsg);
+    socket.on('sendMessage',(payload)=>{
+      if(!payload||typeof payload!=='object') return;
+      const bot=payload.bot, msg=payload.msg;
+      if(!bots[bot]||typeof msg!=='string') return;
+      const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' ');
+      if(cleanMsg) bots[bot].say(bots[bot].defaultTarget,cleanMsg);
     });
 
-    socket.on('getMoney', () => socket.emit('moneyUpdate', money));
-    socket.on('getPieces', () => socket.emit('piecesUpdate', pieces));
-    socket.on('getHotels', () => socket.emit('hotelsUpdate', hotels));
-    socket.on('getHouses', () => socket.emit('housesUpdate', houses));
+    socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
+    socket.on('getPieces',()=>socket.emit('piecesUpdate',pieces));
+    socket.on('getHotels',()=>socket.emit('hotelsUpdate',hotels));
+    socket.on('getHouses',()=>socket.emit('housesUpdate',houses));
+    socket.on('getDisplay',()=>socket.emit('displayUpdate',display));
 
-    socket.on('updateMoney', (payload) => {
-      if (!payload || typeof payload !== 'object') return;
-      const player = payload.player;
-      const amount = parseInt(payload.amount, 10);
-      if (!colorMap[player] || Number.isNaN(amount) || amount < -999 || amount > 9999) return;
-      money[player] = amount;
-      saveMoney();
-      safeEmit('moneyUpdate', money);
+    socket.on('updateMoney',(payload)=>{
+      if(!payload||typeof payload!=='object') return;
+      const player=payload.player;
+      const amount=parseInt(payload.amount,10);
+      if(!colorMap[player]||Number.isNaN(amount)||amount<-999||amount>9999) return;
+      updateMoney(player,amount);
     });
 
-    socket.on('disconnect', () => console.log(`Frontend disconnected: ${ip}`));
-  } catch (err) { console.error('Socket error:', err); }
+    socket.on('disconnect',()=>console.log(`Frontend disconnected: ${ip}`));
+  }catch(err){ console.error('Socket error:',err); }
 });
 
 // --- Serve static files + JSON endpoints ---
 app.use(express.static(__dirname));
-app.get('/pieces.json', (_, res) => res.json(pieces));
-app.get('/money.json', (_, res) => res.json(money));
-app.get('/hotels.json', (_, res) => res.json(hotels));
-app.get('/houses.json', (_, res) => res.json(houses));
+app.get('/pieces.json',(_,res)=>res.json(pieces));
+app.get('/money.json',(_,res)=>res.json(money));
+app.get('/hotels.json',(_,res)=>res.json(hotels));
+app.get('/houses.json',(_,res)=>res.json(houses));
+app.get('/display.json',(_,res)=>res.json(display));
 
 // --- Graceful shutdown ---
-let shuttingDown = false;
-async function gracefulShutdown(sig) {
-  if (shuttingDown) return;
-  shuttingDown = true;
+let shuttingDown=false;
+async function gracefulShutdown(sig){
+  if(shuttingDown) return;
+  shuttingDown=true;
   console.log(`Received ${sig} — saving state and shutting down...`);
-  try {
-    saveMoney(); saveHotels(); saveHouses();
-    Object.values(bots).forEach(b => { try { b.destroy(); } catch {} });
-    io.close(() => console.log('Socket.IO closed.'));
-    server.close(() => { console.log('HTTP server closed.'); process.exit(0); });
-    setTimeout(() => { console.warn('Forcing shutdown.'); process.exit(0); }, 5000);
-  } catch (err) {
-    console.error('Error during shutdown:', err);
-    process.exit(1);
-  }
+  try{
+    saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay();
+    Object.values(bots).forEach(b=>{try{b.destroy();}catch{}});
+    io.close(()=>console.log('Socket.IO closed.'));
+    server.close(()=>{console.log('HTTP server closed.'); process.exit(0);});
+    setTimeout(()=>{console.warn('Forcing shutdown.'); process.exit(0);},5000);
+  }catch(err){ console.error('Error during shutdown:',err); process.exit(1); }
 }
-['SIGINT','SIGTERM'].forEach(sig => process.on(sig, () => gracefulShutdown(sig)));
+['SIGINT','SIGTERM'].forEach(sig=>process.on(sig,()=>gracefulShutdown(sig)));
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));
+const PORT = process.env.PORT||3000;
+server.listen(PORT,()=>console.log(`Server running at http://localhost:${PORT}`));
