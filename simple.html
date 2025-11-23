@@ -240,15 +240,15 @@ board.appendChild(el);
 fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
 fetch('/display.json').then(res=>res.json()).then(data=>updateDisplay(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
-fetch('/hotels.json').then(res=>res.json()).then(data=>renderElements('hotel',data,'hotel.webp'));
-fetch('/houses.json').then(res=>res.json()).then(data=>renderElements('house',data,'house.webp'));
+fetch('/hotels.json').then(res=>res.json()).then(data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
+fetch('/houses.json').then(res=>res.json()).then(data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
 // Socket.IO updates
 socket.on('piecesUpdate',updatePieces);
 socket.on('displayUpdate',data=>updateDisplay(data.text));
 socket.on('moneyUpdate',updateMoney);
-socket.on('hotelsUpdate',data=>renderElements('hotel',data,'hotel.webp'));
-socket.on('housesUpdate',data=>renderElements('house',data,'house.webp'));
+socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
+socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 </script>
 </body>
 </html>
