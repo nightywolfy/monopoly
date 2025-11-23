@@ -279,7 +279,7 @@ function createBot(nick, defaultTarget, options = {}) {
             const msgText = args.join(' ').trim().replace(/^"(.*)"$/,'$1');
             if (!msgText) { safeSay(defaultTarget,'Usage: !display <text>'); break; }
             updateDisplay(msgText);
-            safeSay(defaultTarget, `Display updated: "${msgText}"`);
+            
             break;
           }
 
@@ -296,12 +296,12 @@ function createBot(nick, defaultTarget, options = {}) {
 
 // --- Create bots ---
 const bots = {
-  player11bot: createBot('player11bot','diceman'),
-  player22bot: createBot('player22bot','diceman'),
-  player33bot: createBot('player33bot','##rento'),
-  player44bot: createBot('player44bot','##rento'),
-  player55bot: createBot('player55bot','##rento'),
-  player66bot: createBot('player66bot','##rento')
+  player1bot: createBot('player1bot','diceman'),
+  player2bot: createBot('player2bot','diceman'),
+  player3bot: createBot('player3bot','##rento'),
+  player4bot: createBot('player4bot','##rento'),
+  player5bot: createBot('player5bot','##rento'),
+  player6bot: createBot('player6bot','##rento')
 };
 
 // --- Forum Buttons ---
