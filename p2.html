@@ -179,35 +179,28 @@ html, body {
 <body>
 
 <div id="boardContainer">
-    <div id="board">
-        <img id="boardImg" src="https://yegorc.net/rento/map.webp" alt="Monopoly Board">
-        <div id="boardButtons"></div>
-
-        <!-- Player pieces -->
-        <div id="p1" class="piece red">p1</div>
-        <div id="p2" class="piece blue">p2</div>
-        <div id="p3" class="piece yellow">p3</div>
-        <div id="p4" class="piece green">p4</div>
-
-        <!-- Money overlays -->
-        <div id="money-p1-overlay" class="moneyOverlay">Player1: $0</div>
-        <div id="money-p2-overlay" class="moneyOverlay">Player2: $0</div>
-        <div id="money-p3-overlay" class="moneyOverlay">Player3: $0</div>
-        <div id="money-p4-overlay" class="moneyOverlay">Player4: $0</div>
-
-        <!-- Properties/Rules links -->
-        <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" target="_blank">
-            <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" style="position:absolute; left:calc(31.5% - 30px); top:68%; transform:translate(-50%, -50%); width:120px; z-index:20;">
-        </a>
-        <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
-            <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="position:absolute; left:calc(16% + 110px); top:50%; transform:translate(-50%, -50%); width:120px; z-index:21;">
-        </a>
+<div id="board">
+<img id="boardImg" src="map.webp" alt="Monopoly Board">
+<div id="boardButtons"></div>
+<div id="p1" class="piece red">p1</div>
+<div id="p2" class="piece blue">p2</div>
+<div id="p3" class="piece yellow">p3</div>
+<div id="p4" class="piece green">p4</div>
+<div id="money-p1-overlay" class="moneyOverlay">Player1: $0</div>
+<div id="money-p2-overlay" class="moneyOverlay">Player2: $0</div>
+<div id="money-p3-overlay" class="moneyOverlay">Player3: $0</div>
+<div id="money-p4-overlay" class="moneyOverlay">Player4: $0</div>
+<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" target="_blank">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" style="position:absolute; left:calc(31.5% - 30px); top:68%; transform:translate(-50%, -50%); width:120px; z-index:20;">
+</a>
+<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="position:absolute; left:calc(16% + 110px); top:50%; transform:translate(-50%, -50%); width:120px; z-index:21;">
+</a>
 <audio id="sndBuild2" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/build2.mp3" preload="auto"></audio>
 <audio id="sndBuild3" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/build3.mp3" preload="auto"></audio>
 <audio id="sndDestroy2" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy2.mp3" preload="auto"></audio>
 <audio id="sndDestroy3" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy3.mp3" preload="auto"></audio>
 <div id="modeToggle">
-<!-- First 8 buttons -->
 <div>
 <form action="/send-irc" method="POST" target="hiddenFrame">
 <input type="hidden" name="bot" value="player4bot">
@@ -254,7 +247,6 @@ html, body {
 <button type="button" class="mode-btn active" data-mode="redeem">Redeem</button>
 <button type="button" class="mode-btn" data-mode="mortgage">Mortgage</button>
 </div>
-<!-- Second 8 buttons -->
 <div>
 <form action="/send-irc" method="POST" target="hiddenFrame">
 <input type="hidden" name="bot" value="player4bot">
@@ -319,7 +311,6 @@ html, body {
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!add p2 -50"><button type="submit" class="small-button">-50</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!add p2 -10"><button type="submit" class="small-button">-10</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!add p2 -5"><button type="submit" class="small-button">-5</button></form>
-
 <div style="width:2px; background:#888; margin:0 4px;"></div>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button">5</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button">10</button></form>
@@ -329,12 +320,9 @@ html, body {
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button">F</button></form>
 </div>
 </div>
- <!-- Chat iframe -->
-        <iframe id="chatFrame" src="https://web.libera.chat/gamja/##rento" title="IRC Chat" loading="lazy" allow="clipboard-read; clipboard-write"></iframe>
+<iframe id="chatFrame" src="https://web.libera.chat/gamja/##rento" title="IRC Chat" loading="lazy" allow="clipboard-read; clipboard-write"></iframe>
 </div>
-
 </div>
-
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -462,9 +450,9 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
 // Refresh board image
 function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
-    boardImg.src = 'https://yegorc.net/rento/map.webp?t=' + Date.now();
+    boardImg.src = 'map.webp?t=' + Date.now();
 }
-setInterval(refreshBoardImage, 30000);
+setInterval(refreshBoardImage, 60000);
 
 async function refreshPieces() {
     try {
@@ -507,7 +495,7 @@ async function refreshPieces() {
     }
 }
 
-setInterval(refreshPieces, 4000);
+setInterval(refreshPieces, 9000);
 
 // Refresh money
 async function refreshMoney() {
@@ -520,7 +508,7 @@ async function refreshMoney() {
     } catch (e) { console.error(e); }
 }
 refreshMoney();
-setInterval(refreshMoney, 4000);
+setInterval(refreshMoney, 9000);
 
 // Houses & hotels
 async function refreshElements(type, url, positions, imgSrc) {

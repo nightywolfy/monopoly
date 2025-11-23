@@ -55,9 +55,10 @@ html, body {
 
 /* Chat iframe fills remaining space */
 #chatFrame {
-    flex-grow: 1;      /* take all remaining vertical space */
+    
     width: 100%;       /* stretch fully horizontally */
     border: none;      /* remove default border */
+    height: 100%
 }
 
 /* Player pieces */
@@ -184,7 +185,7 @@ html, body {
 <body>
 <div id="boardContainer">
 <div id="board">
-<img id="boardImg" src="https://yegorc.net/rento/map.webp" alt="Monopoly Board">
+<img id="boardImg" src="map.webp" alt="Monopoly Board">
 <div id="boardButtons"></div>
 <div id="p1" class="piece red">p1</div>
 <div id="p2" class="piece blue">p2</div>
@@ -201,7 +202,6 @@ html, body {
 <audio id="sndDestroy2" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy2.mp3" preload="auto"></audio>
 <audio id="sndDestroy3" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy3.mp3" preload="auto"></audio>
 <div id="modeToggle">
-<!-- First 8 buttons -->
 <div>
 <form action="/send-irc" method="POST" target="hiddenFrame">
 <input type="hidden" name="bot" value="player3bot">
@@ -248,7 +248,6 @@ html, body {
 <button type="button" class="mode-btn active" data-mode="redeem">Redeem</button>
 <button type="button" class="mode-btn" data-mode="mortgage">Mortgage</button>
 </div>
-<!-- Second 8 buttons -->
 <div>
 <form action="/send-irc" method="POST" target="hiddenFrame">
 <input type="hidden" name="bot" value="player3bot">
@@ -519,7 +518,7 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
 // Refresh board every minute
 function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
-    boardImg.src = 'https://yegorc.net/rento/map.webp?t=' + Date.now();
+    boardImg.src = 'map.webp?t=' + Date.now();
 }
 setInterval(refreshBoardImage, 20000);
 
