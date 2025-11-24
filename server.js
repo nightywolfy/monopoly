@@ -125,7 +125,7 @@ function updateBuildings(targetObj, spaces, unset = false) {
 // --- IRC Bot Factory ---
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
-  const host = options.host || 'irc.ipv6.libera.chat';
+  const host = options.host || 'irc.libera.chat';
   const port = options.port || 6667;
   const secure = !!options.secure;
   const nickServ = options.nickServ || null;
