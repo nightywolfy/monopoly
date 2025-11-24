@@ -26,17 +26,15 @@ html, body {
   background: black;
 }
 
-/* Board inner */
-#board {
-  position: relative;
-  width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+#board{
+  position:relative;
+  width:900px;
+  height:900px;
 }
+
 #boardImg {
   width: 100%;
-  height: 900px;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -63,7 +61,7 @@ html, body {
 /* Central container for money + display */
 #centralDisplayContainer {
   position: absolute;
-  top: 50%;
+  top: 48%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -95,33 +93,7 @@ html, body {
 .moneyBox.blue { left: calc(17% + 12.6px); top: 0%; color: #66ccff; } 
 
 
-/* Quick links */
-#quickLinks img {
-  width: 120px;
-  border-radius: 8px;
-  box-shadow: 0 0 6px rgba(255,255,255,0.5);
-}
-#quickLinks {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: -40px;
-}
 
-/* Display box */
-#displayBox {
-  padding: 20px 30px;
-  border-radius: 12px;
-  width: 360px;
-  text-align: center;
-  font-weight: bold;
-  font-size: 28px;
-  background: linear-gradient(135deg,#6a0dad,#00d4ff);
-  color: white;
-  box-shadow: 0 0 18px #6a0dad,0 0 28px #00d4ff;
-  word-wrap: break-word;
-  transform: translateY(185px);
-}
 
 /* Buildings */
 .hotel, .house {
@@ -246,6 +218,45 @@ html, body {
 .white-btn.plus:hover { background-color: #218838 !important; }
 .white-btn.minus:hover { background-color: #c82333 !important; }
 
+/* Display boxes */
+#displayContainer{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  align-items:center;
+
+}
+
+#display1 { position: relative; top: 105px; }
+#display2 { position: relative; top: 135px; }
+
+.displayBox{
+  padding:15px 20px;
+  border-radius:12px;
+  width:300px;
+  text-align:center;
+  font-weight:bold;
+  font-size:22px;
+  background:linear-gradient(135deg,#6a0dad,#00d4ff);
+  color:white;
+  box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;
+  word-wrap:break-word;
+}
+
+/* Quick links with absolute positioning */
+#propertyLink, #rulesLink{
+  position:absolute;
+  z-index:20;
+}
+#propertyLink img, #rulesLink img{
+  width:120px;
+  border-radius:8px;
+  box-shadow:0 0 6px rgba(255,255,255,0.5);
+}
+
+/* Example positions: */
+#propertyLink{ top:40%; left:200px; transform:translateY(-50%); }
+#rulesLink{ top:50%; right:580px; transform:translateY(-50%); }
 
 
 </style>
@@ -258,27 +269,32 @@ html, body {
 <img id="boardImg" src="map.webp" alt="Monopoly Board">
 <div id="p1" class="piece red">p1</div>
 <div id="p2" class="piece blue">p2</div>
-
 <div id="boardButtons"></div>
 <div id="centralDisplayContainer">
 <div id="moneyContainer">
 <div id="money-p1-overlay" class="moneyBox red">Player1: $0</div>
 <div id="money-p2-overlay" class="moneyBox blue">Player2: $0</div>
-
 </div>
-<div id="displayBox">Welcome!</div> 
-<div id="quickLinks">
+<div id="displayContainer">
+<div id="display1" class="displayBox">Display 1</div>
+<div id="display2" class="displayBox">Display 2</div>
+</div>
+</div>
+<div id="propertyLink">
 <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" target="_blank">
-<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" alt="Properties">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg">
 </a>
+</div>
+<div id="rulesLink">
 <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
-<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" alt="Rules">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg">
 </a>
+</div>
 <audio id="sndBuild2" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/build2.mp3" preload="auto"></audio>
 <audio id="sndBuild3" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/build3.mp3" preload="auto"></audio>
 <audio id="sndDestroy2" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy2.mp3" preload="auto"></audio>
 <audio id="sndDestroy3" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/destroy3.mp3" preload="auto"></audio>
-</div>
+
 </div>
 <!-- Mode buttons BELOW the map -->
 <div id="modeToggle">
@@ -488,10 +504,9 @@ el.style.top=(pos.y+index*offset)+'px';
 }
 }
 
-// Display
-function updateDisplay(text){
-document.getElementById('displayBox').innerText = text||'';
-}
+// Displays
+function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }
+function updateDisplay2(text){ document.getElementById('display2').innerText = text || ''; }
 
 // Money
 function updateMoney(data){
@@ -519,14 +534,16 @@ board.appendChild(el);
 
 // Initial fetch
 fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
-fetch('/display.json').then(res=>res.json()).then(data=>updateDisplay(data.text));
+fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
+fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/hotels.json').then(res=>res.json()).then(data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
 fetch('/houses.json').then(res=>res.json()).then(data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
 // Socket.IO updates
 socket.on('piecesUpdate',updatePieces);
-socket.on('displayUpdate',data=>updateDisplay(data.text));
+socket.on('displayUpdate1', data => updateDisplay1(data.text));
+socket.on('displayUpdate2', data => updateDisplay2(data.text));
 socket.on('moneyUpdate',updateMoney);
 socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
 socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
@@ -646,7 +663,7 @@ function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
     boardImg.src = 'map.webp?t=' + Date.now();
 }
-setInterval(refreshBoardImage, 20000);
+setInterval(refreshBoardImage, 30000);
 
 </script>
 </body>
