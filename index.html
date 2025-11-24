@@ -63,7 +63,7 @@ html, body {
 /* Central container for money + display */
 #centralDisplayContainer {
   position: absolute;
-  top: 50%;
+  top: 60%;
   left: 50%;
   transform: translate(-50%, -50%);
   display: flex;
@@ -263,7 +263,7 @@ html, body {
 <!-- Left: Board -->
 <div id="boardContainer">
 <div id="board">
-<img id="boardImg" src="map.webp" alt="Monopoly Board">
+<img id="boardImg" src="map2.webp" alt="Monopoly Board">
 <div id="p1" class="piece red">p1</div>
 <div id="p2" class="piece blue">p2</div>
 <div id="p3" class="piece yellow">p3</div>
@@ -278,7 +278,6 @@ html, body {
 </div>
 <div id="displayContainer">
 <div id="display1" class="displayBox">Display 1</div>
-<div id="display2" class="displayBox">Display 2</div>
 </div>
 </div>
 <div id="propertyLink">
@@ -606,9 +605,9 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
 // Refresh board image
 function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
-    boardImg.src = 'map.webp?t=' + Date.now();
+    boardImg.src = 'map2.webp?t=' + Date.now();
 }
-setInterval(refreshBoardImage, 900000);
+setInterval(refreshBoardImage, 999000);
 
 </script>
 </body>
