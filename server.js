@@ -45,7 +45,8 @@ const moneyFile = path.join(__dirname, 'money.json');
 const hotelsFile = path.join(__dirname, 'hotels.json');
 const housesFile = path.join(__dirname, 'houses.json');
 const piecesFile = path.join(__dirname, 'pieces.json');
-const displayFile = path.join(__dirname, 'display.json');
+const display1File = path.join(__dirname, 'display1.json');
+const display2File = path.join(__dirname, 'display2.json');
 
 let money = safeReadJSON(moneyFile, { p1: 10, p2: 10, p3: 10, p4: 10 });
 let hotels = safeReadJSON(hotelsFile, {});
@@ -56,35 +57,28 @@ let pieces = safeReadJSON(piecesFile, {
   yellow: { x: 825, y: 755 },
   green: { x: 825, y: 755 }
 });
-let display = safeReadJSON(displayFile, { text: "" });
+let display1 = safeReadJSON(display1File, { text: "" });
+let display2 = safeReadJSON(display2File, { text: "" });
 
 const saveMoney = () => safeWriteJSON(moneyFile, money);
 const saveHotels = () => safeWriteJSON(hotelsFile, hotels);
 const saveHouses = () => safeWriteJSON(housesFile, houses);
 const savePieces = () => safeWriteJSON(piecesFile, pieces);
-const saveDisplay = () => safeWriteJSON(displayFile, display);
+const saveDisplay1 = () => safeWriteJSON(display1File, display1);
+const saveDisplay2 = () => safeWriteJSON(display2File, display2);
 
+// --- Board spaces ---
 const boardSpaces = [
-  { number: 0, x: 825, y: 755 }, { number: 1, x: 730, y: 775 },
-  { number: 2, x: 650, y: 775 }, { number: 3, x: 580, y: 775 },
-  { number: 4, x: 505, y: 775 }, { number: 5, x: 430, y: 775 },
-  { number: 6, x: 355, y: 775 }, { number: 7, x: 280, y: 775 },
-  { number: 8, x: 205, y: 775 }, { number: 9, x: 134, y: 775 },
-  { number: 10, x: 40, y: 775 }, { number: 11, x: 34, y: 680 },
-  { number: 12, x: 38, y: 612 }, { number: 13, x: 42, y: 545 },
-  { number: 14, x: 46, y: 475 }, { number: 15, x: 50, y: 405 },
-  { number: 16, x: 54, y: 345 }, { number: 17, x: 58, y: 280 },
-  { number: 18, x: 62, y: 215 }, { number: 19, x: 66, y: 155 },
-  { number: 20, x: 75, y: 75 }, { number: 21, x: 155, y: 75 },
-  { number: 22, x: 223, y: 75 }, { number: 23, x: 295, y: 75 },
-  { number: 24, x: 360, y: 75 }, { number: 25, x: 430, y: 75 },
-  { number: 26, x: 500, y: 75 }, { number: 27, x: 570, y: 75 },
-  { number: 28, x: 637, y: 75 }, { number: 29, x: 705, y: 75 },
-  { number: 30, x: 796, y: 75 }, { number: 31, x: 800, y: 155 },
-  { number: 32, x: 803, y: 215 }, { number: 33, x: 806, y: 277 },
-  { number: 34, x: 809, y: 340 }, { number: 35, x: 812, y: 408 },
-  { number: 36, x: 815, y: 478 }, { number: 37, x: 818, y: 543 },
-  { number: 38, x: 821, y: 610 }, { number: 39, x: 824, y: 680 }
+  { number: 0, x: 825, y: 755 }, { number: 1, x: 730, y: 775 }, { number: 2, x: 650, y: 775 }, { number: 3, x: 580, y: 775 },
+  { number: 4, x: 505, y: 775 }, { number: 5, x: 430, y: 775 }, { number: 6, x: 355, y: 775 }, { number: 7, x: 280, y: 775 },
+  { number: 8, x: 205, y: 775 }, { number: 9, x: 134, y: 775 }, { number: 10, x: 40, y: 775 }, { number: 11, x: 34, y: 680 },
+  { number: 12, x: 38, y: 612 }, { number: 13, x: 42, y: 545 }, { number: 14, x: 46, y: 475 }, { number: 15, x: 50, y: 405 },
+  { number: 16, x: 54, y: 345 }, { number: 17, x: 58, y: 280 }, { number: 18, x: 62, y: 215 }, { number: 19, x: 66, y: 155 },
+  { number: 20, x: 75, y: 75 }, { number: 21, x: 155, y: 75 }, { number: 22, x: 223, y: 75 }, { number: 23, x: 295, y: 75 },
+  { number: 24, x: 360, y: 75 }, { number: 25, x: 430, y: 75 }, { number: 26, x: 500, y: 75 }, { number: 27, x: 570, y: 75 },
+  { number: 28, x: 637, y: 75 }, { number: 29, x: 705, y: 75 }, { number: 30, x: 796, y: 75 }, { number: 31, x: 800, y: 155 },
+  { number: 32, x: 803, y: 215 }, { number: 33, x: 806, y: 277 }, { number: 34, x: 809, y: 340 }, { number: 35, x: 812, y: 408 },
+  { number: 36, x: 815, y: 478 }, { number: 37, x: 818, y: 543 }, { number: 38, x: 821, y: 610 }, { number: 39, x: 824, y: 680 }
 ];
 
 const colorMap = { p1: 'red', p2: 'blue', p3: 'yellow', p4: 'green' };
@@ -92,54 +86,36 @@ const colorMap = { p1: 'red', p2: 'blue', p3: 'yellow', p4: 'green' };
 // --- Initialize defaults ---
 function initializeDefaults() {
   Object.keys(colorMap).forEach(p => { if (money[p] === undefined) money[p] = 10; });
-  for (let i = 0; i < 40; i++) {
-    if (hotels[i] === undefined) hotels[i] = false;
-    if (houses[i] === undefined) houses[i] = false;
-  }
-  for (const color of Object.values(colorMap)) {
-    if (!pieces[color]) pieces[color] = { x: 825, y: 755 };
-  }
-  if (!display.text) display.text = "";
-  saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay();
+  for (let i = 0; i < 40; i++) { if (hotels[i] === undefined) hotels[i] = false; if (houses[i] === undefined) houses[i] = false; }
+  for (const color of Object.values(colorMap)) { if (!pieces[color]) pieces[color] = { x: 825, y: 755 }; }
+  if (!display1.text) display1.text = "";
+  if (!display2.text) display2.text = "";
+  saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2();
 }
 initializeDefaults();
 
 // --- Safe emit helper ---
-function safeEmit(event, data) {
-  try { io.emit(event, data); } catch (err) { console.error(`[Socket] Emit failed (${event}):`, err); }
+function safeEmit(event, data) { try { io.emit(event, data); } catch (err) { console.error(`[Socket] Emit failed (${event}):`, err); } }
+
+// --- Update helpers ---
+function updatePiece(player, x, y) { 
+  const color = colorMap[player]; 
+  if (!color) return; 
+  const current = pieces[color]; 
+  if (current && current.x === x && current.y === y) return; 
+  pieces[color] = { x, y }; 
+  savePieces(); 
+  safeEmit('piecesUpdate', pieces); 
 }
 
-// --- Update helpers that only emit on change ---
-function updatePiece(player, x, y) {
-  const color = colorMap[player];
-  if (!color) return;
-  const current = pieces[color];
-  if (current && current.x === x && current.y === y) return;
-  pieces[color] = { x, y };
-  savePieces();
-  safeEmit('piecesUpdate', pieces);
-}
+function updateDisplay1(newText) { if (display1.text === newText) return; display1.text = newText; saveDisplay1(); safeEmit('displayUpdate1', { text: display1.text }); }
+function updateDisplay2(newText) { if (display2.text === newText) return; display2.text = newText; saveDisplay2(); safeEmit('displayUpdate2', { text: display2.text }); }
 
-function updateDisplay(newText) {
-  if (display.text === newText) return;
-  display.text = newText;
-  saveDisplay();
-  safeEmit('displayUpdate', display);
-}
-
-function updateMoney(player, amount) {
-  if (!colorMap[player] || money[player] === amount) return;
-  money[player] = amount;
-  saveMoney();
-  safeEmit('moneyUpdate', money);
-}
+function updateMoney(player, amount) { if (!colorMap[player] || money[player] === amount) return; money[player] = amount; saveMoney(); safeEmit('moneyUpdate', money); }
 
 function updateBuildings(targetObj, spaces, unset = false) {
   let changed = false;
-  spaces.forEach(space => {
-    if (space < 0 || space > 39) return;
-    if (targetObj[space] !== !unset) { targetObj[space] = !unset; changed = true; }
-  });
+  spaces.forEach(space => { if (space < 0 || space > 39) return; if (targetObj[space] !== !unset) { targetObj[space] = !unset; changed = true; } });
   if (!changed) return false;
   if (targetObj === hotels) saveHotels(); else saveHouses();
   safeEmit(targetObj === hotels ? 'hotelsUpdate' : 'housesUpdate', targetObj);
@@ -154,13 +130,9 @@ function createBot(nick, defaultTarget, options = {}) {
   const secure = !!options.secure;
   const nickServ = options.nickServ || null;
 
-  let reconnectDelay = 9000;
-  let isConnecting = false;
-  let isConnected = false;
-  let destroyed = false;
-  const sendQueue = [];
+  let reconnectDelay = 9000, isConnecting = false, isConnected = false, destroyed = false;
+  const sendQueue = [], SEND_INTERVAL_MS = 900;
   let sendInterval = null;
-  const SEND_INTERVAL_MS = 900;
 
   function startSendLoop() {
     if (sendInterval) return;
@@ -183,30 +155,21 @@ function createBot(nick, defaultTarget, options = {}) {
   function connectBot() {
     if (destroyed || isConnecting || isConnected) return;
     isConnecting = true;
-    try {
-      client.connect({ host, port, nick, secure, timeout: 20000, auto_reconnect: false });
-    } catch (err) {
-      console.error(`${nick} connection error:`, err);
-      isConnecting = false;
-      reconnectDelay = Math.min(reconnectDelay * 2, 60000);
-      setTimeout(connectBot, reconnectDelay);
-    }
+    try { client.connect({ host, port, nick, secure, timeout: 20000, auto_reconnect: false }); } 
+    catch (err) { console.error(`${nick} connection error:`, err); isConnecting = false; reconnectDelay = Math.min(reconnectDelay*2,60000); setTimeout(connectBot,reconnectDelay); }
   }
   connectBot();
 
   client.on('registered', () => {
-    reconnectDelay = 9000;
-    isConnecting = false;
-    isConnected = true;
+    reconnectDelay = 9000; isConnecting=false; isConnected=true;
     if (defaultTarget) { try { client.join(defaultTarget); } catch {} }
     if (nickServ?.identifyCommand) client.say('NickServ', nickServ.identifyCommand);
   });
 
-  client.on('close', () => {
-    isConnected = false;
-    isConnecting = false;
-    if (sendQueue.length > 2000) sendQueue.length = 0;
-    setTimeout(() => { reconnectDelay = Math.min(reconnectDelay * 2, 60000); connectBot(); }, reconnectDelay);
+  client.on('close', () => { 
+    isConnected=false; isConnecting=false; 
+    if (sendQueue.length>2000) sendQueue.length=0;
+    setTimeout(()=>{ reconnectDelay=Math.min(reconnectDelay*2,60000); connectBot(); }, reconnectDelay); 
   });
 
   client.on('error', (err) => console.error(`Error for ${nick}:`, err?.stack || err));
@@ -217,42 +180,34 @@ function createBot(nick, defaultTarget, options = {}) {
       const raw = String(event.message).trim();
       if (!raw.startsWith('!')) return;
       const commands = raw.split(' !').map((c,i) => i>0?'!'+c:c);
-
       for (const fullCmd of commands) {
         if (!fullCmd) continue;
         const parts = fullCmd.trim().split(/\s+/);
         const cmd = (parts.shift() || '').toLowerCase();
         const args = parts;
 
-        switch (cmd) {
+        switch(cmd) {
           case '!set': {
-            if (args[0]?.toLowerCase() !== 'all' || args.length !== Object.keys(colorMap).length + 1) {
-              safeSay(defaultTarget, `Usage: !set all <amounts for ${Object.keys(colorMap).length} players>`);
-              break;
-            }
-            const amounts = args.slice(1).map(a => parseInt(a, 10));
-            if (amounts.some(a => isNaN(a))) { safeSay(defaultTarget, 'All amounts must be valid numbers.'); break; }
-            Object.keys(colorMap).forEach((p,i) => updateMoney(p, Math.max(-999, Math.min(9999, amounts[i]))));
+            if (args[0]?.toLowerCase() !== 'all' || args.length !== Object.keys(colorMap).length + 1) { safeSay(defaultTarget, `Usage: !set all <amounts for ${Object.keys(colorMap).length} players>`); break; }
+            const amounts = args.slice(1).map(a=>parseInt(a,10));
+            if (amounts.some(a=>isNaN(a))) { safeSay(defaultTarget,'All amounts must be valid numbers.'); break; }
+            Object.keys(colorMap).forEach((p,i)=>updateMoney(p,Math.max(-999,Math.min(9999,amounts[i]))));
             break;
           }
 
           case '!mv': {
-            const [target, ...spacesStr] = args;
-            if (target?.toLowerCase() !== 'all') { safeSay(defaultTarget, 'Only !mv all ... allowed'); break; }
+            const [target,...spacesStr] = args;
+            if (target?.toLowerCase()!=='all') { safeSay(defaultTarget,'Only !mv all ... allowed'); break; }
             const players = Object.keys(colorMap);
-            if (spacesStr.length !== players.length) { safeSay(defaultTarget, `Must provide exactly ${players.length} spaces`); break; }
-            players.forEach((p,i) => {
-              const space = parseInt(spacesStr[i], 10);
-              if (isNaN(space) || space < 0 || space >= boardSpaces.length) { safeSay(defaultTarget, `Invalid space "${spacesStr[i]}"`); return; }
-              const { x,y } = boardSpaces[space]; updatePiece(p,x,y);
-            });
+            if (spacesStr.length!==players.length) { safeSay(defaultTarget,`Must provide exactly ${players.length} spaces`); break; }
+            players.forEach((p,i)=>{ const space=parseInt(spacesStr[i],10); if(isNaN(space)||space<0||space>=boardSpaces.length){ safeSay(defaultTarget,`Invalid space "${spacesStr[i]}"`); return; } const {x,y}=boardSpaces[space]; updatePiece(p,x,y); });
             break;
           }
 
           case '!mv2': {
-            const [player,xStr,yStr] = args;
-            const x=parseInt(xStr,10), y=parseInt(yStr,10);
-            if (!colorMap[player] || isNaN(x)||isNaN(y)) { safeSay(defaultTarget, 'Invalid player or coordinates'); break; }
+            const [player,xStr,yStr]=args;
+            const x=parseInt(xStr,10),y=parseInt(yStr,10);
+            if(!colorMap[player]||isNaN(x)||isNaN(y)){ safeSay(defaultTarget,'Invalid player or coordinates'); break; }
             updatePiece(player,x,y);
             break;
           }
@@ -263,88 +218,62 @@ function createBot(nick, defaultTarget, options = {}) {
             const targetObj = isHotel ? hotels : houses;
             const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
             if (spaces.length===0) break;
-            const changed = updateBuildings(targetObj, spaces, unset);
-            if (changed) safeSay(defaultTarget, `${unset?'Removed':'Set'} ${isHotel?'hotel(s)':'house(s)'} on spaces: ${spaces.join(', ')}`);
+            const changed = updateBuildings(targetObj,spaces,unset);
+            if(changed) safeSay(defaultTarget,`${unset?'Removed':'Set'} ${isHotel?'hotel(s)':'house(s)'} on spaces: ${spaces.join(', ')}`);
             break;
           }
 
-          case '!clearall': {
-            updateBuildings(hotels, Object.keys(hotels).map(Number), true);
-            updateBuildings(houses, Object.keys(houses).map(Number), true);
-            safeSay(defaultTarget,'All hotels and houses cleared.');
-            break;
-          }
+          case '!clearall': { updateBuildings(hotels,Object.keys(hotels).map(Number),true); updateBuildings(houses,Object.keys(houses).map(Number),true); safeSay(defaultTarget,'All hotels and houses cleared.'); break; }
 
-          case '!display': {
-            const msgText = args.join(' ').trim().replace(/^"(.*)"$/,'$1');
-            if (!msgText) { safeSay(defaultTarget,'Usage: !display <text>'); break; }
-            updateDisplay(msgText);
-            
-            break;
-          }
+          case '!d1': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d1 <text>'); break; } updateDisplay1(msgText); break; }
+
+          case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }
 
           default: break;
         }
       }
-    } catch(err) { console.error(`Command error ${nick}:`, err?.stack||err); }
+    } catch(err){ console.error(`Command error ${nick}:`,err?.stack||err); }
   });
 
-  function say(target,msg){ safeSay(target,msg); }
-  function destroy(){ destroyed=true; isConnecting=false; isConnected=false; stopSendLoop(); try{client.quit('shutdown',true);}catch{} }
-  return { client, defaultTarget, say, connect:connectBot, destroy, getState:()=>({nick,isConnected,reconnectDelay}) };
+  return { client, defaultTarget, say:(t,m)=>safeSay(t,m), connect:connectBot, destroy:()=>{destroyed=true;isConnecting=false;isConnected=false;stopSendLoop();try{client.quit('shutdown',true);}catch{}}, getState:()=>({nick,isConnected,reconnectDelay}) };
 }
 
 // --- Create bots ---
 const bots = {
-  player1bot: createBot('player1bot','diceman'),
-  player2bot: createBot('player2bot','diceman'),
-  player3bot: createBot('player3bot','##rento'),
-  player4bot: createBot('player4bot','##rento'),
-  player5bot: createBot('player5bot','##rento'),
-  player6bot: createBot('player6bot','##rento')
+  player1bot:createBot('player1bot','diceman'),
+  player2bot:createBot('player2bot','diceman'),
+  player3bot:createBot('player3bot','##rento'),
+  player4bot:createBot('player4bot','##rento'),
+  player5bot:createBot('player5bot','##rento'),
+  player6bot:createBot('player6bot','##rento')
 };
 
-// --- Forum Buttons ---
+// --- Express + Socket.IO endpoints ---
 app.post('/send-irc',(req,res)=>{
-  try{
-    const {bot,msg}=req.body||{};
-    if(!bot||!msg) return res.status(400).send('Missing bot or message');
-    if(!bots[bot]) return res.status(400).send('Unknown bot');
-    bots[bot].say(bots[bot].defaultTarget,String(msg));
-    return res.redirect('/');
-  }catch(err){ console.error('/send-irc error:',err); return res.status(500).send('Server error'); }
+  try{ const {bot,msg}=req.body||{}; if(!bot||!msg) return res.status(400).send('Missing bot or message'); if(!bots[bot]) return res.status(400).send('Unknown bot'); bots[bot].say(bots[bot].defaultTarget,String(msg)); return res.redirect('/'); }
+  catch(err){ console.error('/send-irc error:',err); return res.status(500).send('Server error'); }
 });
 
-// --- Socket.IO ---
 io.on('connection',(socket)=>{
   try{
     const ip = socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`Frontend connected from IP: ${ip}`);
 
-    socket.on('sendMessage',(payload)=>{
-      if(!payload||typeof payload!=='object') return;
-      const bot=payload.bot, msg=payload.msg;
-      if(!bots[bot]||typeof msg!=='string') return;
-      const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' ');
-      if(cleanMsg) bots[bot].say(bots[bot].defaultTarget,cleanMsg);
-    });
+    socket.on('sendMessage',payload=>{ if(!payload||typeof payload!=='object') return; const bot=payload.bot,msg=payload.msg; if(!bots[bot]||typeof msg!=='string') return; const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' '); if(cleanMsg) bots[bot].say(bots[bot].defaultTarget,cleanMsg); });
 
     socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
     socket.on('getPieces',()=>socket.emit('piecesUpdate',pieces));
     socket.on('getHotels',()=>socket.emit('hotelsUpdate',hotels));
     socket.on('getHouses',()=>socket.emit('housesUpdate',houses));
-    socket.on('getDisplay',()=>socket.emit('displayUpdate',display));
+    socket.on('getDisplay1',()=>socket.emit('displayUpdate1',{text:display1.text}));
+    socket.on('getDisplay2',()=>socket.emit('displayUpdate2',{text:display2.text}));
 
-    socket.on('updateMoney',(payload)=>{
-      if(!payload||typeof payload!=='object') return;
-      const player=payload.player;
-      const amount=parseInt(payload.amount,10);
-      if(!colorMap[player]||Number.isNaN(amount)||amount<-999||amount>9999) return;
-      updateMoney(player,amount);
-    });
+    socket.on('updateMoney',payload=>{ const player=payload.player; const amount=parseInt(payload.amount,10); if(!colorMap[player]||Number.isNaN(amount)||amount<-999||amount>9999) return; updateMoney(player,amount); });
+    socket.on('updateDisplay1',payload=>{ const newText=String(payload?.text||'').trim(); if(newText) updateDisplay1(newText); });
+    socket.on('updateDisplay2',payload=>{ const newText=String(payload?.text||'').trim(); if(newText) updateDisplay2(newText); });
 
     socket.on('disconnect',()=>console.log(`Frontend disconnected: ${ip}`));
-  }catch(err){ console.error('Socket error:',err); }
+  } catch(err){ console.error('Socket error:',err); }
 });
 
 // --- Serve static files + JSON endpoints ---
@@ -353,7 +282,8 @@ app.get('/pieces.json',(_,res)=>res.json(pieces));
 app.get('/money.json',(_,res)=>res.json(money));
 app.get('/hotels.json',(_,res)=>res.json(hotels));
 app.get('/houses.json',(_,res)=>res.json(houses));
-app.get('/display.json',(_,res)=>res.json(display));
+app.get('/display1.json',(_,res)=>res.json(display1));
+app.get('/display2.json',(_,res)=>res.json(display2));
 
 // --- Graceful shutdown ---
 let shuttingDown=false;
@@ -362,12 +292,12 @@ async function gracefulShutdown(sig){
   shuttingDown=true;
   console.log(`Received ${sig} — saving state and shutting down...`);
   try{
-    saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay();
+    saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2();
     Object.values(bots).forEach(b=>{try{b.destroy();}catch{}});
     io.close(()=>console.log('Socket.IO closed.'));
     server.close(()=>{console.log('HTTP server closed.'); process.exit(0);});
     setTimeout(()=>{console.warn('Forcing shutdown.'); process.exit(0);},5000);
-  }catch(err){ console.error('Error during shutdown:',err); process.exit(1); }
+  } catch(err){ console.error('Error during shutdown:',err); process.exit(1); }
 }
 ['SIGINT','SIGTERM'].forEach(sig=>process.on(sig,()=>gracefulShutdown(sig)));
 
