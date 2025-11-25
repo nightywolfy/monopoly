@@ -103,6 +103,21 @@ function generateKey() {
 const KEY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 
 // ------------------------------
+// Cleanup expired keys every minute
+// ------------------------------
+setInterval(() => {
+    const now = Date.now();
+    for (const player in global.validKeys) {
+        const record = global.validKeys[player];
+        if (record.expires < now) {
+            console.log(`Key for ${player} expired automatically.`);
+            delete global.validKeys[player];
+            delete global.claimedPlayers[player];
+        }
+    }
+}, 60 * 1000);
+
+// ------------------------------
 // Get key route (called by index.html)
 // ------------------------------
 app.get("/getKey", (req, res) => {
@@ -111,7 +126,6 @@ app.get("/getKey", (req, res) => {
 
     if (!player || !game) return res.json({ ok: false, msg: "Missing player or game" });
 
-    // Prevent player already claimed
     if (global.claimedPlayers[player]) return res.json({ ok: false, msg: "Player already in use" });
 
     let fileToUse;
@@ -131,7 +145,6 @@ app.get("/getKey", (req, res) => {
         expires: Date.now() + KEY_LIFETIME_MS
     };
 
-    // Mark player as claimed
     global.claimedPlayers[player] = true;
 
     console.log(`Generated key for ${player}: ${key} ? ${fileToUse}`);
@@ -151,17 +164,14 @@ app.get("/player", (req, res) => {
 
     if (!record || record.key !== auth) return res.status(403).send("Invalid key");
 
-    // Check expiration
     if (record.expires && Date.now() > record.expires) {
         delete global.claimedPlayers[player];
         delete global.validKeys[player];
         return res.status(403).send("Key expired");
     }
 
-    // Prevent reuse
     if (record.used) return res.status(403).send("Key already used");
 
-    // Mark key as used
     record.used = true;
 
     return res.sendFile(path.join(__dirname, record.file));
