@@ -73,10 +73,9 @@ const saveDisplay1 = () => safeWriteJSON(display1File, display1);
 const saveDisplay2 = () => safeWriteJSON(display2File, display2);
 
 // ------------------------------
-//  KEYS STORAGE
+// Player HTML files
 // ------------------------------
-let validKeys = {};   // { playerName: {key, file} }
-let playerFiles = {   // player name -> file in root
+const playerFiles = {
     "player1": "player1.html",
     "player2": "player2.html",
     "p1": "p1.html",
@@ -86,20 +85,20 @@ let playerFiles = {   // player name -> file in root
 };
 
 // ------------------------------
-// Active keys and claimed players
+// Active keys and claimed players (global to prevent redeclaration issues)
 // ------------------------------
-let validKeys = {};       // playerName -> { key, file, used, expires }
-let claimedPlayers = {};  // playerName -> true if already claimed
+global.validKeys = global.validKeys || {};       // playerName -> { key, file, used, expires }
+global.claimedPlayers = global.claimedPlayers || {};  // playerName -> true if claimed
 
 // ------------------------------
-//  GENERATE RANDOM KEY
+// Key generation
 // ------------------------------
 function generateKey() {
     return Math.random().toString(36).substring(2, 12);
 }
 
 // ------------------------------
-//  KEY EXPIRATION TIME
+// Key lifetime
 // ------------------------------
 const KEY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 
@@ -112,13 +111,12 @@ app.get("/getKey", (req, res) => {
 
     if (!player || !game) return res.json({ ok: false, msg: "Missing player or game" });
 
-    // Prevent player from being claimed twice
-    if (claimedPlayers[player]) return res.json({ ok: false, msg: "Player already in use" });
+    // Prevent player already claimed
+    if (global.claimedPlayers[player]) return res.json({ ok: false, msg: "Player already in use" });
 
     let fileToUse;
-
     if (game === "2p") {
-        if (!["player1","player2"].includes(player)) return res.json({ ok: false });
+        if (!["player1", "player2"].includes(player)) return res.json({ ok: false });
         fileToUse = `${player}.html`;
     } else if (game === "4p") {
         if (!["p1","p2","p3","p4"].includes(player)) return res.json({ ok: false });
@@ -126,14 +124,15 @@ app.get("/getKey", (req, res) => {
     } else return res.json({ ok: false });
 
     const key = generateKey();
-    validKeys[player] = {
+    global.validKeys[player] = {
         key,
         file: fileToUse,
         used: false,
         expires: Date.now() + KEY_LIFETIME_MS
     };
 
-    claimedPlayers[player] = true;
+    // Mark player as claimed
+    global.claimedPlayers[player] = true;
 
     console.log(`Generated key for ${player}: ${key} ? ${fileToUse}`);
     res.json({ ok: true, key });
@@ -148,30 +147,26 @@ app.get("/player", (req, res) => {
 
     if (!player || !auth) return res.status(400).send("Missing player or key");
 
-    const record = validKeys[player];
+    const record = global.validKeys[player];
 
-    if (!record || record.key !== auth) {
-        return res.status(403).send("Invalid key");
-    }
+    if (!record || record.key !== auth) return res.status(403).send("Invalid key");
 
-    // Expiration check
+    // Check expiration
     if (record.expires && Date.now() > record.expires) {
-        // free player and delete key
-        delete claimedPlayers[player];
-        delete validKeys[player];
+        delete global.claimedPlayers[player];
+        delete global.validKeys[player];
         return res.status(403).send("Key expired");
     }
 
     // Prevent reuse
-    if (record.used) {
-        return res.status(403).send("Key already used");
-    }
+    if (record.used) return res.status(403).send("Key already used");
 
     // Mark key as used
     record.used = true;
 
     return res.sendFile(path.join(__dirname, record.file));
 });
+
 
 // --- Board spaces ---
 const boardSpaces = [
