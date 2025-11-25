@@ -72,6 +72,103 @@ const savePieces = () => safeWriteJSON(piecesFile, pieces);
 const saveDisplay1 = () => safeWriteJSON(display1File, display1);
 const saveDisplay2 = () => safeWriteJSON(display2File, display2);
 
+// ------------------------------
+//  KEYS STORAGE
+// ------------------------------
+let validKeys = {};   // { playerName: {key, file} }
+let playerFiles = {   // player name -> file in root
+    "player1": "player1.html",
+    "player2": "player2.html",
+    "p1": "p1.html",
+    "p2": "p2.html",
+    "p3": "p3.html",
+    "p4": "p4.html"
+};
+
+// ------------------------------
+//  GENERATE RANDOM KEY
+// ------------------------------
+function generateKey() {
+    return Math.random().toString(36).substring(2, 12);
+}
+
+// ------------------------------
+//  KEY EXPIRATION TIME
+// ------------------------------
+const KEY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
+
+// ------------------------------
+//  GET KEY ROUTE (used by buttons)
+// ------------------------------
+app.get("/getKey", (req, res) => {
+    const player = req.query.player;
+    const game = req.query.game;
+
+    if (!player || !game) return res.json({ ok: false });
+
+    let fileToUse;
+
+    if (game === "2p") {
+        if (!["player1","player2"].includes(player)) return res.json({ ok: false });
+        fileToUse = `${player}.html`;
+    } else if (game === "4p") {
+        if (!["p1","p2","p3","p4"].includes(player)) return res.json({ ok: false });
+        fileToUse = `${player}.html`;
+    } else return res.json({ ok: false });
+
+    const key = generateKey();
+    validKeys[player] = {
+        key,
+        file: fileToUse,
+        used: false,
+        expires: Date.now() + KEY_LIFETIME_MS
+    };
+
+    console.log(`Generated key for ${player}: ${key} ? ${fileToUse}`);
+    res.json({ ok: true, key });
+});
+
+// ------------------------------
+//  PLAYER ROUTE
+// ------------------------------
+app.get("/player", (req, res) => {
+    const player = req.query.name;
+    const auth = req.query.auth;
+
+    if (!player || !auth) return res.status(400).send("Missing player or key");
+
+    const record = validKeys[player];
+
+    if (!record || record.key !== auth) {
+        return res.status(403).send("Invalid key");
+    }
+
+    // Check if key is already used
+    if (record.used) {
+        return res.status(403).send("Key already used");
+    }
+
+    // Check expiration
+    if (record.expires && Date.now() > record.expires) {
+        return res.status(403).send("Key expired");
+    }
+
+    // Mark as used
+    record.used = true;
+
+    return res.sendFile(path.join(__dirname, record.file));
+});
+
+
+
+
+
+
+
+
+
+
+
 // --- Board spaces ---
 const boardSpaces = [
   { number: 0, x: 825, y: 755 }, { number: 1, x: 730, y: 775 }, { number: 2, x: 650, y: 775 }, { number: 3, x: 580, y: 775 },
@@ -133,7 +230,6 @@ function updateMoney(player, amount) {
   safeEmit('moneyUpdate', money); 
 }
 
-
 function updateBuildings(targetObj, spaces, unset = false) {
   let changed = false;
   spaces.forEach(space => { 
@@ -148,74 +244,6 @@ function updateBuildings(targetObj, spaces, unset = false) {
   safeEmit(targetObj === hotels ? 'hotelsUpdate' : 'housesUpdate', targetObj);
   return true;
 }
-
-// ------------------------------
-//  KEYS STORAGE
-// ------------------------------
-let validKeys = {};   // { playerName: {key, file} }
-let playerFiles = {   // player name -> file in root
-    "player1": "player1.html",
-    "player2": "player2.html",
-    "p1": "p1.html",
-    "p2": "p2.html",
-    "p3": "p3.html",
-    "p4": "p4.html"
-};
-
-// ------------------------------
-//  GENERATE RANDOM KEY
-// ------------------------------
-function generateKey() {
-    return Math.random().toString(36).substring(2, 12);
-}
-
-// ------------------------------
-//  GET KEY ROUTE (used by index.html buttons)
-// ------------------------------
-app.get("/getKey", (req, res) => {
-    const player = req.query.player;
-    const game = req.query.game;
-
-    if (!player || !game) return res.json({ ok: false });
-
-    let fileToUse;
-
-    if (game === "2p") {
-        if (!["player1","player2"].includes(player)) return res.json({ ok: false });
-        fileToUse = `${player}.html`;
-    } else if (game === "4p") {
-        if (!["p1","p2","p3","p4"].includes(player)) return res.json({ ok: false });
-        fileToUse = `${player}.html`;
-    } else return res.json({ ok: false });
-
-    const key = generateKey();
-    validKeys[player] = { key, file: fileToUse };
-
-    console.log(`Generated key for ${player}: ${key} ? ${fileToUse}`);
-
-    res.json({ ok: true, key });
-});
-
-// ------------------------------
-//  PLAYER ROUTE
-// ------------------------------
-app.get("/player", (req, res) => {
-    const player = req.query.name;
-    const auth = req.query.auth;
-
-    // Serve HTML using valid key
-    if (validKeys[player] && validKeys[player].key === auth) {
-        return res.sendFile(path.join(__dirname, validKeys[player].file));
-    }
-
-    // Otherwise, just serve file if it exists
-    if (playerFiles[player]) {
-        return res.sendFile(path.join(__dirname, playerFiles[player]));
-    }
-
-    res.status(404).send("Player page not found");
-});
-
 // --- IRC Bot Factory ---
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
