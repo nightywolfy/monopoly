@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 import IRC from 'irc-framework';
 import { readFileSync, writeFileSync, existsSync, renameSync } from 'fs';
+import crypto from 'crypto';
 
 // --- Path helpers ---
 const __filename = fileURLToPath(import.meta.url);
@@ -17,6 +18,16 @@ const io = new Server(server, { maxHttpBufferSize: 1e6 });
 app.set('trust proxy', true);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100kb' }));
+
+
+// --- Persistent files ---
+const moneyFile = path.join(__dirname, 'money.json');
+const hotelsFile = path.join(__dirname, 'hotels.json');
+const housesFile = path.join(__dirname, 'houses.json');
+const piecesFile = path.join(__dirname, 'pieces.json');
+const display1File = path.join(__dirname, 'display1.json');
+const display2File = path.join(__dirname, 'display2.json');
+
 
 // --- File helpers ---
 function safeReadJSON(file, fallback = {}) {
@@ -40,13 +51,7 @@ function safeWriteJSON(file, data) {
   }
 }
 
-// --- Persistent files ---
-const moneyFile = path.join(__dirname, 'money.json');
-const hotelsFile = path.join(__dirname, 'hotels.json');
-const housesFile = path.join(__dirname, 'houses.json');
-const piecesFile = path.join(__dirname, 'pieces.json');
-const display1File = path.join(__dirname, 'display1.json');
-const display2File = path.join(__dirname, 'display2.json');
+
 
 let money = safeReadJSON(moneyFile, { p1: 10, p2: 10, p3: 10, p4: 10 });
 let hotels = safeReadJSON(hotelsFile, {});
@@ -94,10 +99,9 @@ function initializeDefaults() {
 }
 initializeDefaults();
 
-// --- Safe emit helper ---
+// --- Socket Emit Helpers ---
 function safeEmit(event, data) { try { io.emit(event, data); } catch (err) { console.error(`[Socket] Emit failed (${event}):`, err); } }
 
-// --- Update helpers ---
 function updatePiece(player, x, y) { 
   const color = colorMap[player]; 
   if (!color) return; 
@@ -108,24 +112,77 @@ function updatePiece(player, x, y) {
   safeEmit('piecesUpdate', pieces); 
 }
 
-function updateDisplay1(newText) { if (display1.text === newText) return; display1.text = newText; saveDisplay1(); safeEmit('displayUpdate1', { text: display1.text }); }
-function updateDisplay2(newText) { if (display2.text === newText) return; display2.text = newText; saveDisplay2(); safeEmit('displayUpdate2', { text: display2.text }); }
+function updateDisplay1(newText) { 
+  if (display1.text === newText) return; 
+  display1.text = newText; 
+  saveDisplay1(); 
+  safeEmit('displayUpdate1', { text: display1.text }); 
+}
 
-function updateMoney(player, amount) { if (!colorMap[player] || money[player] === amount) return; money[player] = amount; saveMoney(); safeEmit('moneyUpdate', money); }
+function updateDisplay2(newText) { 
+  if (display2.text === newText) return; 
+  display2.text = newText; 
+  saveDisplay2(); 
+  safeEmit('displayUpdate2', { text: display2.text }); 
+}
+
+function updateMoney(player, amount) { 
+  if (!colorMap[player] || money[player] === amount) return; 
+  money[player] = amount; 
+  saveMoney(); 
+  safeEmit('moneyUpdate', money); 
+}
+
 
 function updateBuildings(targetObj, spaces, unset = false) {
   let changed = false;
-  spaces.forEach(space => { if (space < 0 || space > 39) return; if (targetObj[space] !== !unset) { targetObj[space] = !unset; changed = true; } });
+  spaces.forEach(space => { 
+    if (space < 0 || space > 39) return; 
+    if (targetObj[space] !== !unset) { 
+      targetObj[space] = !unset; 
+      changed = true; 
+    } 
+  });
   if (!changed) return false;
   if (targetObj === hotels) saveHotels(); else saveHouses();
   safeEmit(targetObj === hotels ? 'hotelsUpdate' : 'housesUpdate', targetObj);
   return true;
 }
 
+// --- Temporary Player Key System ---
+const activeKeys = {};
+
+const playerFiles = {
+  '2p': { p1: 'player1.html', p2: 'player2.html' },
+  '3-4p': { p1: 'p1.html', p2: 'p2.html', p3: 'p3.html', p4: 'p4.html' }
+};
+
+app.get('/getKey', (req, res) => {
+  const { player, game } = req.query;
+  if (!player || !game || !playerFiles[game] || !playerFiles[game][player]) 
+    return res.json({ ok: false, error: 'Invalid player or game type' });
+
+  const key = crypto.randomBytes(16).toString('hex');
+  activeKeys[key] = { player, file: playerFiles[game][player], expires: Date.now() + 5*60*1000 }; // 5min expiry
+  res.json({ ok: true, key, file: playerFiles[game][player] });
+});
+
+// Middleware to protect files
+app.use((req, res, next) => {
+  const url = req.path.replace('/', '');
+  const queryKey = req.query.auth;
+  if (!queryKey) return next();
+  const keyData = activeKeys[queryKey];
+  if (!keyData) return res.status(403).send('Access denied');
+  if (Date.now() > keyData.expires) { delete activeKeys[queryKey]; return res.status(403).send('Key expired'); }
+  if (keyData.file === url) return next();
+  return res.status(403).send('Access denied');
+});
+
 // --- IRC Bot Factory ---
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
-  const host = options.host || 'irc.libera.chat';
+  const host = options.host || 'irc.ipv6.libera.chat';
   const port = options.port || 6667;
   const secure = !!options.secure;
   const nickServ = options.nickServ || null;
@@ -222,7 +279,7 @@ function createBot(nick, defaultTarget, options = {}) {
             if(changed) safeSay(defaultTarget,`${unset?'Removed':'Set'} ${isHotel?'hotel(s)':'house(s)'} on spaces: ${spaces.join(', ')}`);
             break;
           }
-
+          
           case '!clearall': { updateBuildings(hotels,Object.keys(hotels).map(Number),true); updateBuildings(houses,Object.keys(houses).map(Number),true); safeSay(defaultTarget,'All hotels and houses cleared.'); break; }
 
           case '!d1': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d1 <text>'); break; } updateDisplay1(msgText); break; }
@@ -235,26 +292,46 @@ function createBot(nick, defaultTarget, options = {}) {
     } catch(err){ console.error(`Command error ${nick}:`,err?.stack||err); }
   });
 
-  return { client, defaultTarget, say:(t,m)=>safeSay(t,m), connect:connectBot, destroy:()=>{destroyed=true;isConnecting=false;isConnected=false;stopSendLoop();try{client.quit('shutdown',true);}catch{}}, getState:()=>({nick,isConnected,reconnectDelay}) };
+  return { 
+    client, 
+    defaultTarget, 
+    say:(t,m)=>safeSay(t,m), 
+    connect:connectBot, 
+    destroy:()=>{destroyed=true;isConnecting=false;isConnected=false;stopSendLoop();try{client.quit('shutdown',true);}catch{}}, 
+    getState:()=>({nick,isConnected,reconnectDelay}) 
+  };
 }
 
 // --- Create bots ---
 const bots = {
-  player9bot:createBot('player9bot','##rento')
+
+  player8bot:createBot('player8bot','##rento')
 };
 
 // --- Express + Socket.IO endpoints ---
 app.post('/send-irc',(req,res)=>{
-  try{ const {bot,msg}=req.body||{}; if(!bot||!msg) return res.status(400).send('Missing bot or message'); if(!bots[bot]) return res.status(400).send('Unknown bot'); bots[bot].say(bots[bot].defaultTarget,String(msg)); return res.redirect('/'); }
+  try{ 
+    const {bot,msg}=req.body||{}; 
+    if(!bot||!msg) return res.status(400).send('Missing bot or message'); 
+    if(!bots[bot]) return res.status(400).send('Unknown bot'); 
+    bots[bot].say(bots[bot].defaultTarget,String(msg)); 
+    return res.redirect('/'); 
+  }
   catch(err){ console.error('/send-irc error:',err); return res.status(500).send('Server error'); }
 });
 
 io.on('connection',(socket)=>{
   try{
     const ip = socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
-    console.log(`Frontend connected from IP: ${ip}`);
+    console.log(`[Socket] Frontend connected: ${ip}`);
 
-    socket.on('sendMessage',payload=>{ if(!payload||typeof payload!=='object') return; const bot=payload.bot,msg=payload.msg; if(!bots[bot]||typeof msg!=='string') return; const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' '); if(cleanMsg) bots[bot].say(bots[bot].defaultTarget,cleanMsg); });
+    socket.on('sendMessage',payload=>{ 
+      if(!payload||typeof payload!=='object') return; 
+      const bot=payload.bot,msg=payload.msg; 
+      if(!bots[bot]||typeof msg!=='string') return; 
+      const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' '); 
+      if(cleanMsg) bots[bot].say(bots[bot].defaultTarget,cleanMsg); 
+    });
 
     socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
     socket.on('getPieces',()=>socket.emit('piecesUpdate',pieces));
@@ -263,12 +340,25 @@ io.on('connection',(socket)=>{
     socket.on('getDisplay1',()=>socket.emit('displayUpdate1',{text:display1.text}));
     socket.on('getDisplay2',()=>socket.emit('displayUpdate2',{text:display2.text}));
 
-    socket.on('updateMoney',payload=>{ const player=payload.player; const amount=parseInt(payload.amount,10); if(!colorMap[player]||Number.isNaN(amount)||amount<-999||amount>9999) return; updateMoney(player,amount); });
-    socket.on('updateDisplay1',payload=>{ const newText=String(payload?.text||'').trim(); if(newText) updateDisplay1(newText); });
-    socket.on('updateDisplay2',payload=>{ const newText=String(payload?.text||'').trim(); if(newText) updateDisplay2(newText); });
+    socket.on('updateMoney',payload=>{ 
+      const player=payload.player; 
+      const amount=parseInt(payload.amount,10); 
+      if(!colorMap[player]||Number.isNaN(amount)||amount<-999||amount>9999) return; 
+      updateMoney(player,amount); 
+    });
 
-    socket.on('disconnect',()=>console.log(`Frontend disconnected: ${ip}`));
-  } catch(err){ console.error('Socket error:',err); }
+    socket.on('updateDisplay1',payload=>{ 
+      const newText=String(payload?.text||'').trim(); 
+      if(newText) updateDisplay1(newText); 
+    });
+
+    socket.on('updateDisplay2',payload=>{ 
+      const newText=String(payload?.text||'').trim(); 
+      if(newText) updateDisplay2(newText); 
+    });
+
+    socket.on('disconnect',()=>console.log(`[Socket] Frontend disconnected: ${ip}`));
+  } catch(err){ console.error('[Socket] Error:',err); }
 });
 
 // --- Serve static files + JSON endpoints ---
@@ -280,21 +370,41 @@ app.get('/houses.json',(_,res)=>res.json(houses));
 app.get('/display1.json',(_,res)=>res.json(display1));
 app.get('/display2.json',(_,res)=>res.json(display2));
 
+
 // --- Graceful shutdown ---
-let shuttingDown=false;
-async function gracefulShutdown(sig){
-  if(shuttingDown) return;
-  shuttingDown=true;
-  console.log(`Received ${sig} — saving state and shutting down...`);
-  try{
+let shuttingDown = false;
+
+async function gracefulShutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+
+  console.log(`[Server] Received ${signal}, shutting down gracefully...`);
+
+  try {
     saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2();
-    Object.values(bots).forEach(b=>{try{b.destroy();}catch{}});
-    io.close(()=>console.log('Socket.IO closed.'));
-    server.close(()=>{console.log('HTTP server closed.'); process.exit(0);});
-    setTimeout(()=>{console.warn('Forcing shutdown.'); process.exit(0);},5000);
-  } catch(err){ console.error('Error during shutdown:',err); process.exit(1); }
+
+    for (const bot of Object.values(bots)) {
+      try { bot.destroy(); } catch (err) { console.error(`[Server] Error destroying bot:`, err); }
+    }
+
+    io.close(() => console.log('[Server] Socket.IO closed.'));
+    server.close(() => {
+      console.log('[Server] HTTP server closed.');
+      process.exit(0);
+    });
+
+    setTimeout(() => {
+      console.warn('[Server] Forcing shutdown after 5 seconds.');
+      process.exit(1);
+    }, 5000);
+
+  } catch (err) {
+    console.error('[Server] Error during graceful shutdown:', err);
+    process.exit(1);
+  }
 }
-['SIGINT','SIGTERM'].forEach(sig=>process.on(sig,()=>gracefulShutdown(sig)));
+
+['SIGINT','SIGTERM'].forEach(sig => process.on(sig, () => gracefulShutdown(sig)));
 
 const PORT = process.env.PORT||3000;
-server.listen(PORT,()=>console.log(`Server running at http://localhost:${PORT}`));
+server.listen(PORT,()=>console.log(`[Server] Running at http://localhost:${PORT}`));
