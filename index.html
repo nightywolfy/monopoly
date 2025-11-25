@@ -134,45 +134,62 @@
     height: 24px;
     position: absolute;
   }
+  
+/* Right-side player selection panel */
+#playerContainer {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #111;
+  box-shadow: inset 0 0 40px rgba(0, 212, 255, 0.4);
+  padding: 30px;
+}
 
-  /* Right: Player Selection */
-  #playerContainer {
-    width: 50%;
-    height: 100%;
-    background: #111;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 20px;
-    overflow-y: auto;
-  }
+.playerSection {
+  background: rgba(0,0,0,0.5);
+  padding: 25px 30px;
+  border-radius: 16px;
+  margin-bottom: 40px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 0 15px #6a0dad, 0 0 25px #00d4ff;
+}
 
-  h1 { margin-bottom: 30px; font-size: 2em; color: gold; text-align: center; }
-  h2 { margin: 20px 0 10px 0; color: #FFD700; text-align: center; }
+.playerSection h2 {
+  color: #FFD700;
+  margin-bottom: 20px;
+  text-shadow: 0 0 8px black;
+}
 
-  .playerSection {
-    border: 2px solid gold;
-    border-radius: 12px;
-    padding: 20px;
-    margin: 20px 0;
-    width: 80%;
-    text-align: center;
-  }
+/* Buttons */
+.playerBtn {
+  background: linear-gradient(135deg, #6a0dad, #00d4ff);
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  margin: 8px;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 0 12px #00d4ff, 0 0 16px #6a0dad;
+  transition: 0.2s ease;
+}
 
-  .playerBtn {
-    display: inline-block;
-    width: 120px;
-    padding: 12px;
-    margin: 10px;
-    font-size: 1.1em;
-    background: #222;
-    border: 2px solid gold;
-    border-radius: 12px;
-    color: white;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-  .playerBtn:hover { background: gold; color: black; }
+.playerBtn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #00d4ff, 0 0 30px #6a0dad;
+}
+
+.playerBtn:active {
+  transform: scale(0.97);
+}
+
+
+
 </style>
 </head>
 <body>
@@ -214,19 +231,23 @@
 
 <!-- Right side: Player selection -->
 <div id="playerContainer">
-<div id="twoPlayerSection" style="margin-bottom:40px; text-align:center;">
-<h2 style="color:#FFD700;">2-Player Game</h2>
-<button onclick="choosePlayer('player1','2p')">Player 1</button>
-<button onclick="choosePlayer('player2','2p')">Player 2</button>
+
+  <div class="playerSection">
+    <h2>2-Player Game</h2>
+    <button class="playerBtn" onclick="choosePlayer('player1','2p')">Player 1</button>
+    <button class="playerBtn" onclick="choosePlayer('player2','2p')">Player 2</button>
+  </div>
+
+  <div class="playerSection">
+    <h2>3-4 Player Game</h2>
+    <button class="playerBtn" onclick="choosePlayer('player1','4p')">P1</button>
+    <button class="playerBtn" onclick="choosePlayer('player2','4p')">P2</button>
+    <button class="playerBtn" onclick="choosePlayer('player3','4p')">P3</button>
+    <button class="playerBtn" onclick="choosePlayer('player4','4p')">P4</button>
+  </div>
+
 </div>
-<div id="fourPlayerSection" style="text-align:center;">
-<h2 style="color:#FFD700;">3-4 Player Game</h2>
-<button onclick="choosePlayer('p1','4p')">P1</button>
-<button onclick="choosePlayer('p2','4p')">P2</button>
-<button onclick="choosePlayer('p3','4p')">P3</button>
-<button onclick="choosePlayer('p4','4p')">P4</button>
-</div>
-</div>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
