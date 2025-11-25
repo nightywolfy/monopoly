@@ -212,23 +212,20 @@
   </div>
 </div>
 
-<!-- Right: Player Selection -->
+<!-- Right side: Player selection -->
 <div id="playerContainer">
-  <h1>Choose Player</h1>
-
-  <div class="playerSection">
-    <h2>2-Player Game</h2>
-    <button class="playerBtn" onclick="choosePlayer('p1','2p')">Player 1</button>
-    <button class="playerBtn" onclick="choosePlayer('p2','2p')">Player 2</button>
-  </div>
-
-  <div class="playerSection">
-    <h2>3-4 Player Game</h2>
-    <button class="playerBtn" onclick="choosePlayer('p1','3-4p')">Player 1</button>
-    <button class="playerBtn" onclick="choosePlayer('p2','3-4p')">Player 2</button>
-    <button class="playerBtn" onclick="choosePlayer('p3','3-4p')">Player 3</button>
-    <button class="playerBtn" onclick="choosePlayer('p4','3-4p')">Player 4</button>
-  </div>
+<div id="twoPlayerSection" style="margin-bottom:40px; text-align:center;">
+<h2 style="color:#FFD700;">2-Player Game</h2>
+<button onclick="choosePlayer('player1','2p')">Player 1</button>
+<button onclick="choosePlayer('player2','2p')">Player 2</button>
+</div>
+<div id="fourPlayerSection" style="text-align:center;">
+<h2 style="color:#FFD700;">3-4 Player Game</h2>
+<button onclick="choosePlayer('p1','4p')">P1</button>
+<button onclick="choosePlayer('p2','4p')">P2</button>
+<button onclick="choosePlayer('p3','4p')">P3</button>
+<button onclick="choosePlayer('p4','4p')">P4</button>
+</div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -307,12 +304,16 @@ socket.on('moneyUpdate',updateMoney);
 socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
 socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
-async function choosePlayer(player, gameType) {
-  const res = await fetch(`/getKey?player=${player}&game=${gameType}`);
+async function choosePlayer(player, gameMode){
+  const res = await fetch(`/getKey?player=${player}&game=${gameMode}`);
   const data = await res.json();
-  if (data.ok) window.location.href = `/${data.file}?auth=${data.key}`;
-  else alert("Error getting access key: " + (data.error||'Unknown'));
+  if(data.ok){
+    window.location.href = `/player?name=${player}&auth=${data.key}`;
+  } else {
+    alert('Error getting access key');
+  }
 }
+
 </script>
 </body>
 </html>
