@@ -101,7 +101,7 @@ initializeDefaults();
 
 // --- Socket Emit Helpers ---
 function safeEmit(event, data) { try { io.emit(event, data); } catch (err) { console.error(`[Socket] Emit failed (${event}):`, err); } }
-
+// --- Player update helpers ---
 function updatePiece(player, x, y) { 
   const color = colorMap[player]; 
   if (!color) return; 
@@ -149,35 +149,71 @@ function updateBuildings(targetObj, spaces, unset = false) {
   return true;
 }
 
-// --- Temporary Player Key System ---
-const activeKeys = {};
-
-const playerFiles = {
-  '2p': { p1: 'player1.html', p2: 'player2.html' },
-  '3-4p': { p1: 'p1.html', p2: 'p2.html', p3: 'p3.html', p4: 'p4.html' }
+// ------------------------------
+//  KEYS STORAGE
+// ------------------------------
+let validKeys = {};   // { playerName: {key, file} }
+let playerFiles = {   // player name -> file in root
+    "player1": "player1.html",
+    "player2": "player2.html",
+    "p1": "p1.html",
+    "p2": "p2.html",
+    "p3": "p3.html",
+    "p4": "p4.html"
 };
 
-app.get('/getKey', (req, res) => {
-  const { player, game } = req.query;
-  if (!player || !game || !playerFiles[game] || !playerFiles[game][player]) 
-    return res.json({ ok: false, error: 'Invalid player or game type' });
+// ------------------------------
+//  GENERATE RANDOM KEY
+// ------------------------------
+function generateKey() {
+    return Math.random().toString(36).substring(2, 12);
+}
 
-  const key = crypto.randomBytes(16).toString('hex');
-  activeKeys[key] = { player, file: playerFiles[game][player], expires: Date.now() + 5*60*1000 }; // 5min expiry
-  res.json({ ok: true, key, file: playerFiles[game][player] });
+// ------------------------------
+//  GET KEY ROUTE (used by index.html buttons)
+// ------------------------------
+app.get("/getKey", (req, res) => {
+    const player = req.query.player;
+    const game = req.query.game;
+
+    if (!player || !game) return res.json({ ok: false });
+
+    let fileToUse;
+
+    if (game === "2p") {
+        if (!["player1","player2"].includes(player)) return res.json({ ok: false });
+        fileToUse = `${player}.html`;
+    } else if (game === "4p") {
+        if (!["p1","p2","p3","p4"].includes(player)) return res.json({ ok: false });
+        fileToUse = `${player}.html`;
+    } else return res.json({ ok: false });
+
+    const key = generateKey();
+    validKeys[player] = { key, file: fileToUse };
+
+    console.log(`Generated key for ${player}: ${key} ? ${fileToUse}`);
+
+    res.json({ ok: true, key });
 });
 
-// --- Serve index.html for old player pages without changing URL ---
-const redirectFiles = ['p1.html','p2.html','p3.html','p4.html','player1.html','player2.html'];
-redirectFiles.forEach(file => {
-  app.get(`/${file}`, (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-  });
-});
+// ------------------------------
+//  PLAYER ROUTE
+// ------------------------------
+app.get("/player", (req, res) => {
+    const player = req.query.name;
+    const auth = req.query.auth;
 
-// Serve index.html normally
-app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+    // Serve HTML using valid key
+    if (validKeys[player] && validKeys[player].key === auth) {
+        return res.sendFile(path.join(__dirname, validKeys[player].file));
+    }
+
+    // Otherwise, just serve file if it exists
+    if (playerFiles[player]) {
+        return res.sendFile(path.join(__dirname, playerFiles[player]));
+    }
+
+    res.status(404).send("Player page not found");
 });
 
 // --- IRC Bot Factory ---
@@ -306,7 +342,7 @@ function createBot(nick, defaultTarget, options = {}) {
 // --- Create bots ---
 const bots = {
 
-  player8bot:createBot('player8bot','##rento')
+  player9bot:createBot('player9bot','##rento')
 };
 
 // --- Express + Socket.IO endpoints ---
