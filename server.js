@@ -86,6 +86,12 @@ let playerFiles = {   // player name -> file in root
 };
 
 // ------------------------------
+// Active keys and claimed players
+// ------------------------------
+let validKeys = {};       // playerName -> { key, file, used, expires }
+let claimedPlayers = {};  // playerName -> true if already claimed
+
+// ------------------------------
 //  GENERATE RANDOM KEY
 // ------------------------------
 function generateKey() {
@@ -98,13 +104,16 @@ function generateKey() {
 const KEY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 
 // ------------------------------
-//  GET KEY ROUTE (used by buttons)
+// Get key route (called by index.html)
 // ------------------------------
 app.get("/getKey", (req, res) => {
     const player = req.query.player;
     const game = req.query.game;
 
-    if (!player || !game) return res.json({ ok: false });
+    if (!player || !game) return res.json({ ok: false, msg: "Missing player or game" });
+
+    // Prevent player from being claimed twice
+    if (claimedPlayers[player]) return res.json({ ok: false, msg: "Player already in use" });
 
     let fileToUse;
 
@@ -124,12 +133,14 @@ app.get("/getKey", (req, res) => {
         expires: Date.now() + KEY_LIFETIME_MS
     };
 
+    claimedPlayers[player] = true;
+
     console.log(`Generated key for ${player}: ${key} ? ${fileToUse}`);
     res.json({ ok: true, key });
 });
 
 // ------------------------------
-//  PLAYER ROUTE
+// Player page route
 // ------------------------------
 app.get("/player", (req, res) => {
     const player = req.query.name;
@@ -143,31 +154,24 @@ app.get("/player", (req, res) => {
         return res.status(403).send("Invalid key");
     }
 
-    // Check if key is already used
+    // Expiration check
+    if (record.expires && Date.now() > record.expires) {
+        // free player and delete key
+        delete claimedPlayers[player];
+        delete validKeys[player];
+        return res.status(403).send("Key expired");
+    }
+
+    // Prevent reuse
     if (record.used) {
         return res.status(403).send("Key already used");
     }
 
-    // Check expiration
-    if (record.expires && Date.now() > record.expires) {
-        return res.status(403).send("Key expired");
-    }
-
-    // Mark as used
+    // Mark key as used
     record.used = true;
 
     return res.sendFile(path.join(__dirname, record.file));
 });
-
-
-
-
-
-
-
-
-
-
 
 // --- Board spaces ---
 const boardSpaces = [
