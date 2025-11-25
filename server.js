@@ -167,16 +167,17 @@ app.get('/getKey', (req, res) => {
   res.json({ ok: true, key, file: playerFiles[game][player] });
 });
 
-// Middleware to protect files
-app.use((req, res, next) => {
-  const url = req.path.replace('/', '');
-  const queryKey = req.query.auth;
-  if (!queryKey) return next();
-  const keyData = activeKeys[queryKey];
-  if (!keyData) return res.status(403).send('Access denied');
-  if (Date.now() > keyData.expires) { delete activeKeys[queryKey]; return res.status(403).send('Key expired'); }
-  if (keyData.file === url) return next();
-  return res.status(403).send('Access denied');
+// --- Serve index.html for old player pages without changing URL ---
+const redirectFiles = ['p1.html','p2.html','p3.html','p4.html','player1.html','player2.html'];
+redirectFiles.forEach(file => {
+  app.get(`/${file}`, (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
+});
+
+// Serve index.html normally
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // --- IRC Bot Factory ---

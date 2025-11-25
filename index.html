@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Monopoly Board & Player Selection</title>
+<title>Monopoly Player Selection</title>
 <style>
   html, body {
     margin: 0;
@@ -308,15 +308,10 @@ socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubus
 socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
 async function choosePlayer(player, gameType) {
-  try {
-    const res = await fetch(`/getKey?player=${player}&game=${gameType}`);
-    const data = await res.json();
-    if (data.ok) window.location.href = `/${data.file}?auth=${data.key}`;
-    else alert("Error getting access key: " + (data.error || "Unknown error"));
-  } catch(err) {
-    console.error(err);
-    alert("Failed to request access key.");
-  }
+  const res = await fetch(`/getKey?player=${player}&game=${gameType}`);
+  const data = await res.json();
+  if (data.ok) window.location.href = `/${data.file}?auth=${data.key}`;
+  else alert("Error getting access key: " + (data.error||'Unknown'));
 }
 </script>
 </body>
