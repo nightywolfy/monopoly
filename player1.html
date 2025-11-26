@@ -549,26 +549,16 @@ socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubus
 socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
 const boardSpaces = [
-  { number: 0,  x: 830, y: 770 }, { number: 1,  x: 715, y: 735 },
-  { number: 2,  x: 640, y: 735 }, { number: 3,  x: 570, y: 735 },
-  { number: 4,  x: 495, y: 735 }, { number: 5,  x: 420, y: 735 },
-  { number: 6,  x: 345, y: 735 }, { number: 7,  x: 270, y: 735 },
-  { number: 8,  x: 199, y: 735 }, { number: 9,  x: 128, y: 735 },
-  { number: 10, x: 40,  y: 735 }, { number: 11, x: 66,  y: 675 },
-  { number: 12, x: 66,  y: 605 }, { number: 13, x: 69,  y: 537 },
-  { number: 14, x: 73,  y: 468 }, { number: 15, x: 75,  y: 402 },
-  { number: 16, x: 75,  y: 338 }, { number: 17, x: 78,  y: 273 },
-  { number: 18, x: 75,  y: 209 }, { number: 19, x: 80,  y: 149 },
-  { number: 20, x: 80, y: 99  }, { number: 21, x: 140, y: 99  },
-  { number: 22, x: 210, y: 99  }, { number: 23, x: 295, y: 99  },
-  { number: 24, x: 350, y: 99  }, { number: 25, x: 420, y: 99  },
-  { number: 26, x: 490, y: 99  }, { number: 27, x: 555, y: 99  },
-  { number: 28, x: 625, y: 99  }, { number: 29, x: 695, y: 99  },
-  { number: 30, x: 786, y: 99  }, { number: 31, x: 760, y: 147 },
-  { number: 32, x: 765, y: 200 }, { number: 33, x: 763, y: 272 },
-  { number: 34, x: 766, y: 337 }, { number: 35, x: 769, y: 402 },
-  { number: 36, x: 776, y: 460 }, { number: 37, x: 772, y: 537 },
-  { number: 38, x: 774, y: 603 }, { number: 39, x: 777, y: 673 }
+  { number: 0, x: 825, y: 775 }, { number: 1, x: 730, y: 775 }, { number: 2, x: 650, y: 775 }, { number: 3, x: 580, y: 775 },
+  { number: 4, x: 505, y: 775 }, { number: 5, x: 430, y: 775 }, { number: 6, x: 355, y: 775 }, { number: 7, x: 280, y: 775 },
+  { number: 8, x: 205, y: 775 }, { number: 9, x: 134, y: 775 }, { number: 10, x: 35, y: 775 }, { number: 11, x: 36, y: 685 },
+  { number: 12, x: 37, y: 615 }, { number: 13, x: 38, y: 550 }, { number: 14, x: 39, y: 480 }, { number: 15, x: 40, y: 410 },
+  { number: 16, x: 41, y: 350 }, { number: 17, x: 42, y: 285 }, { number: 18, x: 43, y: 217 }, { number: 19, x: 44, y: 164 },
+  { number: 20, x: 45, y: 70 }, { number: 21, x: 140, y: 70 }, { number: 22, x: 210, y: 70 }, { number: 23, x: 285, y: 70 },
+  { number: 24, x: 355, y: 70 }, { number: 25, x: 430, y: 70 }, { number: 26, x: 503, y: 70 }, { number: 27, x: 575, y: 70 },
+  { number: 28, x: 650, y: 70 }, { number: 29, x: 720, y: 70 }, { number: 30, x: 800, y: 70 }, { number: 31, x: 820, y: 150 },
+  { number: 32, x: 819, y: 210 }, { number: 33, x: 818, y: 277 }, { number: 34, x: 817, y: 342 }, { number: 35, x: 816, y: 408 },
+  { number: 36, x: 815, y: 478 }, { number: 37, x: 814, y: 545 }, { number: 38, x: 813, y: 615 }, { number: 39, x: 812, y: 685 }
 ];
 
 
@@ -648,15 +638,7 @@ allSpaces.forEach(spaceNum => {
     boardButtonsContainer.appendChild(btn);
 });
 
-// Make board buttons invisible
-boardButtonsContainer.querySelectorAll('button').forEach(btn => {
-    const spaceNum = parseInt(btn.textContent);
-    if (spaceNum >= 1 && spaceNum <= 39) {
-        btn.style.backgroundColor = 'transparent';
-        btn.style.border = 'none';
-        btn.style.color = 'transparent';
-    }
-});
+
 
 // Refresh board image
 function refreshBoardImage() {

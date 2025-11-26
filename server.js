@@ -184,12 +184,12 @@ const boardSpaces = [
   { number: 4, x: 505, y: 775 }, { number: 5, x: 430, y: 775 }, { number: 6, x: 355, y: 775 }, { number: 7, x: 280, y: 775 },
   { number: 8, x: 205, y: 775 }, { number: 9, x: 134, y: 775 }, { number: 10, x: 35, y: 775 }, { number: 11, x: 36, y: 685 },
   { number: 12, x: 37, y: 615 }, { number: 13, x: 38, y: 550 }, { number: 14, x: 39, y: 480 }, { number: 15, x: 40, y: 410 },
-  { number: 16, x: 41, y: 350 }, { number: 17, x: 42, y: 285 }, { number: 18, x: 43, y: 220 }, { number: 19, x: 44, y: 160 },
-  { number: 20, x: 75, y: 75 }, { number: 21, x: 155, y: 75 }, { number: 22, x: 223, y: 75 }, { number: 23, x: 295, y: 75 },
-  { number: 24, x: 360, y: 75 }, { number: 25, x: 430, y: 75 }, { number: 26, x: 500, y: 75 }, { number: 27, x: 570, y: 75 },
-  { number: 28, x: 637, y: 75 }, { number: 29, x: 705, y: 75 }, { number: 30, x: 796, y: 75 }, { number: 31, x: 800, y: 155 },
-  { number: 32, x: 803, y: 215 }, { number: 33, x: 806, y: 277 }, { number: 34, x: 809, y: 340 }, { number: 35, x: 812, y: 408 },
-  { number: 36, x: 815, y: 478 }, { number: 37, x: 818, y: 543 }, { number: 38, x: 821, y: 610 }, { number: 39, x: 824, y: 680 }
+  { number: 16, x: 41, y: 350 }, { number: 17, x: 42, y: 285 }, { number: 18, x: 43, y: 217 }, { number: 19, x: 44, y: 164 },
+  { number: 20, x: 45, y: 70 }, { number: 21, x: 140, y: 70 }, { number: 22, x: 210, y: 70 }, { number: 23, x: 285, y: 70 },
+  { number: 24, x: 355, y: 70 }, { number: 25, x: 430, y: 70 }, { number: 26, x: 503, y: 70 }, { number: 27, x: 575, y: 70 },
+  { number: 28, x: 650, y: 70 }, { number: 29, x: 720, y: 70 }, { number: 30, x: 800, y: 70 }, { number: 31, x: 820, y: 150 },
+  { number: 32, x: 819, y: 210 }, { number: 33, x: 818, y: 277 }, { number: 34, x: 817, y: 342 }, { number: 35, x: 816, y: 408 },
+  { number: 36, x: 815, y: 478 }, { number: 37, x: 814, y: 545 }, { number: 38, x: 813, y: 615 }, { number: 39, x: 812, y: 685 }
 ];
 
 const colorMap = { p1: 'red', p2: 'blue', p3: 'yellow', p4: 'green' };
