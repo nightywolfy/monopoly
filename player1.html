@@ -474,11 +474,11 @@ html, body {
 const socket = io();
 const colorMap = {red:"p1", blue:"p2", yellow:"p3", green:"p4"};
 const buildingPositions = {
-  1:{x:742,y:750},3:{x:597,y:750},6:{x:375,y:750},8:{x:230,y:750},9:{x:155,y:750},
-  11:{x:104,y:699},12:{x:107,y:630},14:{x:110,y:495},16:{x:114,y:362},17:{x:117,y:299},
-  19:{x:120,y:175},21:{x:174,y:133},22:{x:240,y:135},24:{x:380,y:135},26:{x:520,y:135},
-  28:{x:655,y:135},29:{x:724,y:135},31:{x:773,y:173},33:{x:776,y:297},34:{x:779,y:362},
-  37:{x:786,y:562},39:{x:790,y:697}
+  1:{x:742,y:756},3:{x:597,y:756},6:{x:375,y:756},8:{x:230,y:756},9:{x:155,y:756},
+  11:{x:101,y:699},12:{x:102,y:630},14:{x:103,y:495},16:{x:104,y:362},17:{x:104,y:299},
+  19:{x:106,y:175},21:{x:160,y:127},22:{x:230,y:127},24:{x:375,y:127},26:{x:520,y:127},
+  28:{x:665,y:127},29:{x:750,y:127},31:{x:792,y:173},33:{x:792,y:297},34:{x:792,y:362},
+  37:{x:794,y:562},39:{x:794,y:700}
 };
 
 // Pieces
@@ -549,16 +549,16 @@ socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubus
 socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
 const boardSpaces = [
-  { number: 0, x: 825, y: 775 }, { number: 1, x: 730, y: 775 }, { number: 2, x: 650, y: 775 }, { number: 3, x: 580, y: 775 },
-  { number: 4, x: 505, y: 775 }, { number: 5, x: 430, y: 775 }, { number: 6, x: 355, y: 775 }, { number: 7, x: 280, y: 775 },
-  { number: 8, x: 205, y: 775 }, { number: 9, x: 134, y: 775 }, { number: 10, x: 35, y: 775 }, { number: 11, x: 36, y: 685 },
-  { number: 12, x: 37, y: 615 }, { number: 13, x: 38, y: 550 }, { number: 14, x: 39, y: 480 }, { number: 15, x: 40, y: 410 },
-  { number: 16, x: 41, y: 350 }, { number: 17, x: 42, y: 285 }, { number: 18, x: 43, y: 217 }, { number: 19, x: 44, y: 164 },
-  { number: 20, x: 45, y: 70 }, { number: 21, x: 140, y: 70 }, { number: 22, x: 210, y: 70 }, { number: 23, x: 285, y: 70 },
-  { number: 24, x: 355, y: 70 }, { number: 25, x: 430, y: 70 }, { number: 26, x: 503, y: 70 }, { number: 27, x: 575, y: 70 },
-  { number: 28, x: 650, y: 70 }, { number: 29, x: 720, y: 70 }, { number: 30, x: 800, y: 70 }, { number: 31, x: 820, y: 150 },
-  { number: 32, x: 819, y: 210 }, { number: 33, x: 818, y: 277 }, { number: 34, x: 817, y: 342 }, { number: 35, x: 816, y: 408 },
-  { number: 36, x: 815, y: 478 }, { number: 37, x: 814, y: 545 }, { number: 38, x: 813, y: 615 }, { number: 39, x: 812, y: 685 }
+  { number: 0, x: 825, y: 775 }, { number: 1, x: 720, y: 740 }, { number: 2, x: 640, y: 740 }, { number: 3, x: 570, y: 740 },
+  { number: 4, x: 500, y: 740 }, { number: 5, x: 425, y: 740 }, { number: 6, x: 350, y: 740 }, { number: 7, x: 275, y: 740 },
+  { number: 8, x: 200, y: 740 }, { number: 9, x: 130, y: 740 }, { number: 10, x: 35, y: 775 }, { number: 11, x: 63, y: 680 },
+  { number: 12, x: 64, y: 610 }, { number: 13, x: 65, y: 540 }, { number: 14, x: 66, y: 475 }, { number: 15, x: 67, y: 402 },
+  { number: 16, x: 68, y: 340 }, { number: 17, x: 69, y: 270 }, { number: 18, x: 70, y: 217 }, { number: 19, x: 71, y: 144 },
+  { number: 20, x: 45, y: 90 }, { number: 21, x: 135, y: 90 }, { number: 22, x: 205, y: 90 }, { number: 23, x: 280, y: 90 },
+  { number: 24, x: 350, y: 90 }, { number: 25, x: 425, y: 90 }, { number: 26, x: 500, y: 90 }, { number: 27, x: 570, y: 90 },
+  { number: 28, x: 645, y: 90 }, { number: 29, x: 715, y: 90 }, { number: 30, x: 800, y: 90 }, { number: 31, x: 780, y: 145 },
+  { number: 32, x: 780, y: 205 }, { number: 33, x: 780, y: 270 }, { number: 34, x: 780, y: 340 }, { number: 35, x: 780, y: 400 },
+  { number: 36, x: 780, y: 475 }, { number: 37, x: 780, y: 540 }, { number: 38, x: 780, y: 610 }, { number: 39, x: 780, y: 680 }
 ];
 
 
@@ -638,7 +638,15 @@ allSpaces.forEach(spaceNum => {
     boardButtonsContainer.appendChild(btn);
 });
 
-
+// Make board buttons invisible
+boardButtonsContainer.querySelectorAll('button').forEach(btn => {
+    const spaceNum = parseInt(btn.textContent);
+    if (spaceNum >= 1 && spaceNum <= 39) {
+        btn.style.backgroundColor = 'transparent';
+        btn.style.border = 'none';
+        btn.style.color = 'transparent';
+    }
+});
 
 // Refresh board image
 function refreshBoardImage() {
