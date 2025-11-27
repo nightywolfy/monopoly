@@ -133,8 +133,8 @@ html, body {
 
 /* Buildings */
 .hotel,.house{
-  width:24px;
-  height:24px;
+  width:29px;
+  height:29px;
   position:absolute;
 }
 
@@ -164,7 +164,7 @@ html, body {
   justify-content: center;
   align-items: center;
   gap: 6px;
-  margin-top: -40px; /* closer to map.webp */
+  margin-top: -8px; /* closer to map.jpg */
   z-index: 60;
   position: relative;
 }
@@ -263,7 +263,7 @@ html, body {
 <!-- Left: Board -->
 <div id="boardContainer">
 <div id="board">
-<img id="boardImg" src="map.webp" alt="Monopoly Board">
+<img id="boardImg" src="map.jpg" alt="Monopoly Board">
 <div id="p1" class="piece red">p1</div>
 <div id="p2" class="piece blue">p2</div>
 <div id="p3" class="piece yellow">p3</div>
@@ -299,84 +299,84 @@ html, body {
 <!-- Mode buttons BELOW the map -->
 <div id="modeToggle">
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse dblue">
 <button class="white-btn plus" onclick="sndBuild2.currentTime=0; sndBuild2.play()">DB+</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse brown">
 <button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">BR+</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse blue">
 <button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">BL+</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse green">
 <button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">GR+</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse yellow">
 <button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">YE+</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse pink">
 <button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">PI+</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse orange">
 <button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">OR+</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!addonehouse red">
 <button class="white-btn plus" onclick="sndBuild2.currentTime=0; sndBuild2.play()">RE+</button>
 </form>
 <button type="button" class="mode-btn active" data-mode="redeem">Redeem</button>
 <button type="button" class="mode-btn" data-mode="mortgage">Mortgage</button>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse dblue">
 <button class="white-btn minus" onclick="sndDestroy2.currentTime=0; sndDestroy2.play()">DB-</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse brown">
 <button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">BR-</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse blue">
 <button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">BL-</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse green">
 <button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">GR-</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse yellow">
 <button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">YE-</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse pink">
 <button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">PI-</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse orange">
 <button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">OR-</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player3bot">
 <input type="hidden" name="msg" value="!removeonehouse red">
 <button class="white-btn minus" onclick="sndDestroy2.currentTime=0; sndDestroy2.play()">RE-</button>
 </form>
@@ -390,23 +390,23 @@ html, body {
 <iframe name="hiddenFrame" style="display:none;"></iframe>
 <audio id="buttonClickSound" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/click.mp3" preload="auto"></audio>
 <div id="topButtons" style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px; justify-content:center; align-items:center;">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!dice1-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D1</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!dice2-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D2</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!dice3-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D3</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!dice4-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">DJ</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!up"><button type="submit" class="small-button">UP3</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!dice1-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D1</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!dice2-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D2</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!dice3-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D3</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!dice4-p3"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">DJ</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!up3"><button type="submit" class="small-button">UP1</button></form>
 <div style="width:2px; background:#888; margin:0 4px;"></div>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!add p3 25"><button type="submit" class="small-button">+25</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!add p3 5"><button type="submit" class="small-button">+5</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!add p3 -25"><button type="submit" class="small-button">-25</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!add p3 -5"><button type="submit" class="small-button">-5</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!add p3 25"><button type="submit" class="small-button">+25</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!add p3 5"><button type="submit" class="small-button">+5</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!add p3 -25"><button type="submit" class="small-button">-25</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!add p3 -5"><button type="submit" class="small-button">-5</button></form>
 <div style="width:4px; background:#888; margin:0 4px;"></div>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button">5</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button">10</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!bidadd 25"><button type="submit" class="small-button">25</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!bidadd 50"><button type="submit" class="small-button">50</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!bidadd 90"><button type="submit" class="small-button">90</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button">F</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button">5</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button">10</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!bidadd 25"><button type="submit" class="small-button">25</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!bidadd 50"><button type="submit" class="small-button">50</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!bidadd 90"><button type="submit" class="small-button">90</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player3bot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button">F</button></form>
 
 </div>
 <iframe id="chatFrame" src="https://web.libera.chat/gamja/##rento" title="IRC Chat" loading="lazy" allow="clipboard-read; clipboard-write"></iframe>
@@ -418,11 +418,28 @@ html, body {
 const socket = io();
 const colorMap = {red:"p1", blue:"p2", yellow:"p3", green:"p4"};
 const buildingPositions = {
-  1:{x:742,y:750},3:{x:597,y:750},6:{x:375,y:750},8:{x:230,y:750},9:{x:155,y:750},
-  11:{x:104,y:699},12:{x:107,y:630},14:{x:110,y:495},16:{x:114,y:362},17:{x:117,y:299},
-  19:{x:120,y:175},21:{x:174,y:133},22:{x:240,y:135},24:{x:380,y:135},26:{x:520,y:135},
-  28:{x:655,y:135},29:{x:724,y:135},31:{x:773,y:173},33:{x:776,y:297},34:{x:779,y:362},
-  37:{x:786,y:562},39:{x:790,y:697}
+  1: { x: 740, y: 789 },
+  3: { x: 595, y: 789 },
+  6: { x: 373, y: 789 },
+  8: { x: 232, y: 789 },
+  9: { x: 160, y: 789 },
+  11: { x: 105, y: 735 },
+  12: { x: 105, y: 665 },
+  14: { x: 105, y: 515 },
+  16: { x: 105, y: 375 },
+  17: { x: 105, y: 300 },
+  19: { x: 105, y: 155 },
+  21: { x: 156, y: 107 },
+  22: { x: 230, y: 107 },
+  24: { x: 375, y: 107 },
+  26: { x: 520, y: 107 },
+  28: { x: 665, y: 107 },
+  29: { x: 740, y: 107 },
+  31: { x: 790, y: 155 },
+  33: { x: 790, y: 300 },
+  34: { x: 790, y: 370 },
+  37: { x: 790, y: 590 },
+  39: { x: 790, y: 730 }
 };
 
 // Pieces
@@ -494,26 +511,36 @@ socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubus
 socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
 const boardSpaces = [
-  { number: 0,  x: 830, y: 770 }, { number: 1,  x: 715, y: 735 },
-  { number: 2,  x: 640, y: 735 }, { number: 3,  x: 570, y: 735 },
-  { number: 4,  x: 495, y: 735 }, { number: 5,  x: 420, y: 735 },
-  { number: 6,  x: 345, y: 735 }, { number: 7,  x: 270, y: 735 },
-  { number: 8,  x: 199, y: 735 }, { number: 9,  x: 128, y: 735 },
-  { number: 10, x: 40,  y: 735 }, { number: 11, x: 66,  y: 675 },
-  { number: 12, x: 66,  y: 605 }, { number: 13, x: 69,  y: 537 },
-  { number: 14, x: 73,  y: 468 }, { number: 15, x: 75,  y: 402 },
-  { number: 16, x: 75,  y: 338 }, { number: 17, x: 78,  y: 273 },
-  { number: 18, x: 75,  y: 209 }, { number: 19, x: 80,  y: 149 },
-  { number: 20, x: 80, y: 99  }, { number: 21, x: 140, y: 99  },
-  { number: 22, x: 210, y: 99  }, { number: 23, x: 295, y: 99  },
-  { number: 24, x: 350, y: 99  }, { number: 25, x: 420, y: 99  },
-  { number: 26, x: 490, y: 99  }, { number: 27, x: 555, y: 99  },
-  { number: 28, x: 625, y: 99  }, { number: 29, x: 695, y: 99  },
-  { number: 30, x: 786, y: 99  }, { number: 31, x: 760, y: 147 },
-  { number: 32, x: 765, y: 200 }, { number: 33, x: 763, y: 272 },
-  { number: 34, x: 766, y: 337 }, { number: 35, x: 769, y: 402 },
-  { number: 36, x: 776, y: 460 }, { number: 37, x: 772, y: 537 },
-  { number: 38, x: 774, y: 603 }, { number: 39, x: 777, y: 673 }
+  { number: 1, x: 717, y: 775 }, 
+  { number: 3, x: 572, y: 775 },
+  { number: 4, x: 500, y: 775 }, 
+  { number: 5, x: 425, y: 775 }, 
+  { number: 6, x: 355, y: 775 }, 
+  { number: 8, x: 210, y: 775 }, 
+  { number: 9, x: 138, y: 775 }, 
+  { number: 11, x: 75, y: 715 },
+  { number: 12, x: 75, y: 643 }, 
+  { number: 13, x: 75, y: 570 }, 
+  { number: 14, x: 75, y: 498 }, 
+  { number: 15, x: 75, y: 425 },
+  { number: 16, x: 75, y: 355 }, 
+  { number: 17, x: 75, y: 283 }, 
+  { number: 19, x: 75, y: 138 },
+  { number: 21, x: 134, y: 74 }, 
+  { number: 22, x: 204, y: 74 }, 
+  { number: 24, x: 352, y: 74 }, 
+  { number: 25, x: 424, y: 74 }, 
+  { number: 26, x: 497, y: 74 }, 
+  { number: 27, x: 569, y: 74 },
+  { number: 28, x: 644, y: 74 }, 
+  { number: 29, x: 714, y: 74 }, 
+  { number: 31, x: 774, y: 135 },
+  { number: 33, x: 774, y: 280 },
+  { number: 34, x: 774, y: 350 },
+  { number: 35, x: 774, y: 420 },
+  { number: 37, x: 774, y: 570 },
+  { number: 38, x: 774, y: 640 },
+  { number: 39, x: 774, y: 712 }
 ];
 
 
@@ -586,7 +613,7 @@ allSpaces.forEach(spaceNum => {
     btn.style.cursor = 'pointer';
 
     btn.addEventListener('click', () => {
-        socket.emit('sendMessage', { bot: 'player5bot', msg: `!${currentMode} ${spaceNum}` });
+        socket.emit('sendMessage', { bot: 'player3bot', msg: `!${currentMode} ${spaceNum}` });
         playSound(soundURLs[currentMode]);
     });
 
@@ -606,7 +633,7 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
 // Refresh board image
 function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
-    boardImg.src = 'map.webp?t=' + Date.now();
+    boardImg.src = 'map.jpg?t=' + Date.now();
 }
 setInterval(refreshBoardImage, 60000);
 
