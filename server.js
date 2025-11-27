@@ -180,16 +180,16 @@ app.get("/player", (req, res) => {
 
 // --- Board spaces ---
 const boardSpaces = [
-  { number: 0, x: 825, y: 775 }, { number: 1, x: 730, y: 775 }, { number: 2, x: 650, y: 775 }, { number: 3, x: 580, y: 775 },
-  { number: 4, x: 505, y: 775 }, { number: 5, x: 430, y: 775 }, { number: 6, x: 355, y: 775 }, { number: 7, x: 280, y: 775 },
-  { number: 8, x: 205, y: 775 }, { number: 9, x: 134, y: 775 }, { number: 10, x: 35, y: 775 }, { number: 11, x: 36, y: 685 },
-  { number: 12, x: 37, y: 615 }, { number: 13, x: 38, y: 550 }, { number: 14, x: 39, y: 480 }, { number: 15, x: 40, y: 410 },
-  { number: 16, x: 41, y: 350 }, { number: 17, x: 42, y: 285 }, { number: 18, x: 43, y: 217 }, { number: 19, x: 44, y: 164 },
-  { number: 20, x: 45, y: 70 }, { number: 21, x: 140, y: 70 }, { number: 22, x: 210, y: 70 }, { number: 23, x: 285, y: 70 },
-  { number: 24, x: 355, y: 70 }, { number: 25, x: 430, y: 70 }, { number: 26, x: 503, y: 70 }, { number: 27, x: 575, y: 70 },
-  { number: 28, x: 650, y: 70 }, { number: 29, x: 720, y: 70 }, { number: 30, x: 800, y: 70 }, { number: 31, x: 820, y: 150 },
-  { number: 32, x: 819, y: 210 }, { number: 33, x: 818, y: 277 }, { number: 34, x: 817, y: 342 }, { number: 35, x: 816, y: 408 },
-  { number: 36, x: 815, y: 478 }, { number: 37, x: 814, y: 545 }, { number: 38, x: 813, y: 615 }, { number: 39, x: 812, y: 685 }
+  { number: 0, x: 825, y: 825 }, { number: 1, x: 722, y: 825 }, { number: 2, x: 650, y: 825 }, { number: 3, x: 577, y: 825 },
+  { number: 4, x: 505, y: 825 }, { number: 5, x: 430, y: 825 }, { number: 6, x: 360, y: 825 }, { number: 7, x: 287, y: 825 },
+  { number: 8, x: 215, y: 825 }, { number: 9, x: 143, y: 825 }, { number: 10, x: 35, y: 825 }, { number: 11, x: 35, y: 720 },
+  { number: 12, x: 35, y: 648 }, { number: 13, x: 35, y: 575 }, { number: 14, x: 35, y: 503 }, { number: 15, x: 35, y: 430 },
+  { number: 16, x: 35, y: 360 }, { number: 17, x: 35, y: 288 }, { number: 18, x: 35, y: 215 }, { number: 19, x: 35, y: 143 },
+  { number: 20, x: 35, y: 40 }, { number: 21, x: 140, y: 40 }, { number: 22, x: 210, y: 40 }, { number: 23, x: 285, y: 40 },
+  { number: 24, x: 358, y: 40 }, { number: 25, x: 430, y: 40 }, { number: 26, x: 503, y: 40 }, { number: 27, x: 575, y: 40 },
+  { number: 28, x: 650, y: 40 }, { number: 29, x: 720, y: 40 }, { number: 30, x: 820, y: 40 }, { number: 31, x: 820, y: 140 },
+  { number: 32, x: 820, y: 212 }, { number: 33, x: 820, y: 285 }, { number: 34, x: 820, y: 355 }, { number: 35, x: 820, y: 425 },
+  { number: 36, x: 820, y: 500 }, { number: 37, x: 820, y: 575 }, { number: 38, x: 820, y: 645 }, { number: 39, x: 820, y: 717 }
 ];
 
 const colorMap = { p1: 'red', p2: 'blue', p3: 'yellow', p4: 'green' };
@@ -379,7 +379,7 @@ function createBot(nick, defaultTarget, options = {}) {
 // --- Create bots ---
 const bots = {
 
-  player9bot:createBot('player9bot','##rento')
+  player11bot:createBot('player11bot','##rento')
 };
 
 // --- Express + Socket.IO endpoints ---
