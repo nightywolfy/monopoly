@@ -189,7 +189,13 @@ const boardSpaces = [
   { number: 24, x: 358, y: 40 }, { number: 25, x: 430, y: 40 }, { number: 26, x: 503, y: 40 }, { number: 27, x: 575, y: 40 },
   { number: 28, x: 650, y: 40 }, { number: 29, x: 720, y: 40 }, { number: 30, x: 820, y: 40 }, { number: 31, x: 820, y: 140 },
   { number: 32, x: 820, y: 212 }, { number: 33, x: 820, y: 285 }, { number: 34, x: 820, y: 355 }, { number: 35, x: 820, y: 425 },
-  { number: 36, x: 820, y: 500 }, { number: 37, x: 820, y: 575 }, { number: 38, x: 820, y: 645 }, { number: 39, x: 820, y: 717 }
+  { number: 36, x: 820, y: 500 }, { number: 37, x: 820, y: 575 }, { number: 38, x: 820, y: 645 }, { number: 39, x: 820, y: 717 },
+  { number: 40, x: 685, y: 710 }, { number: 41, x: 577, y: 710 }, { number: 42, x: 505, y: 710 }, { number: 43, x: 432, y: 710 },
+  { number: 44, x: 360, y: 710 }, { number: 45, x: 288, y: 710 }, { number: 46, x: 150, y: 710 }, { number: 47, x: 150, y: 580 },
+  { number: 48, x: 150, y: 505 }, { number: 49, x: 150, y: 430 }, { number: 50, x: 150, y: 360 }, { number: 51, x: 150, y: 290 },
+  { number: 52, x: 150, y: 150 }, { number: 53, x: 285, y: 150 }, { number: 54, x: 358, y: 150 }, { number: 55, x: 430, y: 150 },
+  { number: 56, x: 500, y: 150 }, { number: 57, x: 575, y: 150 }, { number: 58, x: 710, y: 150 }, { number: 59, x: 710, y: 285 },
+  { number: 60, x: 710, y: 355 }, { number: 61, x: 710, y: 430 }, { number: 62, x: 710, y: 500 }, { number: 63, x: 710, y: 575 }
 ];
 
 const colorMap = { p1: 'red', p2: 'blue', p3: 'yellow', p4: 'green' };
@@ -379,7 +385,7 @@ function createBot(nick, defaultTarget, options = {}) {
 // --- Create bots ---
 const bots = {
 
-  player11bot:createBot('player11bot','##rento')
+  player22bot:createBot('player22bot','##rento')
 };
 
 // --- Express + Socket.IO endpoints ---
