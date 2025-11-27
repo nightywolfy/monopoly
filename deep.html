@@ -709,6 +709,15 @@ allSpaces.forEach(spaceNum => {
     boardButtonsContainer.appendChild(btn);
 });
 
+// Make board buttons invisible
+boardButtonsContainer.querySelectorAll('button').forEach(btn => {
+    const spaceNum = parseInt(btn.textContent);
+    if (spaceNum >= 1 && spaceNum <= 39) {
+        btn.style.backgroundColor = 'transparent';
+        btn.style.border = 'none';
+        btn.style.color = 'transparent';
+    }
+});
 
 
 // Refresh board image

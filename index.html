@@ -196,7 +196,7 @@
 <!-- Left: Monopoly Board -->
 <div id="boardWrapper">
   <div id="board">
-    <img id="boardImg" src="map.jpg" alt="Monopoly Board">
+    <img id="boardImg" src="map2.jpg" alt="Monopoly Board">
     <div id="p1" class="piece red">p1</div>
     <div id="p2" class="piece blue">p2</div>
     <div id="p3" class="piece yellow">p3</div>
@@ -275,28 +275,37 @@ const buildingPositions = {
   33: { x: 790, y: 300 },
   34: { x: 790, y: 370 },
   37: { x: 790, y: 590 },
-  39: { x: 790, y: 730 }
+  39: { x: 790, y: 730 },
+  0: { x: 595, y: 676 },
+  10: { x: 675, y: 590 },
+  20: { x: 305, y: 676 },
+  30: { x: 221, y: 590 },
+  5: { x: 220, y: 305 },
+  15: { x: 304, y: 223 },
+  25: { x: 595, y: 223 },
+  35: { x: 676, y: 305 }
 };
 
+// Robust function to render pieces
 function updatePieces(data){
-  const boardPositions={};
-  for(const [color,pos] of Object.entries(data)){
-    if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number") continue;
-    const key=`${pos.x}-${pos.y}`;
-    if(!boardPositions[key]) boardPositions[key]=[];
-    boardPositions[key].push(color);
-  }
-  for(const [key,colors] of Object.entries(boardPositions)){
-    colors.forEach((color,index)=>{
-      const id=colorMap[color];
-      if(!id) return;
-      const el=document.getElementById(id);
-      const pos=data[color];
-      const offset=8;
-      el.style.left=(pos.x+index*offset)+'px';
-      el.style.top=(pos.y+index*offset)+'px';
-    });
-  }
+    if(!data || typeof data !== 'object'){
+        console.warn("Pieces data invalid:", data);
+        return;
+    }
+
+    for(const [color, pos] of Object.entries(data)){
+        const id = colorMap[color];
+        if(!id){ console.warn("Unknown color:", color); continue; }
+        const el = document.getElementById(id);
+        if(!el){ console.warn("Missing element:", id); continue; }
+        if(!pos || typeof pos.x !== "number" || typeof pos.y !== "number"){
+            console.warn("Invalid position for", color, pos);
+            continue;
+        }
+        el.style.left = pos.x + 'px';
+        el.style.top  = pos.y + 'px';
+        el.style.zIndex = 20; // above board image
+    }
 }
 
 function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }
@@ -309,20 +318,52 @@ function updateMoney(data){
   document.getElementById('money-p4-overlay').textContent = 'Player4: $' + data.p4;
 }
 
-function renderElements(type,data,imgSrc){
-  document.querySelectorAll(`.${type}`).forEach(el=>el.remove());
-  const board=document.getElementById('board');
-  for(const [space,active] of Object.entries(data)){
-    if(active && buildingPositions[space]){
-      const pos=buildingPositions[space];
-      const el=document.createElement('img');
-      el.src=imgSrc;
-      el.className=type;
-      el.style.left=(pos.x-12)+'px';
-      el.style.top=(pos.y-12)+'px';
-      board.appendChild(el);
+function renderElements(type, data, imgSrc){
+    const board = document.getElementById('board');
+    if(!board){ console.error("Board container missing"); return; }
+
+    // Remove existing elements
+    document.querySelectorAll(`.${type}`).forEach(el => el.remove());
+
+    if(!data || typeof data !== 'object'){
+        console.warn(type + " data invalid:", data);
+        return;
     }
-  }
+
+    for(const [space, count] of Object.entries(data)){
+        if(!count) continue;
+        const pos = buildingPositions[space];
+        if(!pos){ console.warn("No position for space:", space); continue; }
+
+        // Stack houses horizontally, hotels centered
+        for(let i=0;i<count;i++){
+            const el = document.createElement('img');
+            el.src = imgSrc;
+            el.className = type;
+            el.style.position = 'absolute';
+            el.style.zIndex = 25;
+
+            // Offset each house horizontally
+            if(type === 'house'){
+                el.style.left = (pos.x - 14 + i*10) + 'px'; // 10px spacing between houses
+                el.style.top  = (pos.y - 14) + 'px';
+            } else if(type === 'hotel'){
+                // hotel always centered, slightly higher if multiple hotels (rare)
+                el.style.left = (pos.x - 14) + 'px';
+                el.style.top  = (pos.y - 14 - i*2) + 'px';
+            }
+
+            el.style.width = '29px';
+            el.style.height = '29px';
+            board.appendChild(el);
+
+            // Fallback if image fails to load
+            el.onerror = () => {
+                console.warn("Failed to load image:", imgSrc);
+                el.src = 'https://via.placeholder.com/29?text=?';
+            }
+        }
+    }
 }
 
 // Initial fetch
