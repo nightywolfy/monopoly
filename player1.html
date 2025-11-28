@@ -266,7 +266,7 @@ html, body {
 <!-- Left: Board -->
 <div id="boardContainer">
 <div id="board">
-<img id="boardImg" src="map.jpg" alt="Monopoly Board">
+<img id="boardImg" src="https://yegorc.net/rento/map.jpg" alt="Monopoly Board">
 <div id="p1" class="piece red">p1</div>
 <div id="p2" class="piece blue">p2</div>
 <div id="boardButtons"></div>
@@ -751,9 +751,9 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
 // Refresh board image
 function refreshBoardImage() {
     const boardImg = document.getElementById('boardImg');
-    boardImg.src = 'map.jpg?t=' + Date.now();
+    boardImg.src = 'https://yegorc.net/rento/map.jpg?t=' + Date.now();
 }
-setInterval(refreshBoardImage, 99000);
+setInterval(refreshBoardImage, 90000);
 
 </script>
 </body>
