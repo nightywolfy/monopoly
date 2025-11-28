@@ -16,125 +16,247 @@
     color: white;
   }
 
-  /* Left: Monopoly Board */
-  #boardWrapper {
-    width: 50%;
-    height: 100%;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
+/* Left: Board */
+#boardContainer {
+  width: 55%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: black;
+}
 
-  #board {
-    position: relative;
-    width: 900px;
-    max-width: 900px;
-    aspect-ratio: 1 / 1;
-  }
+/* Board inner */
+#board {
+  position: relative;
+  width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#boardImg {
+  width: 100%;
+  height: 900px;
+  object-fit: contain;
+  z-index: 1;
+}
 
-  #boardImg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
+/* Pieces */
+.piece {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 3px solid transparent;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  transition: left 0.4s ease, top 0.4s ease;
+  color: white;
+}
+.red { background:#ff4d4d; border-color:#ff8080; }
+.blue { background:#3399ff; border-color:#66a3ff; }
+.yellow { background:goldenrod; border-color:#ffde59; color:black; }
+.green { background:limegreen; border-color:#aaffaa; color:black; }
 
-  .piece {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    border: 3px solid transparent;
-    box-shadow: 0 0 6px rgba(0,0,0,0.4);
-    transition: left 0.4s ease, top 0.4s ease;
-    color: white;
-  }
-  .red { background: #ff4d4d; border-color: #ff8080; }
-  .blue { background: #3399ff; border-color: #66a3ff; }
-  .yellow { background: goldenrod; border-color: #ffde59; color: black; }
-  .green { background: limegreen; border-color: #aaffaa; color: black; }
+/* Central container for money + display */
+#centralDisplayContainer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  z-index: 10;
+}
 
-  /* Central container for money + displays */
-  #centralDisplayContainer {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-  }
+#moneyContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;       /* slightly bigger gap */
+  width: 175px;    /* wider than before */
+}
 
-  /* Money container */
-  #moneyContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 220px;
-  }
-  .moneyBox {
-    padding: 12px 20px;
-    border-radius: 10px;
-    width: 100%;
-    text-align: center;
-    font-weight: bold;
-    font-size: 22px;
-    word-wrap: break-word;
-    box-shadow: 0 0 12px #6a0dad,0 0 18px #00d4ff;
-    color: white;
-  }
-  .moneyBox.red { background: #ff4d4d; }
-  .moneyBox.blue { background: #3399ff; }
-  .moneyBox.yellow { background: goldenrod; color: black; }
-  .moneyBox.green { background: limegreen; color: black; }
+.moneyBox {
+  padding: 10px 20px;   /* bigger padding */
+  border-radius: 12px;
+  width: 100%;          /* fills container */
+  text-align: center;
+  font-weight: bold;
+  font-size: 20px;      /* larger font */
+  word-wrap: break-word;
+  box-shadow: 0 0 18px #6a0dad, 0 0 24px #00d4ff;
+  color: white;
+}
+.moneyBox.red { background:#ff4d4d; }
+.moneyBox.blue { background:#3399ff; }
+.moneyBox.yellow { background:goldenrod; color:black; }
+.moneyBox.green { background:limegreen; color:black; }
 
-  /* Display boxes */
-  #displayContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-  }
-  .displayBox {
-    padding: 15px 20px;
-    border-radius: 12px;
-    width: 300px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 22px;
-    background: linear-gradient(135deg,#6a0dad,#00d4ff);
-    color: white;
-    box-shadow: 0 0 12px #6a0dad,0 0 18px #00d4ff;
-    word-wrap: break-word;
-  }
+/* Display boxes */
+#displayContainer{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  align-items:center;
+}
+.displayBox{
+  padding:8px 14px;
+  border-radius:12px;
+  width:300px;
+  text-align:center;
+  font-weight:bold;
+  font-size:22px;
+  background:linear-gradient(135deg,#6a0dad,#00d4ff);
+  color:white;
+  box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;
+  word-wrap:break-word;
+}
 
-  /* Quick links */
-  #propertyLink, #rulesLink {
-    position: absolute;
-    z-index: 20;
-  }
-  #propertyLink img, #rulesLink img {
-    width: 75px;
-    border-radius: 8px;
-    box-shadow: 0 0 6px rgba(255,255,255,0.5);
-  }
-  #propertyLink { top: 40%; left: 250px; transform: translateY(-50%); }
-  #rulesLink { top: 50%; right: 575px; transform: translateY(-50%); }
+/* Quick links with absolute positioning */
+#propertyLink, #rulesLink{
+  position:absolute;
+  z-index:20;
+}
+#propertyLink img, #rulesLink img{
+  width:75px;
+  border-radius:8px;
+  box-shadow:0 0 6px rgba(255,255,255,0.5);
+}
 
-  /* Buildings */
-  .hotel, .house {
-    width: 29px;
-    height: 29px;
-    position: absolute;
-  }
-  
+/* Example positions: */
+#propertyLink{ top:40%; left:265px; transform:translateY(-50%); }
+#rulesLink{ top:50%; right:560px; transform:translateY(-50%); }
+
+/* Buildings */
+.hotel,.house{
+  width:29px;
+  height:29px;
+  position:absolute;
+}
+
+/* Redeem/Mortgage buttons */
+.mode-btn {
+  padding: 6px 12px;
+  font-size: 0.9em;
+  border-radius: 5px;
+  border: 1px solid #555;
+  background: #111;
+  color: #eee;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.mode-btn.active {
+  background: #0077ff;
+  color: #fff;
+  border-color: #00aaff;
+}
+.mode-btn:hover {
+  background: #333;
+}
+
+#modeToggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  margin-top: -7px; /* closer to map.webp */
+  z-index: 60;
+  position: relative;
+}
+
+/* Top buttons */
+#topButtons button {
+  padding: 8px 10px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  background: linear-gradient(45deg, #0f4f36, #ff416c);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  transition: all 0.2s ease;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+#topButtons button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 10px rgba(0,0,0,0.5);
+}
+#topButtons button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+
+/* Small buttons */
+.small-button {
+  padding: 2px 4px;
+  font-size: 0.9em;
+  border-radius: 6px;
+  background: #222;
+  color: white;
+  cursor: pointer;
+}
+
+/* Right: Controls */
+#controlsContainer {
+  width: 45%;
+  height: 100%;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner container for buttons + chat */
+#controlsInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Chat iframe fills remaining space */
+#chatFrame {
+  flex-grow: 1;
+  width: 100%;
+  border: none;
+  min-height: 0;
+}
+
+/* + buttons green */
+.white-btn.plus {
+  background-color: #28a745 !important;  /* green */
+  border: 1px solid #1e7e34 !important;
+  color: white !important;
+  padding: .1px .1px;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* - buttons red */
+.white-btn.minus {
+  background-color: #dc3545 !important;  /* red */
+  border: 1px solid #b02a37 !important;
+  color: white !important;
+  padding: .1px .1px;
+  border-radius: 3px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* optional hover effect */
+.white-btn.plus:hover { background-color: #218838 !important; }
+.white-btn.minus:hover { background-color: #c82333 !important; }
+
 #playerContainer {
   width: 50%;
   height: 100%;
@@ -186,8 +308,6 @@
 .playerBtn:active {
   transform: scale(0.97);
 }
-
-
 
 </style>
 </head>
@@ -252,13 +372,12 @@
 <script>
 const socket = io();
 const colorMap = {red:"p1", blue:"p2", yellow:"p3", green:"p4"};
-
 const buildingPositions = {
-  1: { x: 740, y: 789 },
-  3: { x: 595, y: 789 },
-  6: { x: 373, y: 789 },
-  8: { x: 232, y: 789 },
-  9: { x: 160, y: 789 },
+  1: { x: 740, y: 791 },
+  3: { x: 595, y: 791 },
+  6: { x: 373, y: 791 },
+  8: { x: 232, y: 791 },
+  9: { x: 160, y: 791 },
   11: { x: 105, y: 735 },
   12: { x: 105, y: 665 },
   14: { x: 105, y: 515 },
@@ -276,14 +395,18 @@ const buildingPositions = {
   34: { x: 790, y: 370 },
   37: { x: 790, y: 590 },
   39: { x: 790, y: 730 },
-  0: { x: 595, y: 676 },
-  10: { x: 675, y: 590 },
-  20: { x: 305, y: 676 },
-  30: { x: 221, y: 590 },
-  5: { x: 220, y: 305 },
-  15: { x: 304, y: 223 },
-  25: { x: 595, y: 223 },
-  35: { x: 676, y: 305 }
+  0: { x: 595, y: 677 },
+  4: { x: 525, y: 677 },
+  5: { x: 676, y: 590 },
+  10: { x: 305, y: 676 },
+  13: { x: 221, y: 590 },
+  15: { x: 380, y: 676 },
+  20: { x: 220, y: 305 },
+  25: { x: 220, y: 375 },
+  27: { x: 304, y: 223 },
+  30: { x: 595, y: 223 },
+  35: { x: 676, y: 305 },
+  38: { x: 523, y: 222 }
 };
 
 // Robust function to render pieces

@@ -82,7 +82,7 @@ html, body {
 }
 
 .moneyBox {
-  padding: 15px 20px;   /* bigger padding */
+  padding: 10px 20px;   /* bigger padding */
   border-radius: 12px;
   width: 100%;          /* fills container */
   text-align: center;
@@ -105,7 +105,7 @@ html, body {
   align-items:center;
 }
 .displayBox{
-  padding:15px 20px;
+  padding:8px 14px;
   border-radius:12px;
   width:300px;
   text-align:center;
@@ -123,14 +123,14 @@ html, body {
   z-index:20;
 }
 #propertyLink img, #rulesLink img{
-  width:80px;
+  width:75px;
   border-radius:8px;
   box-shadow:0 0 6px rgba(255,255,255,0.5);
 }
 
 /* Example positions: */
 #propertyLink{ top:40%; left:265px; transform:translateY(-50%); }
-#rulesLink{ top:50%; right:550px; transform:translateY(-50%); }
+#rulesLink{ top:50%; right:560px; transform:translateY(-50%); }
 
 /* Buildings */
 .hotel,.house{
@@ -278,6 +278,7 @@ html, body {
 <div id="money-p4-overlay" class="moneyBox green">Player4: $0</div>
 </div>
 <div id="displayContainer">
+<div id="display1" class="displayBox">Display 1</div>
 <div id="display2" class="displayBox">Display 2</div>
 </div>
 </div>
@@ -479,14 +480,18 @@ const buildingPositions = {
   34: { x: 790, y: 370 },
   37: { x: 790, y: 590 },
   39: { x: 790, y: 730 },
-  0: { x: 595, y: 676 },
-  10: { x: 675, y: 590 },
-  20: { x: 305, y: 676 },
-  30: { x: 221, y: 590 },
-  5: { x: 220, y: 305 },
-  15: { x: 304, y: 223 },
-  25: { x: 595, y: 223 },
-  35: { x: 676, y: 305 }
+  0: { x: 595, y: 677 },
+  4: { x: 525, y: 677 },
+  5: { x: 676, y: 590 },
+  10: { x: 305, y: 676 },
+  13: { x: 221, y: 590 },
+  15: { x: 380, y: 676 },
+  20: { x: 220, y: 305 },
+  25: { x: 220, y: 375 },
+  27: { x: 304, y: 223 },
+  30: { x: 595, y: 223 },
+  35: { x: 676, y: 305 },
+  38: { x: 523, y: 222 }
 };
 
 // Robust function to render pieces
@@ -713,7 +718,15 @@ allSpaces.forEach(spaceNum => {
     boardButtonsContainer.appendChild(btn);
 });
 
-
+// Make board buttons invisible
+boardButtonsContainer.querySelectorAll('button').forEach(btn => {
+    const spaceNum = parseInt(btn.textContent);
+    if (spaceNum >= 1 && spaceNum <= 63) {
+        btn.style.backgroundColor = 'transparent';
+        btn.style.border = 'none';
+        btn.style.color = 'transparent';
+    }
+});
 
 
 // Refresh board image
