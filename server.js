@@ -384,12 +384,9 @@ function createBot(nick, defaultTarget, options = {}) {
 
 // --- Create bots ---
 const bots = {
-  dice1bot:createBot('dice1bot','dicebot'),
-  dice2bot:createBot('dice2bot','dicebot'),
-  player1bot:createBot('player1bot','##rento'),
-  player2bot:createBot('player2bot','##rento'),
-  player3bot:createBot('player3bot','##rento'),
-  player4bot:createBot('player4bot','##rento')
+ 
+  
+  player44bot:createBot('player44bot','##rento')
 };
 
 // --- Express + Socket.IO endpoints ---
