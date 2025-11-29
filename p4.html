@@ -494,27 +494,48 @@ const buildingPositions = {
   38: { x: 523, y: 220 }
 };
 
-// Robust function to render pieces
 function updatePieces(data){
     if(!data || typeof data !== 'object'){
         console.warn("Pieces data invalid:", data);
         return;
     }
 
+    // Map positions to arrays of colors (to detect overlaps)
+    const posMap = {};
+
     for(const [color, pos] of Object.entries(data)){
-        const id = colorMap[color];
-        if(!id){ console.warn("Unknown color:", color); continue; }
-        const el = document.getElementById(id);
-        if(!el){ console.warn("Missing element:", id); continue; }
         if(!pos || typeof pos.x !== "number" || typeof pos.y !== "number"){
             console.warn("Invalid position for", color, pos);
             continue;
         }
-        el.style.left = pos.x + 'px';
-        el.style.top  = pos.y + 'px';
-        el.style.zIndex = 20; // above board image
+
+        const key = `${pos.x},${pos.y}`;
+        if(!posMap[key]) posMap[key] = [];
+        posMap[key].push(color);
+    }
+
+    for(const [key, colors] of Object.entries(posMap)){
+        const [baseX, baseY] = key.split(',').map(Number);
+
+        colors.forEach((color, idx) => {
+            const id = colorMap[color];
+            if(!id) return;
+            const el = document.getElementById(id);
+            if(!el) return;
+
+            // Slight offsets for overlapping pieces
+            let offsetX = 0, offsetY = 0;
+            if(idx === 1){ offsetX = 10; offsetY = 0; }  // second player
+            if(idx === 2){ offsetX = 0; offsetY = 10; }  // third player
+            if(idx === 3){ offsetX = 10; offsetY = 10; } // fourth player
+
+            el.style.left = (baseX + offsetX) + 'px';
+            el.style.top  = (baseY + offsetY) + 'px';
+            el.style.zIndex = 20;
+        });
     }
 }
+
 
 // Displays
 function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }
