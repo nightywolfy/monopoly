@@ -19,6 +19,7 @@ app.set('trust proxy', true);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100kb' }));
 
+
 // --- Persistent files ---
 const moneyFile = path.join(__dirname, 'money.json');
 const hotelsFile = path.join(__dirname, 'hotels.json');
@@ -26,7 +27,7 @@ const housesFile = path.join(__dirname, 'houses.json');
 const piecesFile = path.join(__dirname, 'pieces.json');
 const display1File = path.join(__dirname, 'display1.json');
 const display2File = path.join(__dirname, 'display2.json');
-const dotsFile = path.join(__dirname, 'dots.json');
+
 
 // --- File helpers ---
 function safeReadJSON(file, fallback = {}) {
@@ -58,7 +59,6 @@ let houses = safeReadJSON(housesFile, {});
 let pieces = safeReadJSON(piecesFile, { red:{x:825,y:755}, blue:{x:825,y:755}, yellow:{x:825,y:755}, green:{x:825,y:755} });
 let display1 = safeReadJSON(display1File, { text: "" });
 let display2 = safeReadJSON(display2File, { text: "" });
-let activeDots = safeReadJSON(dotsFile, {});
 
 const saveMoney = () => safeWriteJSON(moneyFile, money);
 const saveHotels = () => safeWriteJSON(hotelsFile, hotels);
@@ -66,7 +66,6 @@ const saveHouses = () => safeWriteJSON(housesFile, houses);
 const savePieces = () => safeWriteJSON(piecesFile, pieces);
 const saveDisplay1 = () => safeWriteJSON(display1File, display1);
 const saveDisplay2 = () => safeWriteJSON(display2File, display2);
-const saveDots = () => safeWriteJSON(dotsFile, activeDots);
 
 // ------------------------------
 // Player HTML files
@@ -203,128 +202,59 @@ function initializeDefaults() {
   for (const color of Object.values(colorMap)) { if (!pieces[color]) pieces[color] = { x: 825, y: 755 }; }
   if (!display1.text) display1.text = "";
   if (!display2.text) display2.text = "";
-  saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2(); saveDots();
+  saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2();
 }
 initializeDefaults();
 
 // --- Socket Emit Helpers ---
 function safeEmit(event, data) { try { io.emit(event, data); } catch (err) { console.error(`[Socket] Emit failed (${event}):`, err); } }
-
 // --- Player update helpers ---
-function updatePiece(player,x,y){ const color=colorMap[player]; if(!color) return; const current=pieces[color]; if(current&&current.x===x&&current.y===y) return; pieces[color]={x,y}; savePieces(); safeEmit('piecesUpdate',pieces); }
-function updateDisplay1(newText){ if(display1.text===newText) return; display1.text=newText; saveDisplay1(); safeEmit('displayUpdate1',{text:display1.text}); }
-function updateDisplay2(newText){ if(display2.text===newText) return; display2.text=newText; saveDisplay2(); safeEmit('displayUpdate2',{text:display2.text}); }
-function updateMoney(player,amount){ if(!colorMap[player]||money[player]===amount) return; money[player]=amount; saveMoney(); safeEmit('moneyUpdate',money); }
-function updateBuildings(targetObj,spaces,unset=false){ let changed=false; spaces.forEach(space=>{ if(space<0||space>39) return; if(targetObj[space]!==!unset){ targetObj[space]=!unset; changed=true; } }); if(!changed) return false; if(targetObj===hotels) saveHotels(); else saveHouses(); safeEmit(targetObj===hotels?'hotelsUpdate':'housesUpdate',targetObj); return true; }
+function updatePiece(player, x, y) { 
+  const color = colorMap[player]; 
+  if (!color) return; 
+  const current = pieces[color]; 
+  if (current && current.x === x && current.y === y) return; 
+  pieces[color] = { x, y }; 
+  savePieces(); 
+  safeEmit('piecesUpdate', pieces); 
+}
 
-// --- Dots ---
-function updateDot(num,color){
-  const n=Number(num); if(Number.isNaN(n)) return false;
-  const table=currentMap===1?coordinates1:coordinates2;
-  const pos=table[n]; if(!pos) return false;
-  activeDots[String(n)]={x:pos.x,y:pos.y,color:String(color)};
-  saveDots(); safeEmit('draw-dot',{x:pos.x,y:pos.y,color,num:n});
+function updateDisplay1(newText) { 
+  if (display1.text === newText) return; 
+  display1.text = newText; 
+  saveDisplay1(); 
+  safeEmit('displayUpdate1', { text: display1.text }); 
+}
+
+function updateDisplay2(newText) { 
+  if (display2.text === newText) return; 
+  display2.text = newText; 
+  saveDisplay2(); 
+  safeEmit('displayUpdate2', { text: display2.text }); 
+}
+
+function updateMoney(player, amount) { 
+  if (!colorMap[player] || money[player] === amount) return; 
+  money[player] = amount; 
+  saveMoney(); 
+  safeEmit('moneyUpdate', money); 
+}
+
+function updateBuildings(targetObj, spaces, unset = false) {
+  let changed = false;
+  spaces.forEach(space => { 
+    if (space < 0 || space > 39) return; 
+    if (targetObj[space] !== !unset) { 
+      targetObj[space] = !unset; 
+      changed = true; 
+    } 
+  });
+  if (!changed) return false;
+  if (targetObj === hotels) saveHotels(); else saveHouses();
+  safeEmit(targetObj === hotels ? 'hotelsUpdate' : 'housesUpdate', targetObj);
   return true;
 }
-function removeDot(num){ const n=Number(num); if(isNaN(n)||!activeDots[String(n)]) return false; delete activeDots[String(n)]; saveDots(); safeEmit('remove-dot',n); return true; }
-function clearAllDots(){ activeDots={}; saveDots(); safeEmit('clear-all-dots'); }
-
-
-const coordinates1 = {
-    1:  {x:731, y:761},
-    3:  {x:587, y:761},
-    4:  {x:518, y:761},
-    5:  {x:446, y:761},
-    6:  {x:373, y:761},
-    8:  {x:227, y:761},
-    9:  {x:156, y:761},
-    11: {x:125, y:731},
-    12: {x:125, y:661},
-    13: {x:125, y:590},
-    14: {x:125, y:515},
-    15: {x:125, y:444},
-    16: {x:125, y:369},
-    17: {x:125, y:300},
-    19: {x:125, y:154},
-    21: {x:157, y:124},
-    22: {x:227, y:124},
-    24: {x:373, y:124},
-    25: {x:446, y:124},
-    26: {x:517, y:124},
-    27: {x:591, y:124},
-    28: {x:665, y:124},
-    29: {x:735, y:124},
-    31: {x:759, y:153},
-    33: {x:759, y:296},
-    34: {x:759, y:369},
-    35: {x:759, y:443},
-    37: {x:759, y:588},
-    38: {x:759, y:661},
-    39: {x:759, y:732}
-};
-
-
-
-
-
-const coordinates2 = {
-1:  {x:760, y:875},
-3:  {x:617, y:875},
-4:  {x:544, y:875},
-5:  {x:471, y:875},
-6:  {x:399, y:875},
-8:  {x:255, y:875},
-9:  {x:183, y:875},
-11: {x: 13, y: 760},
-12: {x: 13, y: 687},
-13: {x: 13, y: 616},
-14: {x: 13, y: 542},
-15: {x: 13, y: 468},
-16: {x: 13, y: 397},
-17: {x: 13, y: 324},
-19: {x: 13, y: 178},
-21: {x: 182, y: 12},
-22: {x: 255, y: 12},
-24: {x: 400, y: 12},
-25: {x: 472, y: 12},
-26: {x: 545, y: 12},
-27: {x: 616, y: 12},
-28: {x: 688, y: 12},
-29: {x: 762, y: 12},
-31: {x: 872, y: 178},
-33: {x: 872, y: 324},
-34: {x: 872, y: 396},
-35: {x: 872, y: 469},
-37: {x: 872, y: 615},
-38: {x: 872, y: 688},
-39: {x: 872, y: 760},
-40: {x: 758, y: 760},
-41: {x: 616, y: 760},
-42: {x: 544, y: 760},
-44: {x: 399, y: 760},
-45: {x: 326, y: 760},
-46: {x: 126, y: 760},    
-47: {x: 126, y: 615},
-50: {x: 126, y: 395},
-51: {x: 126, y: 324},
-52: {x: 126, y: 126},    
-53: {x:326, y:126},
-56: {x:545, y:126},
-57: {x:617, y:126},
-58: {x:758, y:126},
-59: {x:758, y:324},
-63: {x:758, y:616}
-};
-
-
-// current map state (1 or 2)
-let currentMap = 2;
-
-
-
-// ------------------------------------------------------------------
-// IRC Bot Factory (unchanged) but extended with dot/map commands
-// ------------------------------------------------------------------
+// --- IRC Bot Factory ---
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
   const host = options.host || 'irc.libera.chat';
@@ -389,7 +319,6 @@ function createBot(nick, defaultTarget, options = {}) {
         const args = parts;
 
         switch(cmd) {
-          
           case '!set': {
             if (args[0]?.toLowerCase() !== 'all' || args.length !== Object.keys(colorMap).length + 1) { safeSay(defaultTarget, `Usage: !set all <amounts for ${Object.keys(colorMap).length} players>`); break; }
             const amounts = args.slice(1).map(a=>parseInt(a,10));
@@ -432,44 +361,6 @@ function createBot(nick, defaultTarget, options = {}) {
 
           case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }
 
-          case '!dot': {
-            
-            if(args.length>=1){
-            const n=args[0];
-            const color=args[1]||'red';
-            if(updateDot(n,color)) safeSay(event.target,`Dot set: ${n} -> ${color}`);
-            else safeSay(event.target,`Invalid number: ${n}`);
-          }
-          break;
-        }
-          
-       
-          case '!removedot': {
-          if (args.length >= 1) {
-            const n = args[0];
-            if (removeDot(n)) safeSay(event.target, `Dot removed: ${n}`);
-            else safeSay(event.target, `No dot at ${n}`);
-          }
-          break;
-        }
-
-          case '!cleardot': {
-            clearAllDots();
-            safeSay(event.target,"All dots cleared");
-          break;
-        }
-
-          case '!map': {
-            // Usage: !map 1 or !map 2
-            const num = parseInt(args[0],10);
-            if (![1,2].includes(num)) { safeSay(defaultTarget, 'Usage: !map 1 or !map 2'); break; }
-            currentMap = num;
-            safeEmit('map-change', currentMap);
-            safeEmit('reload-dots', activeDots);
-            safeSay(defaultTarget, `Switched to map ${currentMap}`);
-            break;
-          }
-
           default: break;
         }
       }
@@ -488,6 +379,8 @@ function createBot(nick, defaultTarget, options = {}) {
 
 // --- Create bots ---
 const bots = {
+ 
+  
   player22bot:createBot('player22bot','##rento')
 };
 
@@ -540,20 +433,6 @@ io.on('connection',(socket)=>{
       if(newText) updateDisplay2(newText); 
     });
 
-
-    socket.emit('map-change', currentMap);
-    socket.emit('reload-dots', activeDots);
-    socket.on('cmd-dot', ({ num, color }) => updateDot(num, color));
-    socket.on('cmd-remove', num => removeDot(num));
-    socket.on('cmd-cleardot', () => clearAllDots());
-    socket.on('cmd-map', (num) => {
-      if (![1,2].includes(Number(num))) return;
-      currentMap = Number(num);
-      safeEmit('map-change', currentMap);
-      safeEmit('reload-dots', activeDots);
-    });
-   
-
     socket.on('disconnect',()=>console.log(`[Socket] Frontend disconnected: ${ip}`));
   } catch(err){ console.error('[Socket] Error:',err); }
 });
@@ -566,7 +445,6 @@ app.get('/hotels.json',(_,res)=>res.json(hotels));
 app.get('/houses.json',(_,res)=>res.json(houses));
 app.get('/display1.json',(_,res)=>res.json(display1));
 app.get('/display2.json',(_,res)=>res.json(display2));
-app.get('/dots.json', (_, res) => res.json(activeDots));
 
 
 // --- Graceful shutdown ---
@@ -579,7 +457,7 @@ async function gracefulShutdown(signal) {
   console.log(`[Server] Received ${signal}, shutting down gracefully...`);
 
   try {
-    saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2(); saveDots();
+    saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2();
 
     for (const bot of Object.values(bots)) {
       try { bot.destroy(); } catch (err) { console.error(`[Server] Error destroying bot:`, err); }
