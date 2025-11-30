@@ -460,14 +460,18 @@ function createBot(nick, defaultTarget, options = {}) {
         }
 
           case '!map': {
-            const num = parseInt(args[0],10);
-            if (Number.isNaN(num) || num < 1) { safeSay(defaultTarget, 'Usage: !map 1 or !map 2'); break; }
+            const num = parseInt(args[0], 10);
+            if (Number.isNaN(num) || num < 1) {
+              safeSay(defaultTarget, 'Usage: !map <number> (e.g., !map 1, !map 2, !map 3)');
+              break;
+            }
             currentMap = num;
-            safeEmit('map-change', currentMap);
+            safeEmit('map-change', currentMap);      // frontend should now load map<num>.png
             safeEmit('reload-dots', activeDots);
             safeSay(defaultTarget, `Switched to map ${currentMap}`);
             break;
           }
+
 
           default: break;
         }
@@ -546,8 +550,9 @@ io.on('connection',(socket)=>{
     socket.on('cmd-remove', num => removeDot(num));
     socket.on('cmd-cleardot', () => clearAllDots());
     socket.on('cmd-map', (num) => {
-      if (![1,2].includes(Number(num))) return;
-      currentMap = Number(num);
+      const n = Number(num);
+      if (Number.isNaN(n) || n < 1) return;
+      currentMap = n;
       safeEmit('map-change', currentMap);
       safeEmit('reload-dots', activeDots);
     });
