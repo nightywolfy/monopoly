@@ -255,7 +255,15 @@ html, body {
 .white-btn.plus:hover { background-color: #218838 !important; }
 .white-btn.minus:hover { background-color: #c82333 !important; }
 
-
+.dot {
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  position:absolute;
+  z-index:30;
+  border:2px solid black; /* outer black border */
+  box-shadow: 0 0 1px 1px white; /* optional inner border/highlight */
+}
 
 </style>
 </head>
@@ -283,8 +291,8 @@ html, body {
 </div>
 </div>
 <div id="propertyLink">
-<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg" target="_blank">
-<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/properties.jpg">
+<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property.png" target="_blank">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property.png">
 </a>
 </div>
 <div id="rulesLink">
@@ -456,6 +464,8 @@ html, body {
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
+let currentMap = 1;
+let activeDots = {};
 const colorMap = {red:"p1", blue:"p2", yellow:"p3", green:"p4"};
 const buildingPositions = {
   1: { x: 740, y: 795 },
@@ -469,30 +479,55 @@ const buildingPositions = {
   16: { x: 105, y: 375 },
   17: { x: 105, y: 300 },
   19: { x: 105, y: 155 },
-  21: { x: 156, y: 104 },
-  22: { x: 230, y: 104 },
-  24: { x: 375, y: 104 },
-  26: { x: 520, y: 104 },
-  28: { x: 665, y: 104 },
-  29: { x: 740, y: 104 },
+  21: { x: 156, y: 105 },
+  22: { x: 230, y: 105 },
+  24: { x: 375, y: 105 },
+  26: { x: 520, y: 105 },
+  28: { x: 665, y: 105 },
+  29: { x: 740, y: 105 },
   31: { x: 793, y: 155 },
   33: { x: 793, y: 300 },
   34: { x: 793, y: 370 },
   37: { x: 793, y: 590 },
-  39: { x: 793, y: 734 },
-  0: { x: 595, y: 681 },
-  4: { x: 525, y: 681 },
-  5: { x: 679, y: 590 },
-  10: { x: 305, y: 681 },
+  39: { x: 793, y: 730 },
+  0: { x: 595, y: 680 },
+  4: { x: 525, y: 680 },
+  5: { x: 678, y: 590 },
+  10: { x: 305, y: 680 },
   13: { x: 218, y: 590 },
-  15: { x: 380, y: 681 },
+  15: { x: 380, y: 680 },
   20: { x: 218, y: 305 },
   25: { x: 218, y: 375 },
   27: { x: 304, y: 220 },
   30: { x: 595, y: 220 },
-  35: { x: 679, y: 303 },
+  35: { x: 678, y: 305 },
   38: { x: 523, y: 220 }
 };
+
+function renderDotsFromServer(data){
+  const board = document.getElementById('board');
+  if(!data) return;
+  for(const [num, info] of Object.entries(data)){
+    if(!info) continue;
+    if(activeDots[num]){
+      // Update existing dot
+      const el = activeDots[num];
+      el.style.left = info.x+'px';
+      el.style.top = info.y+'px';
+      el.style.background = info.color || '#fff';
+    } else {
+      // Create new dot
+      const el = document.createElement('div');
+      el.className = 'dot';
+      el.style.left = info.x+'px';
+      el.style.top = info.y+'px';
+      el.style.background = info.color || '#fff';
+      el.style.zIndex = 30;
+      board.appendChild(el);
+      activeDots[num] = el;
+    }
+  }
+}
 
 function updatePieces(data){
     if(!data || typeof data !== 'object'){
@@ -597,21 +632,7 @@ function renderElements(type, data, imgSrc){
 }
 
 
-// Initial fetch
-fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
-fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
-fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
-fetch('/money.json').then(res=>res.json()).then(updateMoney);
-fetch('/hotels.json').then(res=>res.json()).then(data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
-fetch('/houses.json').then(res=>res.json()).then(data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
-// Socket.IO updates
-socket.on('piecesUpdate',updatePieces);
-socket.on('displayUpdate1', data => updateDisplay1(data.text));
-socket.on('displayUpdate2', data => updateDisplay2(data.text));
-socket.on('moneyUpdate',updateMoney);
-socket.on('hotelsUpdate',data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
-socket.on('housesUpdate',data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
 
 const boardSpaces = [
   { number: 1, x: 717, y: 779 }, 
@@ -749,13 +770,26 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
     }
 });
 
+socket.on('piecesUpdate', updatePieces);
+socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
+socket.on('map-change', n => document.getElementById('boardImg').src = (n===1?'map.png':'map'+n+'.png'));
+socket.on('reload-dots', data => { renderDotsFromServer(data); });
+socket.on('displayUpdate1', data=>updateDisplay1(data.text));
+socket.on('displayUpdate2', data=>updateDisplay2(data.text));
+socket.on('moneyUpdate', updateMoney);
+socket.on('housesUpdate', data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
+socket.on('hotelsUpdate', data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
+socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
+socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
 
-// Refresh board image
-function refreshBoardImage() {
-    const boardImg = document.getElementById('boardImg');
-    boardImg.src = 'map2.jpg?t=' + Date.now();
-}
-setInterval(refreshBoardImage, 99000);
+// Initial fetch
+fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
+fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
+fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
+fetch('/money.json').then(res=>res.json()).then(updateMoney);
+fetch('/hotels.json').then(res=>res.json()).then(data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
+fetch('/houses.json').then(res=>res.json()).then(data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
+
 
 </script>
 </body>
