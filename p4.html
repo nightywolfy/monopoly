@@ -272,7 +272,7 @@ html, body {
 <!-- Left: Board -->
 <div id="boardContainer">
 <div id="board">
-<img id="boardImg" src="map2.jpg" alt="Monopoly Board">
+<img id="boardImg" src="map2.png" alt="Monopoly Board">
 <div id="p1" class="piece red">p1</div>
 <div id="p2" class="piece blue">p2</div>
 <div id="p3" class="piece yellow">p3</div>
@@ -772,7 +772,7 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
 
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
-socket.on('map-change', n => document.getElementById('boardImg').src = (n===1?'map.png':'map'+n+'.png'));
+socket.on('map-change', n => document.getElementById('board-img').src = `map${n}.png`);
 socket.on('reload-dots', data => { renderDotsFromServer(data); });
 socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));

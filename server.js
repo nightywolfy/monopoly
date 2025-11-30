@@ -460,9 +460,8 @@ function createBot(nick, defaultTarget, options = {}) {
         }
 
           case '!map': {
-            // Usage: !map 1 or !map 2
             const num = parseInt(args[0],10);
-            if (![1,2].includes(num)) { safeSay(defaultTarget, 'Usage: !map 1 or !map 2'); break; }
+            if (Number.isNaN(num) || num < 1) { safeSay(defaultTarget, 'Usage: !map 1 or !map 2'); break; }
             currentMap = num;
             safeEmit('map-change', currentMap);
             safeEmit('reload-dots', activeDots);
