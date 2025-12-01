@@ -363,27 +363,28 @@ function createBot(nick, defaultTarget, options = {}) {
             if(args.length>=1){
             const n=args[0];
             const color=args[1]||'red';
-            if(updateDot(n,color)) safeSay(event.target,`Dot set: ${n} -> ${color}`);
-            else safeSay(event.target,`Invalid number: ${n}`);
+            if(updateDot(n,color)) safeSay(defaulttarget,`Dot set: ${n} -> ${color}`);
+            else safeSay(defaulttarget,`Invalid number: ${n}`);
           }
           break;
-        }
+          }
           
        
           case '!removedot': {
           if (args.length >= 1) {
             const n = args[0];
-            if (removeDot(n)) safeSay(event.target, `Dot removed: ${n}`);
-            else safeSay(event.target, `No dot at ${n}`);
+            if (removeDot(n)) safeSay(defaulttarget, `Dot removed: ${n}`);
+            else safeSay(defaulttarget, `No dot at ${n}`);
           }
           break;
-        }
+          }
 
           case '!cleardot': {
+            const count = Object.keys(activeDots).length;
             clearAllDots();
-            safeSay(event.target,"All dots cleared");
-          break;
-        }
+            safeSay(defaultTarget, `Cleared ${count} dot(s)`);
+            break;
+          }
         
         // --- COORDINATE TABLE SWITCH ---
           case '!dotlocation': {
@@ -430,7 +431,6 @@ function createBot(nick, defaultTarget, options = {}) {
 
 
 const bots = {
-
 
   player11bot: createBot('player11bot', '##rento')
 };
