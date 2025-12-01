@@ -230,92 +230,18 @@ function removeDot(num){ const n=Number(num); if(isNaN(n)||!activeDots[String(n)
 function clearAllDots(){ activeDots={}; saveDots(); safeEmit('clear-all-dots'); }
 
 
-const coordinates1 = {
-    1:  {x:731, y:761},
-    3:  {x:587, y:761},
-    4:  {x:518, y:761},
-    5:  {x:446, y:761},
-    6:  {x:373, y:761},
-    8:  {x:227, y:761},
-    9:  {x:156, y:761},
-    11: {x:125, y:731},
-    12: {x:125, y:661},
-    13: {x:125, y:590},
-    14: {x:125, y:515},
-    15: {x:125, y:444},
-    16: {x:125, y:369},
-    17: {x:125, y:300},
-    19: {x:125, y:154},
-    21: {x:157, y:124},
-    22: {x:227, y:124},
-    24: {x:373, y:124},
-    25: {x:446, y:124},
-    26: {x:517, y:124},
-    27: {x:591, y:124},
-    28: {x:665, y:124},
-    29: {x:735, y:124},
-    31: {x:759, y:153},
-    33: {x:759, y:296},
-    34: {x:759, y:369},
-    35: {x:759, y:443},
-    37: {x:759, y:588},
-    38: {x:759, y:661},
-    39: {x:759, y:732}
-};
+// --- Dot coordinate tables ---
+const coordinates1 = { 1:{x:731,y:761},3:{x:587,y:761},4:{x:518,y:761},5:{x:446,y:761},6:{x:373,y:761},8:{x:227,y:761},9:{x:156,y:761},
+11:{x:125,y:731},12:{x:125,y:661},13:{x:125,y:590},14:{x:125,y:515},15:{x:125,y:444},16:{x:125,y:369},17:{x:125,y:300},19:{x:125,y:154},
+21:{x:157,y:124},22:{x:227,y:124},24:{x:373,y:124},25:{x:446,y:124},26:{x:517,y:124},27:{x:591,y:124},28:{x:665,y:124},29:{x:735,y:124},
+31:{x:759,y:153},33:{x:759,y:296},34:{x:759,y:369},35:{x:759,y:443},37:{x:759,y:588},38:{x:759,y:661},39:{x:759,y:732} };
 
-
-
-
-
-const coordinates2 = {
-1:  {x:760, y:875},
-3:  {x:617, y:875},
-4:  {x:544, y:875},
-5:  {x:471, y:875},
-6:  {x:399, y:875},
-8:  {x:255, y:875},
-9:  {x:183, y:875},
-11: {x: 13, y: 760},
-12: {x: 13, y: 687},
-13: {x: 13, y: 616},
-14: {x: 13, y: 542},
-15: {x: 13, y: 468},
-16: {x: 13, y: 397},
-17: {x: 13, y: 324},
-19: {x: 13, y: 178},
-21: {x: 182, y: 12},
-22: {x: 255, y: 12},
-24: {x: 400, y: 12},
-25: {x: 472, y: 12},
-26: {x: 545, y: 12},
-27: {x: 616, y: 12},
-28: {x: 688, y: 12},
-29: {x: 762, y: 12},
-31: {x: 872, y: 178},
-33: {x: 872, y: 324},
-34: {x: 872, y: 396},
-35: {x: 872, y: 469},
-37: {x: 872, y: 615},
-38: {x: 872, y: 688},
-39: {x: 872, y: 760},
-40: {x: 758, y: 760},
-41: {x: 616, y: 760},
-42: {x: 544, y: 760},
-44: {x: 399, y: 760},
-45: {x: 326, y: 760},
-46: {x: 126, y: 760},    
-47: {x: 126, y: 615},
-50: {x: 126, y: 395},
-51: {x: 126, y: 324},
-52: {x: 126, y: 126},    
-53: {x:326, y:126},
-56: {x:545, y:126},
-57: {x:617, y:126},
-58: {x:758, y:126},
-59: {x:758, y:324},
-63: {x:758, y:616}
-};
-
+const coordinates2 = { 1:{x:760,y:875},3:{x:617,y:875},4:{x:544,y:875},5:{x:471,y:875},6:{x:399,y:875},8:{x:255,y:875},9:{x:183,y:875},
+11:{x:13,y:760},12:{x:13,y:687},13:{x:13,y:616},14:{x:13,y:542},15:{x:13,y:468},16:{x:13,y:397},17:{x:13,y:324},19:{x:13,y:178},
+21:{x:182,y:12},22:{x:255,y:12},24:{x:400,y:12},25:{x:472,y:12},26:{x:545,y:12},27:{x:616,y:12},28:{x:688,y:12},29:{x:762,y:12},
+31:{x:872,y:178},33:{x:872,y:324},34:{x:872,y:396},35:{x:872,y:469},37:{x:872,y:615},38:{x:872,y:688},39:{x:872,y:760},40:{x:758,y:760},
+41:{x:616,y:760},42:{x:544,y:760},44:{x:399,y:760},45:{x:326,y:760},46:{x:126,y:760},47:{x:126,y:615},50:{x:126,y:395},51:{x:126,y:324},
+52:{x:126,y:126},53:{x:326,y:126},56:{x:545,y:126},57:{x:617,y:126},58:{x:758,y:126},59:{x:758,y:324},63:{x:758,y:616} };
 
 // current map state (1 or 2)
 let currentMap = 2;
@@ -458,18 +384,30 @@ function createBot(nick, defaultTarget, options = {}) {
             safeSay(event.target,"All dots cleared");
           break;
         }
-
-          case '!map': {
+        
+        // --- COORDINATE TABLE SWITCH ---
+          case '!dotlocation': {
             const num = parseInt(args[0], 10);
-            if (Number.isNaN(num) || num < 1) {
-              safeSay(defaultTarget, 'Usage: !map <number> (e.g., !map 1, !map 2, !map 3)');
+            if (Number.isNaN(num) || (num !== 1 && num !== 2)) {
+              safeSay(defaultTarget, 'Usage: !dotlocation <1 or 2>');
               break;
             }
             currentMap = num;
-            safeEmit('map-change', currentMap);      // frontend should now load map<num>.png
             safeEmit('reload-dots', activeDots);
-            safeSay(defaultTarget, `Switched to map ${currentMap}`);
+            safeSay(defaultTarget, `Switched coordinates table to coordinates${num}`);
             break;
+          }
+
+          case '!map': {
+            const num = parseInt(args[0], 10);
+            if (isNaN(num) || num < 1) {
+              safeSay(defaultTarget, 'Usage: !map <number> (e.g., !map 1, !map 2)');
+              break;
+            }
+            safeEmit('map-change', num);
+            safeSay(defaultTarget, `Switched map image to map${num}.png`);
+            break;
+            
           }
 
 
@@ -557,6 +495,13 @@ io.on('connection',(socket)=>{
       if (Number.isNaN(n) || n < 1) return;
       currentMap = n;
       safeEmit('map-change', currentMap);
+      safeEmit('reload-dots', activeDots);
+    });
+    
+    socket.on('cmd-dotlocation', num => {
+      const n = Number(num);
+      if(Number.isNaN(n) || (n !== 1 && n !== 2)) return;
+      currentMap = n;
       safeEmit('reload-dots', activeDots);
     });
    
