@@ -1,6 +1,3 @@
-// Full server.js — unified buildings, motel removed, !unbuilding added,
-// getHotels/getHouses socket handlers removed, /hotels.json and /houses.json endpoints removed.
-
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -24,7 +21,8 @@ app.use(express.json({ limit: '100kb' }));
 
 // --- Persistent files ---
 const moneyFile = path.join(__dirname, 'money.json');
-const buildingsFile = path.join(__dirname, 'building.json');
+const hotelsFile = path.join(__dirname, 'hotels.json');
+const housesFile = path.join(__dirname, 'houses.json');
 const piecesFile = path.join(__dirname, 'pieces.json');
 const display1File = path.join(__dirname, 'display1.json');
 const display2File = path.join(__dirname, 'display2.json');
@@ -52,31 +50,23 @@ function safeWriteJSON(file, data) {
   }
 }
 
-// --- Load persisted state ---
+
+
 let money = safeReadJSON(moneyFile, { p1: 10, p2: 10, p3: 10, p4: 10 });
+let hotels = safeReadJSON(hotelsFile, {});
+let houses = safeReadJSON(housesFile, {});
 let pieces = safeReadJSON(piecesFile, { red:{x:825,y:755}, blue:{x:825,y:755}, yellow:{x:825,y:755}, green:{x:825,y:755} });
 let display1 = safeReadJSON(display1File, { text: "" });
 let display2 = safeReadJSON(display2File, { text: "" });
 let activeDots = safeReadJSON(dotsFile, {});
-let buildings = safeReadJSON(buildingsFile, {});
-
-for (const k of Object.keys(buildings)) {
-  if (buildings[k] === 'motel') delete buildings[k];
-}
-
-
 
 const saveMoney = () => safeWriteJSON(moneyFile, money);
-const saveBuildings = () => safeWriteJSON(buildingsFile, buildings);
+const saveHotels = () => safeWriteJSON(hotelsFile, hotels);
+const saveHouses = () => safeWriteJSON(housesFile, houses);
 const savePieces = () => safeWriteJSON(piecesFile, pieces);
 const saveDisplay1 = () => safeWriteJSON(display1File, display1);
 const saveDisplay2 = () => safeWriteJSON(display2File, display2);
 const saveDots = () => safeWriteJSON(dotsFile, activeDots);
-
-
-
-
-
 
 // ------------------------------
 // Player HTML files
@@ -109,7 +99,7 @@ function generateKey() {
 const KEY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
 
 // ------------------------------
-// Cleanup expired keys every 4 minutes (keeps behavior similar to your previous value)
+// Cleanup expired keys every minute
 // ------------------------------
 setInterval(() => {
     const now = Date.now();
@@ -209,12 +199,11 @@ const colorMap = { p1: 'red', p2: 'blue', p3: 'yellow', p4: 'green' };
 // --- Initialize defaults ---
 function initializeDefaults() {
   Object.keys(colorMap).forEach(p => { if (money[p] === undefined) money[p] = 10; });
-  // buildings object exists (no need to prefill with false). Ensure it's an object.
-  if (!buildings || typeof buildings !== 'object') buildings = {};
+  for (let i = 0; i < 40; i++) { if (hotels[i] === undefined) hotels[i] = false; if (houses[i] === undefined) houses[i] = false; }
   for (const color of Object.values(colorMap)) { if (!pieces[color]) pieces[color] = { x: 825, y: 755 }; }
   if (!display1.text) display1.text = "";
   if (!display2.text) display2.text = "";
-  saveMoney(); saveBuildings(); savePieces(); saveDisplay1(); saveDisplay2(); saveDots();
+  saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2(); saveDots();
 }
 initializeDefaults();
 
@@ -226,72 +215,7 @@ function updatePiece(player,x,y){ const color=colorMap[player]; if(!color) retur
 function updateDisplay1(newText){ if(display1.text===newText) return; display1.text=newText; saveDisplay1(); safeEmit('displayUpdate1',{text:display1.text}); }
 function updateDisplay2(newText){ if(display2.text===newText) return; display2.text=newText; saveDisplay2(); safeEmit('displayUpdate2',{text:display2.text}); }
 function updateMoney(player,amount){ if(!colorMap[player]||money[player]===amount) return; money[player]=amount; saveMoney(); safeEmit('moneyUpdate',money); }
-
-// --- Building helpers (unified) ---
-function getBuilding(space) {
-  return buildings[String(space)] || null;
-}
-
-function setBuilding(space, type, unset = false) {
-  const key = String(Number(space));
-  if (Number.isNaN(Number(key))) return false;
-  if (unset) {
-    if (!buildings[key]) return false;
-    const old = buildings[key];
-    delete buildings[key];
-    saveBuildings();
-    safeEmit('buildingsUpdate', buildings);
-    safeEmit('building-removed', { space: Number(key), type: old });
-    return true;
-  } else {
-    const old = buildings[key];
-    // If same type already present, do nothing
-    if (old === type) return false;
-    // Replace previous building (if any)
-    if (old) {
-      // notify removal of old
-      delete buildings[key];
-      // fall through to set new one
-    }
-    buildings[key] = type;
-    saveBuildings();
-    safeEmit('buildingsUpdate', buildings);
-    safeEmit('building-set', { space: Number(key), type });
-    return { removed: old || null, set: type };
-  }
-}
-
-// Bulk helper: set/unset multiple spaces to a type (or unset)
-function bulkUpdateBuildings(spaces, type = null, unset = false) {
-  let changed = false;
-  const sanitized = spaces.map(s => Number(s)).filter(n => !Number.isNaN(n) && n >= 0 && n <= 39);
-  sanitized.forEach(space => {
-    const key = String(space);
-    if (unset) {
-      if (buildings[key]) {
-        delete buildings[key];
-        changed = true;
-      }
-    } else {
-      if (type && buildings[key] !== type) {
-        buildings[key] = type;
-        changed = true;
-      }
-    }
-  });
-  if (!changed) return false;
-  saveBuildings();
-  safeEmit('buildingsUpdate', buildings);
-  return true;
-}
-
-function clearAllBuildings() {
-  const count = Object.keys(buildings).length;
-  buildings = {};
-  saveBuildings();
-  safeEmit('buildingsUpdate', buildings);
-  return count;
-}
+function updateBuildings(targetObj,spaces,unset=false){ let changed=false; spaces.forEach(space=>{ if(space<0||space>39) return; if(targetObj[space]!==!unset){ targetObj[space]=!unset; changed=true; } }); if(!changed) return false; if(targetObj===hotels) saveHotels(); else saveHouses(); safeEmit(targetObj===hotels?'hotelsUpdate':'housesUpdate',targetObj); return true; }
 
 // --- Dots ---
 function updateDot(num,color){
@@ -319,6 +243,7 @@ const coordinates2 = { 1:{x:760,y:875},3:{x:617,y:875},4:{x:544,y:875},5:{x:471,
 41:{x:616,y:760},42:{x:544,y:760},44:{x:399,y:760},45:{x:326,y:760},46:{x:126,y:760},47:{x:126,y:615},50:{x:126,y:395},51:{x:126,y:324},
 52:{x:126,y:126},53:{x:326,y:126},56:{x:545,y:126},57:{x:617,y:126},58:{x:758,y:126},59:{x:758,y:324},63:{x:758,y:616} };
 
+// current map state (1 or 2)
 let currentMap = 2;
 
 
@@ -416,60 +341,42 @@ function createBot(nick, defaultTarget, options = {}) {
             break;
           }
 
-
-          case '!house': {
+          case '!hotel': case '!uhotel': case '!house': case '!uhouse': {
+            const unset = cmd.startsWith('!u');
+            const isHotel = cmd.includes('hotel');
+            const targetObj = isHotel ? hotels : houses;
             const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
-            if (spaces.length === 0) { safeSay(defaultTarget, 'Usage: !house <space>'); break; }
-            const changed = bulkUpdateBuildings(spaces, 'house', false);
-            if (changed) safeSay(defaultTarget, `Set house(s) on spaces: ${spaces.join(', ')}`);
-            break;
-          }
-
-          case '!hotel': {
-            const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
-            if (spaces.length === 0) { safeSay(defaultTarget, 'Usage: !hotel <space>'); break; }
-            const changed = bulkUpdateBuildings(spaces, 'hotel', false);
-            if (changed) safeSay(defaultTarget, `Set hotel(s) on spaces: ${spaces.join(', ')}`);
-            break;
-          }
-
-          case '!unbuilding': {
-            const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
-            if (spaces.length === 0) { safeSay(defaultTarget, 'Usage: !unbuilding <space>'); break; }
-            const removed = bulkUpdateBuildings(spaces, null, true);
-            if (removed) safeSay(defaultTarget, `Removed building(s) from spaces: ${spaces.join(', ')}`);
-            else safeSay(defaultTarget, `No buildings removed (none present on provided spaces).`);
+            if (spaces.length===0) break;
+            const changed = updateBuildings(targetObj,spaces,unset);
+            if(changed) safeSay(defaultTarget,`${unset?'Removed':'Set'} ${isHotel?'hotel(s)':'house(s)'} on spaces: ${spaces.join(', ')}`);
             break;
           }
           
-          case '!clearall': {
-            const count = clearAllBuildings();
-            safeSay(defaultTarget, `All buildings cleared (${count} removed).`);
-            break;
-          }
+          case '!clearall': { updateBuildings(hotels,Object.keys(hotels).map(Number),true); updateBuildings(houses,Object.keys(houses).map(Number),true); safeSay(defaultTarget,'All hotels and houses cleared.'); break; }
 
           case '!d1': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d1 <text>'); break; } updateDisplay1(msgText); break; }
 
           case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }
 
           case '!dot': {
+            
             if(args.length>=1){
-              const n=args[0];
-              const color=args[1]||'red';
-              if(updateDot(n,color)) safeSay(defaultTarget,`Dot set: ${n} -> ${color}`);
-              else safeSay(defaultTarget,`Invalid number: ${n}`);
-            }
-            break;
+            const n=args[0];
+            const color=args[1]||'red';
+            if(updateDot(n,color)) safeSay(defaulttarget,`Dot set: ${n} -> ${color}`);
+            else safeSay(defaulttarget,`Invalid number: ${n}`);
+          }
+          break;
           }
           
        
           case '!removedot': {
-            if (args.length >= 1) {
-              const n = args[0];
-              if (removeDot(n)) safeSay(defaultTarget, `Dot removed: ${n}`);
-              else safeSay(defaultTarget, `No dot at ${n}`);
-            }
-            break;
+          if (args.length >= 1) {
+            const n = args[0];
+            if (removeDot(n)) safeSay(defaulttarget, `Dot removed: ${n}`);
+            else safeSay(defaulttarget, `No dot at ${n}`);
+          }
+          break;
           }
 
           case '!cleardot': {
@@ -559,10 +466,8 @@ io.on('connection',(socket)=>{
 
     socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
     socket.on('getPieces',()=>socket.emit('piecesUpdate',pieces));
-    // removed socket events for hotels/houses (backward-compat removed)
-    // preferred new event
-    socket.on('getBuildings',()=>socket.emit('buildingsUpdate',buildings));
-
+    socket.on('getHotels',()=>socket.emit('hotelsUpdate',hotels));
+    socket.on('getHouses',()=>socket.emit('housesUpdate',houses));
     socket.on('getDisplay1',()=>socket.emit('displayUpdate1',{text:display1.text}));
     socket.on('getDisplay2',()=>socket.emit('displayUpdate2',{text:display2.text}));
 
@@ -603,18 +508,8 @@ io.on('connection',(socket)=>{
       currentMap = n;
       safeEmit('reload-dots', activeDots);
     });
-
-    // socket-based building commands (optional helpers from UI)
-    socket.on('cmd-set-building', ({ space, type }) => {
-      if (typeof space === 'undefined' || !type) return;
-      setBuilding(space, type, false);
-    });
-    socket.on('cmd-remove-building', (space) => {
-      if (typeof space === 'undefined') return;
-      setBuilding(space, null, true);
-    });
-    socket.on('cmd-clear-buildings', () => clearAllBuildings());
    
+
     socket.on('disconnect',()=>console.log(`[Socket] Frontend disconnected: ${ip}`));
   } catch(err){ console.error('[Socket] Error:',err); }
 });
@@ -623,10 +518,12 @@ io.on('connection',(socket)=>{
 app.use(express.static(__dirname));
 app.get('/pieces.json',(_,res)=>res.json(pieces));
 app.get('/money.json',(_,res)=>res.json(money));
-app.get('/building.json',(_,res)=>res.json(buildings));
+app.get('/hotels.json',(_,res)=>res.json(hotels));
+app.get('/houses.json',(_,res)=>res.json(houses));
 app.get('/display1.json',(_,res)=>res.json(display1));
 app.get('/display2.json',(_,res)=>res.json(display2));
 app.get('/dots.json', (_, res) => res.json(activeDots));
+
 
 // --- Graceful shutdown ---
 let shuttingDown = false;
@@ -638,7 +535,7 @@ async function gracefulShutdown(signal) {
   console.log(`[Server] Received ${signal}, shutting down gracefully...`);
 
   try {
-    saveMoney(); saveBuildings(); savePieces(); saveDisplay1(); saveDisplay2(); saveDots();
+    saveMoney(); saveHotels(); saveHouses(); savePieces(); saveDisplay1(); saveDisplay2(); saveDots();
 
     for (const bot of Object.values(bots)) {
       try { bot.destroy(); } catch (err) { console.error(`[Server] Error destroying bot:`, err); }
