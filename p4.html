@@ -583,54 +583,26 @@ document.getElementById('money-p2-overlay').textContent = 'Player2: $' + data.p2
 document.getElementById('money-p3-overlay').textContent = 'Player3: $' + data.p3;
 document.getElementById('money-p4-overlay').textContent = 'Player4: $' + data.p4;
 }
-function renderElements(type, data, imgSrc){
-    const board = document.getElementById('board');
-    if(!board){ console.error("Board container missing"); return; }
 
-    // Remove existing elements
-    document.querySelectorAll(`.${type}`).forEach(el => el.remove());
-
-    if(!data || typeof data !== 'object'){
-        console.warn(type + " data invalid:", data);
-        return;
-    }
-
-    for(const [space, count] of Object.entries(data)){
-        if(!count) continue;
-        const pos = buildingPositions[space];
-        if(!pos){ console.warn("No position for space:", space); continue; }
-
-        // Stack houses horizontally, hotels centered
-        for(let i=0;i<count;i++){
-            const el = document.createElement('img');
-            el.src = imgSrc;
-            el.className = type;
-            el.style.position = 'absolute';
-            el.style.zIndex = 25;
-
-            // Offset each house horizontally
-            if(type === 'house'){
-                el.style.left = (pos.x - 14 + i*10) + 'px'; // 10px spacing between houses
-                el.style.top  = (pos.y - 14) + 'px';
-            } else if(type === 'hotel'){
-                // hotel always centered, slightly higher if multiple hotels (rare)
-                el.style.left = (pos.x - 14) + 'px';
-                el.style.top  = (pos.y - 14 - i*2) + 'px';
-            }
-
-            el.style.width = '29px';
-            el.style.height = '29px';
-            board.appendChild(el);
-
-            // Fallback if image fails to load
-            el.onerror = () => {
-                console.warn("Failed to load image:", imgSrc);
-                el.src = 'https://via.placeholder.com/29?text=?';
-            }
-        }
-    }
+function renderBuildings(data){
+  const board = document.getElementById('board');
+  document.querySelectorAll('.house, .hotel').forEach(el => el.remove());
+  if(!data) return;
+  for(const [space, type] of Object.entries(data)){
+      const pos = buildingPositions[space]; 
+      if(!pos) continue;
+      const el = document.createElement('img');
+      el.src = type==='house'?'house.webp':'hotel.webp';
+      el.className = type;
+      el.style.position='absolute';
+      el.style.left=(pos.x-14)+'px';
+      el.style.top=(pos.y-14)+'px';
+      el.style.width='29px';
+      el.style.height='29px';
+      el.style.zIndex = type==='house'?25:26;
+      board.appendChild(el);
+  }
 }
-
 
 
 
@@ -770,6 +742,7 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
     }
 });
 
+
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
 socket.on('map-change', n => document.getElementById('boardImg').src = `map${n}.png`);
@@ -777,8 +750,7 @@ socket.on('reload-dots', data => { renderDotsFromServer(data); });
 socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));
 socket.on('moneyUpdate', updateMoney);
-socket.on('housesUpdate', data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
-socket.on('hotelsUpdate', data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
+socket.on('buildingsUpdate', renderBuildings);
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
 
@@ -787,10 +759,7 @@ fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
 fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
-fetch('/hotels.json').then(res=>res.json()).then(data=>renderElements('hotel',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/hotel.webp'));
-fetch('/houses.json').then(res=>res.json()).then(data=>renderElements('house',data,'https://raw.githubusercontent.com/nightywolfy/monopoly/main/house.webp'));
-
-
+fetch('/building.json').then(r=>r.json()).then(renderBuildings);
 </script>
 </body>
 </html>
