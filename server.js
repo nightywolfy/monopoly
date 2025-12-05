@@ -7,14 +7,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 import IRC from 'irc-framework';
-import { readFileSync, writeFileSync, existsSync, renameSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, renameSync } from 'fs';
 import crypto from 'crypto';
 
 // --- Path helpers ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataDir = path.join(__dirname, 'data');
-if (!existsSync(dataDir)) mkdirSync(dataDir, { recursive: true });
+
 
 // --- Express + Socket.IO ---
 const app = express();
@@ -24,13 +23,16 @@ app.set('trust proxy', true);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100kb' }));
 
+
 // --- Persistent files ---
-const moneyFile = path.join(dataDir, 'money.json');
-const buildingsFile = path.join(dataDir, 'building.json');
-const piecesFile = path.join(dataDir, 'pieces.json');
-const display1File = path.join(dataDir, 'display1.json');
-const display2File = path.join(dataDir, 'display2.json');
-const dotsFile = path.join(dataDir, 'dots.json');
+const moneyFile = path.join(__dirname, 'money.json');
+const buildingsFile = path.join(__dirname, 'building.json');
+const piecesFile = path.join(__dirname, 'pieces.json');
+const display1File = path.join(__dirname, 'display1.json');
+const display2File = path.join(__dirname, 'display2.json');
+const dotsFile = path.join(__dirname, 'dots.json');
+
+
 
 // --- File helpers ---
 function safeReadJSON(file, fallback = {}) {
