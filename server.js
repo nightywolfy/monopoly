@@ -13,6 +13,8 @@ import crypto from 'crypto';
 // --- Path helpers ---
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const dataDir = path.join(__dirname, 'data');
+if (!existsSync(dataDir)) mkdirSync(dataDir, { recursive: true });
 
 // --- Express + Socket.IO ---
 const app = express();
@@ -23,12 +25,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100kb' }));
 
 // --- Persistent files ---
-const moneyFile = path.join(__dirname, 'money.json');
-const buildingsFile = path.join(__dirname, 'building.json');
-const piecesFile = path.join(__dirname, 'pieces.json');
-const display1File = path.join(__dirname, 'display1.json');
-const display2File = path.join(__dirname, 'display2.json');
-const dotsFile = path.join(__dirname, 'dots.json');
+const moneyFile = path.join(dataDir, 'money.json');
+const buildingsFile = path.join(dataDir, 'building.json');
+const piecesFile = path.join(dataDir, 'pieces.json');
+const display1File = path.join(dataDir, 'display1.json');
+const display2File = path.join(dataDir, 'display2.json');
+const dotsFile = path.join(dataDir, 'dots.json');
 
 // --- File helpers ---
 function safeReadJSON(file, fallback = {}) {
@@ -59,13 +61,9 @@ let display1 = safeReadJSON(display1File, { text: "" });
 let display2 = safeReadJSON(display2File, { text: "" });
 let activeDots = safeReadJSON(dotsFile, {});
 let buildings = safeReadJSON(buildingsFile, {});
-
-for (const k of Object.keys(buildings)) {
-  if (buildings[k] === 'motel') delete buildings[k];
 }
 
-
-
+// --- Save helpers ---
 const saveMoney = () => safeWriteJSON(moneyFile, money);
 const saveBuildings = () => safeWriteJSON(buildingsFile, buildings);
 const savePieces = () => safeWriteJSON(piecesFile, pieces);
@@ -621,11 +619,11 @@ io.on('connection',(socket)=>{
 
 // --- Serve static files + JSON endpoints ---
 app.use(express.static(__dirname));
-app.get('/pieces.json',(_,res)=>res.json(pieces));
-app.get('/money.json',(_,res)=>res.json(money));
-app.get('/building.json',(_,res)=>res.json(buildings));
-app.get('/display1.json',(_,res)=>res.json(display1));
-app.get('/display2.json',(_,res)=>res.json(display2));
+app.get('/pieces.json', (_, res) => res.json(pieces));
+app.get('/money.json', (_, res) => res.json(money));
+app.get('/building.json', (_, res) => res.json(buildings));
+app.get('/display1.json', (_, res) => res.json(display1));
+app.get('/display2.json', (_, res) => res.json(display2));
 app.get('/dots.json', (_, res) => res.json(activeDots));
 
 // --- Graceful shutdown ---
@@ -663,5 +661,6 @@ async function gracefulShutdown(signal) {
 
 ['SIGINT','SIGTERM'].forEach(sig => process.on(sig, () => gracefulShutdown(sig)));
 
-const PORT = process.env.PORT||3000;
-server.listen(PORT,()=>console.log(`[Server] Running at http://localhost:${PORT}`));
+// --- Start server ---
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`[Server] Running at http://localhost:${PORT}`));
