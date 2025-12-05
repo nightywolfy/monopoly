@@ -7,7 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 import IRC from 'irc-framework';
-import { readFileSync, writeFileSync, existsSync, renameSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, renameSync, mkdirSync } from 'fs';
 import crypto from 'crypto';
 
 // --- Path helpers ---
@@ -61,7 +61,7 @@ let display1 = safeReadJSON(display1File, { text: "" });
 let display2 = safeReadJSON(display2File, { text: "" });
 let activeDots = safeReadJSON(dotsFile, {});
 let buildings = safeReadJSON(buildingsFile, {});
-}
+
 
 // --- Save helpers ---
 const saveMoney = () => safeWriteJSON(moneyFile, money);
