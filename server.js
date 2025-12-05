@@ -521,13 +521,25 @@ function createBot(nick, defaultTarget, options = {}) {
 
 
 
-const bots = {
-  dice1bot: createBot('dice1bot', 'dicebot'),
-  dice2bot: createBot('dice2bot', 'dicebot'),
-  player1bot: createBot('player1bot', '##rento'),
-  player2bot: createBot('player2bot', '##rento')
+// --- All bots initialization with safe delays (Option C) ---
+const bots = {};
 
-};
+const botConfigs = [
+  { name: 'player1bot', target: '##rento', delay: 0 },
+  { name: 'player2bot', target: '##rento', delay: 200 },
+  { name: 'player3bot', target: '##rento', delay: 400 },
+  { name: 'player4bot', target: '##rento', delay: 600 },
+  { name: 'dice1bot', target: 'dicebot', delay: 800 },
+  { name: 'dice2bot', target: 'dicebot', delay: 1000 }
+];
+
+botConfigs.forEach(cfg => {
+  setTimeout(() => {
+    bots[cfg.name] = createBot(cfg.name, cfg.target);
+    console.log(`[Server] Started bot: ${cfg.name}`);
+  }, cfg.delay);
+});
+
 
 // --- Express + Socket.IO endpoints ---
 app.post('/send-irc',(req,res)=>{
