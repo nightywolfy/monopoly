@@ -521,24 +521,26 @@ function createBot(nick, defaultTarget, options = {}) {
 
 
 
-// --- All bots initialization with safe delays (Option C) ---
+// --- Option B: Dynamic bot creation for all bots ---
 const bots = {};
 
-const botConfigs = [
-  { name: 'player1bot', target: '##rento', delay: 0 },
-  { name: 'player2bot', target: '##rento', delay: 200 },
-  { name: 'player3bot', target: '##rento', delay: 400 },
-  { name: 'player4bot', target: '##rento', delay: 600 },
-  { name: 'dice1bot', target: 'dicebot', delay: 800 },
-  { name: 'dice2bot', target: 'dicebot', delay: 1000 }
+const botList = [
+  { nick: 'player1bot', target: '##rento' },
+  { nick: 'player2bot', target: '##rento' },
+  { nick: 'player3bot', target: '##rento' },
+  { nick: 'player4bot', target: '##rento' },
+  { nick: 'dice1bot', target: 'dicebot' },
+  { nick: 'dice2bot', target: 'dicebot' }
 ];
 
-botConfigs.forEach(cfg => {
+// Sequential delayed startup to prevent Evennode collisions
+botList.forEach((cfg, idx) => {
   setTimeout(() => {
-    bots[cfg.name] = createBot(cfg.name, cfg.target);
-    console.log(`[Server] Started bot: ${cfg.name}`);
-  }, cfg.delay);
+    bots[cfg.nick] = createBot(cfg.nick, cfg.target);
+    console.log(`[Server] Started bot: ${cfg.nick}`);
+  }, idx * 200); // 200ms gap between bot starts
 });
+
 
 
 // --- Express + Socket.IO endpoints ---
