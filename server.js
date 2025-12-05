@@ -524,8 +524,8 @@ function createBot(nick, defaultTarget, options = {}) {
 
 
 const bots = {
-  dice1bot: createBot('dice1bot', 'dicebot'),
-  dice2bot: createBot('dice2bot', 'dicebot'),
+  dice1bot: createBot('dice1bot', 'rentobot'),
+  dice2bot: createBot('dice2bot', 'rentobot'),
   player1bot: createBot('player1bot', '##rento'),
   player2bot: createBot('player2bot', '##rento'),
   player3bot: createBot('player3bot', '##rento'),
