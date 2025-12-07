@@ -197,8 +197,8 @@ html, body {
   background-color: #28a745 !important;  /* green */
   border: 1px solid #1e7e34 !important;
   color: white !important;
-  padding: 2px 4px;
-  border-radius: 5px;
+  padding: .1px .1px;
+  border-radius: 3px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -208,8 +208,8 @@ html, body {
   background-color: #dc3545 !important;  /* red */
   border: 1px solid #b02a37 !important;
   color: white !important;
-  padding: 2px 4px;
-  border-radius: 5px;
+  padding: .1px .1px;
+  border-radius: 3px;
   font-weight: bold;
   cursor: pointer;
 }
@@ -347,6 +347,26 @@ html, body {
 <input type="hidden" name="msg" value="!addonehouse red">
 <button class="white-btn plus" onclick="sndBuild2.currentTime=0; sndBuild2.play()">RE+</button>
 </form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!addonehouse white">
+<button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">WH+</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!addonehouse aqua">
+<button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">AQ+</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!addonehouse purple">
+<button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">PU+</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!addonehouse black">
+<button class="white-btn plus" onclick="sndBuild3.currentTime=0; sndBuild3.play()">BL+</button>
+</form>
 <button type="button" class="mode-btn active" data-mode="redeem">Redeem</button>
 <button type="button" class="mode-btn" data-mode="mortgage">Mortgage</button>
 <form action="/send-irc" method="POST" target="hiddenFrame">
@@ -389,6 +409,26 @@ html, body {
 <input type="hidden" name="msg" value="!removeonehouse red">
 <button class="white-btn minus" onclick="sndDestroy2.currentTime=0; sndDestroy2.play()">RE-</button>
 </form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!removeonehouse white">
+<button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">WH-</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!removeonehouse aqua">
+<button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">AQ-</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!removeonehouse purple">
+<button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">PU-</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!removeonehouse black">
+<button class="white-btn minus" onclick="sndDestroy3.currentTime=0; sndDestroy3.play()">BL-</button>
+</form>
 </div>
 </div>
 </div>
@@ -407,8 +447,8 @@ html, body {
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
 <input type="hidden" name="bot" value="player1bot">
-<input type="hidden" name="msg" value="!stopgo">
-<button type="submit" class="small-button">ST</button>
+<input type="hidden" name="msg" value="!gooverride">
+<button type="submit" class="small-button">OR</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
 <input type="hidden" name="bot" value="player1bot">
