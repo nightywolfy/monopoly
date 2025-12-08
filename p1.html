@@ -765,6 +765,8 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard(); // initial scale
 
+
+
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
 socket.on('map-change', n => document.getElementById('boardImg').src = `map${n}.png`);
