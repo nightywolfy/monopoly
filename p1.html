@@ -14,7 +14,6 @@ html, body {
   display: flex;
 }
 
-/* Left: Board */
 #boardContainer {
   width: 50%;
   height: 100%;
@@ -31,9 +30,7 @@ html, body {
   position: relative;
   height: 900px;
   width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+
 }
 #boardImg {
   width: 100%;
@@ -764,6 +761,9 @@ function scaleBoard() {
 
   container.style.transform = `scale(${scale})`;
 }
+
+window.addEventListener('resize', scaleBoard);
+scaleBoard(); // initial scale
 
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
