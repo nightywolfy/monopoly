@@ -810,6 +810,17 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
     }
 });
 
+function scaleBoard() {
+  const wrapper = document.getElementById('boardWrapper');
+  const board = document.getElementById('board');
+  const scaleX = wrapper.clientWidth / 900;
+  const scaleY = wrapper.clientHeight / 900;
+  const scale = Math.min(scaleX, scaleY); // maintain aspect ratio
+  board.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', scaleBoard);
+scaleBoard();
+
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
 socket.on('map-change', n => document.getElementById('boardImg').src = `map${n}.png`);
