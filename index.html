@@ -94,12 +94,12 @@
 
   <!-- Images + Map buttons -->
   <div style="position:relative; width:100%; margin-bottom:20px; display:flex; justify-content:center; align-items:flex-start;">
-    <div style="position:absolute; left:0px; top:240px; display:flex; flex-direction:column; gap:10px;">
+    <div style="position:absolute; left:30px; top:240px; display:flex; flex-direction:column; gap:10px;">
       <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
-        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:300px; height:auto; border-radius:10px; box-shadow:0 0 12px #00d4ff;" />
+        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #00d4ff;" />
       </a>
       <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
-        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:300px; height:auto; border-radius:10px; box-shadow:0 0 12px #6a0dad;" />
+        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #6a0dad;" />
       </a>
     </div>
 
@@ -254,6 +254,17 @@ async function choosePlayer(player,gameMode){
   if(data.ok) window.location.href=`/player?name=${player}&auth=${data.key}`;
   else alert('Error getting access key');
 }
+
+function scaleBoard() {
+  const wrapper = document.getElementById('boardWrapper');
+  const board = document.getElementById('board');
+  const scaleX = wrapper.clientWidth / 900;
+  const scaleY = wrapper.clientHeight / 900;
+  const scale = Math.min(scaleX, scaleY); // maintain aspect ratio
+  board.style.transform = `scale(${scale})`;
+}
+window.addEventListener('resize', scaleBoard);
+scaleBoard();
 
 // Socket events
 socket.on('piecesUpdate', updatePieces);
