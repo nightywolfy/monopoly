@@ -14,7 +14,6 @@ html, body {
   display: flex;
 }
 
-/* Left: Board */
 #boardContainer {
   width: 50%;
   height: 100%;
@@ -31,14 +30,22 @@ html, body {
   position: relative;
   height: 900px;
   width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+
 }
 #boardImg {
-  width: 900px;
-  height: 900px;
+  width: 100%;
+  height: 100%;
+ 
+}
 
+#boardWrapper {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+  overflow: hidden;
 }
 
 /* Pieces */
@@ -138,6 +145,8 @@ html, body {
   height:29px;
   position:absolute;
 }
+
+
 
 /* Redeem/Mortgage buttons */
 .mode-btn {
@@ -270,6 +279,7 @@ html, body {
 <body>
 
 <!-- Left: Board -->
+<div id="boardWrapper">
 <div id="boardContainer">
 <div id="board">
 <img id="boardImg" src="map2.png" alt="Monopoly Board">
@@ -291,8 +301,8 @@ html, body {
 </div>
 </div>
 <div id="propertyLink">
-<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property.png" target="_blank">
-<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property.png">
+<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png">
 </a>
 </div>
 <div id="rulesLink">
@@ -443,10 +453,8 @@ html, body {
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!dice2-p4"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D2</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!dice3-p4"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">D3</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!dice4-p4"><button type="submit" onclick="document.getElementById('buttonClickSound').play();">DJ</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!up"><button type="submit" class="small-button">UP4</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!up"><button type="submit" class="small-button">UP1</button></form>
 <div style="width:2px; background:#888; margin:0 4px;"></div>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!add p4 25"><button type="submit" class="small-button">+25</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!add p4 5"><button type="submit" class="small-button">+5</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!add p4 -25"><button type="submit" class="small-button">-25</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player4bot"><input type="hidden" name="msg" value="!add p4 -5"><button type="submit" class="small-button">-5</button></form>
 <div style="width:4px; background:#888; margin:0 4px;"></div>
@@ -528,6 +536,7 @@ function renderDotsFromServer(data){
     }
   }
 }
+
 
 function updatePieces(data){
     if(!data || typeof data !== 'object'){
@@ -742,6 +751,21 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
     }
 });
 
+function scaleBoard() {
+  const container = document.getElementById('boardContainer');
+  const wrapper = document.getElementById('boardWrapper');
+
+  const scaleX = wrapper.clientWidth / 930; // board original width
+  const scaleY = wrapper.clientHeight / 930; // board original height
+  const scale = Math.min(scaleX, scaleY);
+
+  container.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('resize', scaleBoard);
+scaleBoard(); // initial scale
+
+
 
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
@@ -760,6 +784,7 @@ fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.tex
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/building.json').then(r=>r.json()).then(renderBuildings);
+
 </script>
 </body>
 </html>
