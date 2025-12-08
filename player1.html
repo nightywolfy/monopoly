@@ -810,16 +810,22 @@ boardButtonsContainer.querySelectorAll('button').forEach(btn => {
     }
 });
 
+
+
 function scaleBoard() {
+  const container = document.getElementById('boardContainer');
   const wrapper = document.getElementById('boardWrapper');
-  const board = document.getElementById('board');
-  const scaleX = wrapper.clientWidth / 900;
-  const scaleY = wrapper.clientHeight / 900;
-  const scale = Math.min(scaleX, scaleY); // maintain aspect ratio
-  board.style.transform = `scale(${scale})`;
+
+  const scaleX = wrapper.clientWidth / 900; // board original width
+  const scaleY = wrapper.clientHeight / 900; // board original height
+  const scale = Math.min(scaleX, scaleY);
+
+  container.style.transform = `scale(${scale})`;
 }
+
 window.addEventListener('resize', scaleBoard);
-scaleBoard();
+scaleBoard(); // initial scale
+
 
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
