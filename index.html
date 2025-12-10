@@ -281,13 +281,13 @@ socket.on('remove-dot', n=>{ if(activeDots[n]){ activeDots[n].remove(); delete a
 socket.on('clear-all-dots', ()=>{ Object.values(activeDots).forEach(e=>e.remove()); activeDots={}; });
 
 
-// --- Play sound from server ---
 socket.on('play-sound', ({ file }) => {
   if (!file) return;
-  // Use the URL directly instead of /sounds/ directory
-  const audio = new Audio(file);
+  const audio = new Audio(`./${file}`);
+  
   audio.play().catch(err => console.error('Audio play error:', err));
 });
+
 
 
 
