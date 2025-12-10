@@ -273,7 +273,7 @@ scaleBoard();
 
 
 
-socket.off('play-sound'); // remove previous listeners
+socket.off('play-sound');
 socket.on('play-sound', ({ file }) => {
   if (!file) return;
   const audio = new Audio(file);
