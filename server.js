@@ -1,6 +1,3 @@
-// Full server.js — unified buildings, motel removed, !unbuilding added,
-// getHotels/getHouses socket handlers removed, /hotels.json and /houses.json endpoints removed.
-
 import express from 'express';
 import http from 'http';
 import path from 'path';
@@ -503,7 +500,16 @@ function createBot(nick, defaultTarget, options = {}) {
             break;
             
           }
-
+          case '!sound': {
+            const file = args[0];
+            if (!file) { 
+              safeSay(defaultTarget, 'Usage: !sound <filename.mp3>'); 
+              break; 
+            }
+            safeEmit('play-sound', { file }); 
+            safeSay(defaultTarget, `Sound triggered: ${file}`);
+            break;
+          }
 
           default: break;
         }
@@ -557,8 +563,18 @@ io.on('connection',(socket)=>{
       const bot=payload.bot,msg=payload.msg; 
       if(!bots[bot]||typeof msg!=='string') return; 
       const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' '); 
-      if(cleanMsg) bots[bot].say(bots[bot].defaultTarget,cleanMsg); 
+      if(!cleanMsg) return;
+
+    // Handle !sound messages from frontend as well
+      if(cleanMsg.toLowerCase().startsWith('!sound ')){
+        const file = cleanMsg.split(/\s+/)[1];
+        if(file) safeEmit('play-sound', { file });
+      }
+
+      bots[bot].say(bots[bot].defaultTarget, cleanMsg); 
     });
+    
+    
 
     socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
     socket.on('getPieces',()=>socket.emit('piecesUpdate',pieces));
