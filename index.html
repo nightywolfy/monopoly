@@ -289,17 +289,7 @@ socket.on('play-sound', ({ file }) => {
   audio.play().catch(err => console.error('Audio play error:', err));
 });
 
-// Example: input + button to trigger sound
-const soundInput = document.getElementById('soundInput');
-const soundBtn = document.getElementById('soundBtn');
-if (soundInput && soundBtn) {
-  soundBtn.addEventListener('click', () => {
-    const file = soundInput.value.trim();
-    if (!file) return;
-    socket.emit('sendMessage', { bot: 'player1bot', msg: `!sound ${file}` });
-    soundInput.value = '';
-  });
-}
+
 
 
 // Initial fetches
