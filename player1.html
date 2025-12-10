@@ -831,6 +831,13 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard(); // initial scale
 
+socket.on('play-sound', ({ file }) => {
+  if (!file) return;
+  const audio = new Audio(`/${file}`);
+  audio.currentTime = 0;
+  audio.play().catch(err => console.error('Audio play error:', err));
+});
+
 
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
