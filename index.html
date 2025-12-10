@@ -281,25 +281,21 @@ socket.on('remove-dot', n=>{ if(activeDots[n]){ activeDots[n].remove(); delete a
 socket.on('clear-all-dots', ()=>{ Object.values(activeDots).forEach(e=>e.remove()); activeDots={}; });
 
 
-// Listen for server-sent sound commands
+// --- Play sound from server ---
 socket.on('play-sound', ({ file }) => {
   if (!file) return;
   const audio = new Audio(`/sounds/${file}`);
   audio.play().catch(err => console.error('Audio play error:', err));
 });
 
-// Optional: play sound from input button
+// Example: input + button to trigger sound
 const soundInput = document.getElementById('soundInput');
 const soundBtn = document.getElementById('soundBtn');
 if (soundInput && soundBtn) {
   soundBtn.addEventListener('click', () => {
     const file = soundInput.value.trim();
     if (!file) return;
-    try {
-      socket.emit('sendMessage', { bot: 'player1bot', msg: `!sound ${file}` });
-    } catch (err) {
-      console.error('Failed to send sound message:', err);
-    }
+    socket.emit('sendMessage', { bot: 'player1bot', msg: `!sound ${file}` });
     soundInput.value = '';
   });
 }
