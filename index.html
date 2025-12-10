@@ -271,8 +271,7 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard();
 
-if (!window.socket) window.socket = io();
-const socket = window.socket;
+
 
 socket.off('play-sound'); // remove previous listeners
 socket.on('play-sound', ({ file }) => {
