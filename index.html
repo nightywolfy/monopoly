@@ -105,38 +105,11 @@
 
     <div id="quickButtons" style="text-align:center;">
       <iframe name="hiddenFrame" style="display:none;"></iframe>
-      <audio id="soldSound" src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/sold.mp3" preload="auto"></audio>
-      
-      <form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-        <input type="hidden" name="bot" value="player1bot">
-        <input type="hidden" name="msg" value="!map 1">
-        <button type="submit" onclick="document.getElementById('soldSound').play();" style="padding:6px 10px; border-radius:6px;">Map1</button>
-      </form>
-      <form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-        <input type="hidden" name="bot" value="player1bot">
-        <input type="hidden" name="msg" value="!map 2">
-        <button type="submit" onclick="document.getElementById('soldSound').play();" style="padding:6px 10px; border-radius:6px;">Map2</button>
-      </form>
-      <form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-        <input type="hidden" name="bot" value="player1bot">
-        <input type="hidden" name="msg" value="!map 3">
-        <button type="submit" onclick="document.getElementById('soldSound').play();" style="padding:6px 10px; border-radius:6px;">Map3</button>
-      </form>
-      <form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-        <input type="hidden" name="bot" value="player1bot">
-        <input type="hidden" name="msg" value="!map 4">
-        <button type="submit" onclick="document.getElementById('soldSound').play();" style="padding:6px 10px; border-radius:6px;">Map4</button>
-      </form>
-      <form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-        <input type="hidden" name="bot" value="player1bot">
-        <input type="hidden" name="msg" value="!map 5">
-        <button type="submit" onclick="document.getElementById('soldSound').play();" style="padding:6px 10px; border-radius:6px;">Map5</button>
-      </form>
-      <form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-        <input type="hidden" name="bot" value="player1bot">
-        <input type="hidden" name="msg" value="!map 6">
-        <button type="submit" onclick="document.getElementById('soldSound').play();" style="padding:6px 10px; border-radius:6px;">Map6</button>
-      </form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 1"><button type="submit" class="small-button">Map1</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 2"><button type="submit" class="small-button">Map2</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 3"><button type="submit" class="small-button">Map3</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 4"><button type="submit" class="small-button">Map4</button></form>
+
     </div>
   </div>
 
@@ -265,6 +238,24 @@ function scaleBoard() {
 }
 window.addEventListener('resize', scaleBoard);
 scaleBoard();
+
+
+// Play sound from server
+socket.on('play-sound', ({ file }) => {
+  if(!file) return;
+  const audio = new Audio(`/sounds/${file}`);
+  audio.play().catch(err => console.error('Audio play error:', err));
+});
+
+// Play sound button
+const soundInput = document.getElementById('soundInput');
+const soundBtn = document.getElementById('soundBtn');
+soundBtn.addEventListener('click', () => {
+  const file = soundInput.value.trim();
+  if(!file) return;
+  socket.emit('sendMessage', { bot: 'player1bot', msg: `!sound ${file}` });
+  soundInput.value = '';
+});
 
 // Socket events
 socket.on('piecesUpdate', updatePieces);
