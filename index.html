@@ -175,6 +175,9 @@ const buildingPositions = {
   27:{x:304,y:220},30:{x:595,y:220},35:{x:679,y:303},38:{x:523,y:220}
 };
 
+
+
+
 function updatePieces(data){
     if(!data || typeof data !== 'object'){ console.warn("Pieces data invalid:", data); return; }
     const posMap = {};
@@ -268,6 +271,15 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard();
 
+socket.on('play-sound', ({ file }) => {
+  if (!file) return;
+  const audio = new Audio(`/${file}`);
+  audio.currentTime = 0;
+  audio.play().catch(err => console.error('Audio play error:', err));
+});
+
+
+
 // Socket events
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info=>renderDotsFromServer({[info.num]:info}));
@@ -279,18 +291,6 @@ socket.on('moneyUpdate', updateMoney);
 socket.on('buildingsUpdate', renderBuildings);
 socket.on('remove-dot', n=>{ if(activeDots[n]){ activeDots[n].remove(); delete activeDots[n];}});
 socket.on('clear-all-dots', ()=>{ Object.values(activeDots).forEach(e=>e.remove()); activeDots={}; });
-
-
-socket.on('play-sound', ({ file }) => {
-  if (!file) return;
-  const audio = new Audio(`./${file}`);
-  
-  audio.play().catch(err => console.error('Audio play error:', err));
-});
-
-
-
-
 
 // Initial fetches
 fetch('/pieces.json').then(r=>r.json()).then(updatePieces);
