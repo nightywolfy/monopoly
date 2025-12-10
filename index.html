@@ -94,21 +94,50 @@
 
   <!-- Images + Map buttons -->
   <div style="position:relative; width:100%; margin-bottom:20px; display:flex; justify-content:center; align-items:flex-start;">
-    <div style="position:absolute; left:40px; top:240px; display:flex; flex-direction:column; gap:10px;">
+    <div style="position:absolute; left:30px; top:240px; display:flex; flex-direction:column; gap:10px;">
       <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
-        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:100px; height:auto; border-radius:10px; box-shadow:0 0 12px #00d4ff;" />
+        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #00d4ff;" />
       </a>
       <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
-        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:100px; height:auto; border-radius:10px; box-shadow:0 0 12px #6a0dad;" />
+        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #6a0dad;" />
       </a>
     </div>
 
     <div id="quickButtons" style="text-align:center;">
       <iframe name="hiddenFrame" style="display:none;"></iframe>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 1"><button type="submit" class="small-button">Map1</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 2"><button type="submit" class="small-button">Map2</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 3"><button type="submit" class="small-button">Map3</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!map 4"><button type="submit" class="small-button">Map4</button></form>
+      
+      
+<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!map 1">
+<button type="submit" style="padding:6px 10px; border-radius:6px;">Map1</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!map 2">
+<button type="submit" style="padding:6px 10px; border-radius:6px;">Map2</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!map 3">
+<button type="submit" style="padding:6px 10px; border-radius:6px;">Map3</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!map 4">
+<button type="submit" style="padding:6px 10px; border-radius:6px;">Map4</button>
+</form>
+
+<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!map 5">
+<button type="submit" style="padding:6px 10px; border-radius:6px;">Map5</button>
+</form>
+<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
+<input type="hidden" name="bot" value="player1bot">
+<input type="hidden" name="msg" value="!map 6">
+<button type="submit" style="padding:6px 10px; border-radius:6px;">Map6</button>
+</form>
 
     </div>
   </div>
@@ -239,24 +268,6 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard();
 
-
-// Play sound from server
-socket.on('play-sound', ({ file }) => {
-  if(!file) return;
-  const audio = new Audio(`/sounds/${file}`);
-  audio.play().catch(err => console.error('Audio play error:', err));
-});
-
-// Play sound button
-const soundInput = document.getElementById('soundInput');
-const soundBtn = document.getElementById('soundBtn');
-soundBtn.addEventListener('click', () => {
-  const file = soundInput.value.trim();
-  if(!file) return;
-  socket.emit('sendMessage', { bot: 'player1bot', msg: `!sound ${file}` });
-  soundInput.value = '';
-});
-
 // Socket events
 socket.on('piecesUpdate', updatePieces);
 socket.on('draw-dot', info=>renderDotsFromServer({[info.num]:info}));
@@ -268,6 +279,31 @@ socket.on('moneyUpdate', updateMoney);
 socket.on('buildingsUpdate', renderBuildings);
 socket.on('remove-dot', n=>{ if(activeDots[n]){ activeDots[n].remove(); delete activeDots[n];}});
 socket.on('clear-all-dots', ()=>{ Object.values(activeDots).forEach(e=>e.remove()); activeDots={}; });
+
+
+// Listen for server-sent sound commands
+socket.on('play-sound', ({ file }) => {
+  if (!file) return;
+  const audio = new Audio(`/sounds/${file}`);
+  audio.play().catch(err => console.error('Audio play error:', err));
+});
+
+// Optional: play sound from input button
+const soundInput = document.getElementById('soundInput');
+const soundBtn = document.getElementById('soundBtn');
+if (soundInput && soundBtn) {
+  soundBtn.addEventListener('click', () => {
+    const file = soundInput.value.trim();
+    if (!file) return;
+    try {
+      socket.emit('sendMessage', { bot: 'player1bot', msg: `!sound ${file}` });
+    } catch (err) {
+      console.error('Failed to send sound message:', err);
+    }
+    soundInput.value = '';
+  });
+}
+
 
 // Initial fetches
 fetch('/pieces.json').then(r=>r.json()).then(updatePieces);
