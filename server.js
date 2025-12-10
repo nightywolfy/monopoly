@@ -507,7 +507,6 @@ function createBot(nick, defaultTarget, options = {}) {
               break; 
             }
             safeEmit('play-sound', { file }); 
-            safeSay(defaultTarget, `Sound triggered: ${file}`);
             break;
           }
 
