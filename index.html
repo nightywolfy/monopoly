@@ -286,6 +286,16 @@ socket.on('play-sound', ({ file }) => {
   audio.play().catch(err => console.error('Audio play error:', err));
 });
 
+document.getElementById('sendBtn').addEventListener('click', () => {
+  const file = document.getElementById('soundInput').value.trim();
+  if (!file) return;
+  fetch('/send-irc', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ bot: 'player1bot', msg: `!sound ${file}` })
+  }).catch(err => console.error(err));
+  document.getElementById('soundInput').value = '';
+});
 
 
 // Socket events
