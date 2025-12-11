@@ -569,9 +569,9 @@ io.on('connection',(socket)=>{
         const file = args[1];
         if (file) {
           const now = Date.now();
-          if (file !== lastSound || now - lastTime > 300) {
+          if (file !== lastSound || now - lastSoundTime > 300) {
             lastSound = file;
-            lastTime = now;
+            lastSoundTime = now;
             io.emit('play-sound', { file });
           }
         }

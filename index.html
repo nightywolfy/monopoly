@@ -275,13 +275,13 @@ scaleBoard();
 
 
 let lastSound = '';
-let lastTime = 0;
+let lastSoundTime = 0;
 socket.on('play-sound', ({ file }) => {
   if (!file) return;
   const now = Date.now();
-  if (file === lastSound && now - lastTime < 300) return;
+  if (file === lastSound && now - lastSoundTime < 300) return;
   lastSound = file;
-  lastTime = now;
+  lastSoundTime = now;
   const audio = new Audio(file);
   audio.play().catch(err => console.error('Audio play error:', err));
 });
