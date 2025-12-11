@@ -498,9 +498,10 @@ function createBot(nick, defaultTarget, options = {}) {
           }
           case '!sound': {
             const file = args[0];
-            if (target.startsWith('#')) break;  // ignore channel messages
-            if (!file) break;  // ignore if no file provided
-            bots['player1bot'].say('player1bot', `!sound ${file}`);
+            if (!file) break;
+            if (target.startsWith('#')) break;
+            if (nick !== 'player1bot') break;
+            safeEmit('play-sound', { file });
             break;
           }
 
