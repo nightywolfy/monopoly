@@ -502,7 +502,7 @@ function createBot(nick, defaultTarget, options = {}) {
               safeSay(defaultTarget, 'Usage: !sound <filename.mp3>'); 
               break; 
             }
-            safeEmit('play-sound', { file }); 
+            safeEmit('play-sound', { file });
             break;
           }
 
@@ -553,21 +553,32 @@ io.on('connection',(socket)=>{
     const ip = socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`[Socket] Frontend connected: ${ip}`);
 
-    socket.on('sendMessage',payload=>{ 
-      if(!payload||typeof payload!=='object') return; 
-      const bot=payload.bot,msg=payload.msg; 
-      if(!bots[bot]||typeof msg!=='string') return; 
-      const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' '); 
-      if(!cleanMsg) return;
+    let lastSound = '';
+    let lastSoundTime = 0;
 
-    // Handle !sound messages from frontend as well
-      if(cleanMsg.toLowerCase().startsWith('!sound ')){
+    socket.on('sendMessage', (payload) => {
+      if (!payload || typeof payload !== 'object') return;
+      const bot = payload.bot;
+      const msg = payload.msg;
+      if (!bots[bot] || typeof msg !== 'string') return;
+      const cleanMsg = msg.trim().slice(0, 200).replace(/\n/g, ' ');
+      if (!cleanMsg) return;
+      // Handle !sound messages from frontend
+      if (cleanMsg.toLowerCase().startsWith('!sound ')) {
         const file = cleanMsg.split(/\s+/)[1];
-        if (file) socket.broadcast.emit('play-sound', { file });
+        if (file) {
+          const now = Date.now();
+          if (file !== lastSound || now - lastSoundTime > 300) {
+            lastSound = file;
+            lastSoundTime = now;
+            socket.emit('play-sound', { file });         // sender hears it once
+            socket.broadcast.emit('play-sound', { file }); // all other clients
+          }
+        }
         return;
       }
-
-      bots[bot].say(bots[bot].defaultTarget, cleanMsg); 
+     // Forward other commands/messages to the IRC bot
+      bots[bot].say(bots[bot].defaultTarget, cleanMsg);
     });
     
     
