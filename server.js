@@ -498,19 +498,11 @@ function createBot(nick, defaultTarget, options = {}) {
           }
           case '!sound': {
             const file = args[0];
-            if (target.startsWith('#')) {
-            safeSay(target, 'Sound commands can only be used in private message.');
+            if (target.startsWith('#')) break;  // ignore channel messages
+            if (!file) break;  // ignore if no file provided
+            bots['player1bot'].say('player1bot', `!sound ${file}`);
             break;
-            }
-
-            if (!file) { 
-            safeSay(defaultTarget, 'Usage: !sound <filename.mp3>');
-            break;
-            }
-
-            safeEmit('play-sound', { file });
-            break;
-            }
+          }
 
 
           default: break;
