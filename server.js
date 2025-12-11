@@ -564,15 +564,21 @@ io.on('connection',(socket)=>{
       const cleanMsg = msg.trim().slice(0, 200).replace(/\n/g, ' ');
       if (!cleanMsg) return;
      
-      if (cleanMsg.toLowerCase().startsWith('!sound') && bot === 'player1bot') {
+      if (bot === 'player1bot' && cleanMsg.toLowerCase().startsWith('!sound')) {
         const args = cleanMsg.split(/\s+/);
         const file = args[1];
         if (file) {
-          safeEmit('play-sound', { file });  
+          const now = Date.now();
+          if (file !== lastSound || now - lastTime > 300) {
+            lastSound = file;
+            lastTime = now;
+            safeEmit('play-sound', { file });
+          }
         }
-        return; // no confirmation sent
+        return;
       }
 
+      // All other messages handled normally
       bots[bot].say(bots[bot].defaultTarget, cleanMsg);
     });
     
