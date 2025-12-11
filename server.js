@@ -567,7 +567,7 @@ io.on('connection',(socket)=>{
     // Handle !sound messages from frontend as well
       if(cleanMsg.toLowerCase().startsWith('!sound ')){
         const file = cleanMsg.split(/\s+/)[1];
-        if (file) io.emit('play-sound', { file });
+        if (file) socket.broadcast.emit('play-sound', { file });
         return;
       }
 
