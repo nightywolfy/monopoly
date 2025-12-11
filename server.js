@@ -450,21 +450,17 @@ function createBot(nick, defaultTarget, options = {}) {
           case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }
 
           case '!dot': {
-            if(args.length>=1){
-              const n=args[0];
-              const color=args[1]||'red';
-              if(updateDot(n,color)) safeSay(defaultTarget,`Dot set: ${n} -> ${color}`);
-              else safeSay(defaultTarget,`Invalid number: ${n}`);
+            if (args.length >= 1) {
+              const n = args[0], color = args[1] || 'red';
+              if (!updateDot(n, color)) safeSay(defaultTarget, `Invalid number: ${n}`);
             }
             break;
           }
-          
-       
+
           case '!removedot': {
             if (args.length >= 1) {
               const n = args[0];
-              if (removeDot(n)) safeSay(defaultTarget, `Dot removed: ${n}`);
-              else safeSay(defaultTarget, `No dot at ${n}`);
+              !removeDot(n) && safeSay(defaultTarget, `No dot at ${n}`);
             }
             break;
           }
