@@ -563,11 +563,16 @@ io.on('connection',(socket)=>{
       if (!bots[bot] || typeof msg !== 'string') return;
       const cleanMsg = msg.trim().slice(0, 200).replace(/\n/g, ' ');
       if (!cleanMsg) return;
-      // Handle !sound messages from frontend
-      if (cleanMsg.toLowerCase().startsWith('!sound')) {
-        socket.emit('errorMsg', 'Sound commands are only allowed via private IRC message.');
-        return;
+     
+      if (cleanMsg.toLowerCase().startsWith('!sound') && bot === 'player1bot') {
+        const args = cleanMsg.split(/\s+/);
+        const file = args[1];
+        if (file) {
+          safeEmit('play-sound', { file });  
+        }
+        return; // no confirmation sent
       }
+
       bots[bot].say(bots[bot].defaultTarget, cleanMsg);
     });
     
