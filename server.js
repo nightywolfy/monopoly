@@ -548,14 +548,18 @@ app.post('/send-irc',(req,res)=>{
   catch(err){ console.error('/send-irc error:',err); return res.status(500).send('Server error'); }
 });
 
+
+
 io.on('connection',(socket)=>{
   try{
     const ip = socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`[Socket] Frontend connected: ${ip}`);
 
-    let lastSound = '';
-    let lastSoundTime = 0;
 
+
+    let lastSound = '';
+    let lastTime = 0;
+    
     socket.on('sendMessage', (payload) => {
       if (!payload || typeof payload !== 'object') return;
       const bot = payload.bot;
@@ -567,16 +571,17 @@ io.on('connection',(socket)=>{
       if (bot === 'player1bot' && cleanMsg.toLowerCase().startsWith('!sound')) {
         const args = cleanMsg.split(/\s+/);
         const file = args[1];
-        if (file) {
-          const now = Date.now();
-          if (file !== lastSound || now - lastSoundTime > 300) {
+        if (!file) return;
+        const now = Date.now();
+        if (file !== lastSound || now - lastTime > 300) {
             lastSound = file;
-            lastSoundTime = now;
+            lastTime = now;
             io.emit('play-sound', { file });
-          }
         }
-        return;
       }
+        return;
+  }
+
 
       // All other messages handled normally
       bots[bot].say(bots[bot].defaultTarget, cleanMsg);
