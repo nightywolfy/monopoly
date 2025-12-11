@@ -501,7 +501,7 @@ function createBot(nick, defaultTarget, options = {}) {
             if (!file) break;
             if (target.startsWith('#')) break;
             if (nick !== 'player1bot') break;
-            safeEmit('play-sound', { file });
+            io.emit('play-sound', { file });
             break;
           }
 
@@ -572,7 +572,7 @@ io.on('connection',(socket)=>{
           if (file !== lastSound || now - lastTime > 300) {
             lastSound = file;
             lastTime = now;
-            safeEmit('play-sound', { file });
+            io.emit('play-sound', { file });
           }
         }
         return;
