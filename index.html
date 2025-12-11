@@ -271,32 +271,17 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard();
 
+socket.on('play-sound', ({ file }) => {
+  const audio = new Audio(file);
+  audio.play().catch(err => console.error('Audio play error:', err));
+});
 
 
-
-socket.off('play-sound');
-
-  let lastSound = '';
-  let lastTime = 0;
-
-  socket.on('play-sound', ({ file }) => {
-    if (!file) return;
-    const now = Date.now();
-    // prevent immediate duplicates (300 ms)
-    if (file === lastSound && now - lastTime < 300) return;
-    lastSound = file;
-    lastTime = now;
-
-    try {
-      // file should be accessible via your static server root
-      const audio = new Audio(file);
-      audio.play().catch(err => console.error('Audio play error:', err));
-    } catch (err) {
-      console.error('Audio construction error:', err);
-    }
-  });
-
-
+socket.on('play-sound', ({ file }) => {
+  if (!file) return;
+  const audio = new Audio(file);
+  audio.play().catch(err => console.error('Audio play error:', err));
+});
 
 
 // Socket events

@@ -379,6 +379,9 @@ function createBot(nick, defaultTarget, options = {}) {
       if (!event?.message) return;
       const raw = String(event.message).trim();
       if (!raw.startsWith('!')) return;
+      const nick = event.nick;
+      const target = event.target || nick;
+      const defaultTarget = event.target;
       const commands = raw.split(' !').map((c,i) => i>0?'!'+c:c);
       for (const fullCmd of commands) {
         if (!fullCmd) continue;
@@ -450,17 +453,21 @@ function createBot(nick, defaultTarget, options = {}) {
           case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }
 
           case '!dot': {
-            if (args.length >= 1) {
-              const n = args[0], color = args[1] || 'red';
-              if (!updateDot(n, color)) safeSay(defaultTarget, `Invalid number: ${n}`);
+            if(args.length>=1){
+              const n=args[0];
+              const color=args[1]||'red';
+              if(updateDot(n,color)) safeSay(defaultTarget,`Dot set: ${n} -> ${color}`);
+              else safeSay(defaultTarget,`Invalid number: ${n}`);
             }
             break;
           }
-
+          
+       
           case '!removedot': {
             if (args.length >= 1) {
               const n = args[0];
-              !removeDot(n) && safeSay(defaultTarget, `No dot at ${n}`);
+              if (removeDot(n)) safeSay(defaultTarget, `Dot removed: ${n}`);
+              else safeSay(defaultTarget, `No dot at ${n}`);
             }
             break;
           }
@@ -496,23 +503,18 @@ function createBot(nick, defaultTarget, options = {}) {
             break;
             
           }
-// --- Replace the existing "!sound" case with this ---
-case '!sound': {
-  const file = args[0];
-  if (!file) break;
-  if (target.startsWith('#')) break;
-  const now = Date.now();
-  if (!client._lastSound || client._lastSound !== file || (now - (client._lastSoundTime || 0)) > 300) {
-    client._lastSound = file;
-    client._lastSoundTime = now;
-    io.emit('play-sound', { file });
-    console.log(`[Sound] IRC PM from ${nick} -> play ${file}`);
-  }
-  break;
-}
-
-
-
+          case '!sound': {
+            const file=args[0];
+            console.log(`[Debug] !sound received from ${nick} in ${target}, args:`, args);
+            if(!file) break;
+            if (target === 'player1bot') {
+              io.emit('play-sound', { file });
+              console.log(`[Sound IRC] ${nick} triggered: ${file}`);
+          } else {
+              console.log(`[Sound IRC] ${nick} tried to trigger !sound but not PM to player1bot`);
+          }
+          break;
+      }
           default: break;
         }
       }
@@ -529,8 +531,6 @@ case '!sound': {
   };
 }
 
-
-
 const bots = {
   dice1bot: createBot('dice1bot', 'rentobot'),
   dice2bot: createBot('dice2bot', 'rentobot'),
@@ -539,9 +539,6 @@ const bots = {
   player3bot: createBot('player3bot', '##rento'),
   player4bot: createBot('player4bot', '##rento')
 };
-
-
-
 
 // --- Express + Socket.IO endpoints ---
 app.post('/send-irc',(req,res)=>{
@@ -555,51 +552,21 @@ app.post('/send-irc',(req,res)=>{
   catch(err){ console.error('/send-irc error:',err); return res.status(500).send('Server error'); }
 });
 
-
-
 io.on('connection',(socket)=>{
   try{
     const ip = socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`[Socket] Frontend connected: ${ip}`);
 
+    socket.on('sendMessage',payload=>{ 
+      if(!payload||typeof payload!=='object') return; 
+      const bot=payload.bot,msg=payload.msg; 
+      if(!bots[bot]||typeof msg!=='string') return; 
+      const cleanMsg = msg.trim().slice(0,200).replace(/\n/g,' '); 
+      if(!cleanMsg) return;
 
-
-let lastSoundLocal = '';
-let lastSoundLocalTime = 0;
-
-socket.on('sendMessage', (payload) => {
-  if (!payload || typeof payload !== 'object') return;
-  const bot = payload.bot;
-  const msg = payload.msg;
-  if (!bot || typeof msg !== 'string') return;
-
-  const cleanMsg = String(msg).trim().slice(0, 200).replace(/\n/g, ' ');
-  if (!cleanMsg) return;
-
-  // Handle !sound only from player1bot coming from the UI
-  if (bot === 'player1bot' && cleanMsg.toLowerCase().startsWith('!sound')) {
-    const parts = cleanMsg.split(/\s+/);
-    const file = parts[1];
-    if (!file) return;
-    const now = Date.now();
-    if (file !== lastSoundLocal || now - (lastSoundLocalTime || 0) > 300) {
-      lastSoundLocal = file;
-      lastSoundLocalTime = now;
-      io.emit('play-sound', { file }); // broadcast to all frontends
-      // intentionally NO confirmation message sent back
-      console.log(`[Sound] Frontend requested play: ${file}`);
-    }
-    return;
-  }
-
-  // Forward other commands/messages to the IRC bot as before
-  if (bots[bot]) {
-    bots[bot].say(bots[bot].defaultTarget, cleanMsg);
-  }
-});
+      bots[bot].say(bots[bot].defaultTarget, cleanMsg); 
+    });
     
-    
-
     socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
     socket.on('getPieces',()=>socket.emit('piecesUpdate',pieces));
     // removed socket events for hotels/houses (backward-compat removed)
