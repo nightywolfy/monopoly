@@ -496,14 +496,21 @@ function createBot(nick, defaultTarget, options = {}) {
             break;
             
           }
-          case '!sound': {
-            const file = args[0];
-            if (!file) break;
-            if (target.startsWith('#')) break;
-            if (nick !== 'player1bot') break;
-            io.emit('play-sound', { file });
-            break;
-          }
+// --- Replace the existing "!sound" case with this ---
+case '!sound': {
+  const file = args[0];
+  if (!file) break;
+  if (target.startsWith('#')) break;
+  const now = Date.now();
+  if (!client._lastSound || client._lastSound !== file || (now - (client._lastSoundTime || 0)) > 300) {
+    client._lastSound = file;
+    client._lastSoundTime = now;
+    io.emit('play-sound', { file });
+    console.log(`[Sound] IRC PM from ${nick} -> play ${file}`);
+  }
+  break;
+}
+
 
 
           default: break;
@@ -557,35 +564,39 @@ io.on('connection',(socket)=>{
 
 
 
-    let lastSound = '';
-    let lastTime = 0;
-    
-    socket.on('sendMessage', (payload) => {
-      if (!payload || typeof payload !== 'object') return;
-      const bot = payload.bot;
-      const msg = payload.msg;
-      if (!bots[bot] || typeof msg !== 'string') return;
-      const cleanMsg = msg.trim().slice(0, 200).replace(/\n/g, ' ');
-      if (!cleanMsg) return;
-     
-      if (bot === 'player1bot' && cleanMsg.toLowerCase().startsWith('!sound')) {
-        const args = cleanMsg.split(/\s+/);
-        const file = args[1];
-        if (!file) return;
-        const now = Date.now();
-        if (file !== lastSound || now - lastTime > 300) {
-            lastSound = file;
-            lastTime = now;
-            io.emit('play-sound', { file });
-        }
-      }
-        return;
+let lastSoundLocal = '';
+let lastSoundLocalTime = 0;
+
+socket.on('sendMessage', (payload) => {
+  if (!payload || typeof payload !== 'object') return;
+  const bot = payload.bot;
+  const msg = payload.msg;
+  if (!bot || typeof msg !== 'string') return;
+
+  const cleanMsg = String(msg).trim().slice(0, 200).replace(/\n/g, ' ');
+  if (!cleanMsg) return;
+
+  // Handle !sound only from player1bot coming from the UI
+  if (bot === 'player1bot' && cleanMsg.toLowerCase().startsWith('!sound')) {
+    const parts = cleanMsg.split(/\s+/);
+    const file = parts[1];
+    if (!file) return;
+    const now = Date.now();
+    if (file !== lastSoundLocal || now - (lastSoundLocalTime || 0) > 300) {
+      lastSoundLocal = file;
+      lastSoundLocalTime = now;
+      io.emit('play-sound', { file }); // broadcast to all frontends
+      // intentionally NO confirmation message sent back
+      console.log(`[Sound] Frontend requested play: ${file}`);
+    }
+    return;
   }
 
-
-      // All other messages handled normally
-      bots[bot].say(bots[bot].defaultTarget, cleanMsg);
-    });
+  // Forward other commands/messages to the IRC bot as before
+  if (bots[bot]) {
+    bots[bot].say(bots[bot].defaultTarget, cleanMsg);
+  }
+});
     
     
 
