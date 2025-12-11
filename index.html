@@ -279,7 +279,6 @@ let lastTime = 0;
 socket.on('play-sound', ({ file }) => {
   if (!file) return;
   const now = Date.now();
-  // Prevent rapid repeat or duplicate sound
   if (file === lastSound && now - lastTime < 300) return;
   lastSound = file;
   lastTime = now;

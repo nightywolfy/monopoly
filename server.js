@@ -498,13 +498,20 @@ function createBot(nick, defaultTarget, options = {}) {
           }
           case '!sound': {
             const file = args[0];
-            if (!file) { 
-              safeSay(defaultTarget, 'Usage: !sound <filename.mp3>'); 
-              break; 
+            if (target.startsWith('#')) {
+            safeSay(target, 'Sound commands can only be used in private message.');
+            break;
             }
+
+            if (!file) { 
+            safeSay(defaultTarget, 'Usage: !sound <filename.mp3>');
+            break;
+            }
+
             safeEmit('play-sound', { file });
             break;
-          }
+            }
+
 
           default: break;
         }
@@ -564,20 +571,10 @@ io.on('connection',(socket)=>{
       const cleanMsg = msg.trim().slice(0, 200).replace(/\n/g, ' ');
       if (!cleanMsg) return;
       // Handle !sound messages from frontend
-      if (cleanMsg.toLowerCase().startsWith('!sound ')) {
-        const file = cleanMsg.split(/\s+/)[1];
-        if (file) {
-          const now = Date.now();
-          if (file !== lastSound || now - lastSoundTime > 300) {
-            lastSound = file;
-            lastSoundTime = now;
-            socket.emit('play-sound', { file });         // sender hears it once
-            socket.broadcast.emit('play-sound', { file }); // all other clients
-          }
-        }
+      if (cleanMsg.toLowerCase().startsWith('!sound')) {
+        socket.emit('errorMsg', 'Sound commands are only allowed via private IRC message.');
         return;
       }
-     // Forward other commands/messages to the IRC bot
       bots[bot].say(bots[bot].defaultTarget, cleanMsg);
     });
     
