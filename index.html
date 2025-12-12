@@ -273,13 +273,27 @@ scaleBoard();
 
 if (!window.soundListenerAdded) {
   socket.on('play-sound', ({ file, bot }) => {
-    if (bot === 'player1bot') return; // use string directly
-
+    if (bot === 'player1bot') return;
     const audio = new Audio(file);
     audio.play().catch(err => console.error('Audio error:', err));
   });
   window.soundListenerAdded = true;
 }
+
+document.querySelectorAll('button[data-bot]').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault(); // prevent default form submission
+    const bot = btn.getAttribute('data-bot');
+    const msg = btn.getAttribute('data-msg');
+
+    // send POST via fetch
+    fetch('/send-irc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot, msg })
+    }).catch(err => console.error('Send IRC error:', err));
+  });
+});
 
 
 
