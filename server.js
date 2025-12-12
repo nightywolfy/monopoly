@@ -503,20 +503,29 @@ function createBot(nick, defaultTarget, options = {}) {
             break;
             
           }
-          case '!sound': {
-            const file = args[0];
-            if (!file) break;
-            const isPrivate = (target === bots['player1bot'].nick);
+case '!sound': {
+  const file = args[0];
+  if (!file) break;
 
-            if (isPrivate) {
-              io.emit('play-sound', { file, bot: 'player1bot' });
-              console.log(`[Sound IRC] ${nick} triggered: ${file}`);
-            } else {
-              console.log(`[Sound IRC] Ignored !sound from non-PM target: ${target}`);
-            }
+  const botKey = 'player1bot';
+
+  // Safe lookup: works even if bots[player5bot] or .nick is undefined
+  const botObj  = bots[botKey];
+  const botNick = botObj?.nick || botKey;
+
+  // Only allow !sound if message was sent in PM to player5bot
+  const isPrivate = (target === botNick || target === botKey);
+
+  if (isPrivate) {
+    io.emit('play-sound', { file, bot: botKey });
+    console.log(`[Sound IRC] ${nick} triggered sound: ${file}`);
+  } else {
+    console.log(`[Sound IRC] Ignored !sound from non-PM target: ${target}`);
+  }
 
   break;
 }
+
           default: break;
         }
       }
