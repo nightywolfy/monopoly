@@ -836,10 +836,20 @@ if (!window.__SOUND_LISTENER_LOCK__) {
     console.log("Sound listener attached (single instance)");
 }
 
-document.addEventListener("submit", e => {
+/* Prevent ALL submits from navigating hiddenFrame */
+document.addEventListener("submit", function (e) {
     if (e.target.target === "hiddenFrame") {
-        e.preventDefault();  // stop iframe reload
-        console.warn("Prevented iframe reload");
+        e.preventDefault();   // <-- stops iframe reload
+        console.log("Prevented hiddenFrame reload");
+
+        // Manually send the form data using fetch()
+        const form = e.target;
+        const data = new FormData(form);
+
+        fetch(form.action, {
+            method: form.method || "POST",
+            body: data
+        }).catch(err => console.error(err));
     }
 });
 
