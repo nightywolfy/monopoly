@@ -825,37 +825,27 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard(); // initial scale
 
+
 if (!window.soundListenerAdded) {
   socket.on('play-sound', ({ file, bot }) => {
-    if (bot === 'player2bot') return; // use string directly
-
-    const audio = new Audio(file);
-    audio.play().catch(err => console.error('Audio error:', err));
+    if (bot === 'player2bot') return; // ignore own bot
+    new Audio(file).play().catch(err=>console.error(err));
   });
   window.soundListenerAdded = true;
 }
 
-if (!window.soundListenerAdded) {
-  socket.on('play-sound', ({ file, bot }) => {
-    if (bot === 'player1bot') return;
-    const audio = new Audio(file);
-    audio.play().catch(err => console.error('Audio error:', err));
-  });
-  window.soundListenerAdded = true;
-}
-
+// Handle all buttons
 document.querySelectorAll('button[data-bot]').forEach(btn => {
   btn.addEventListener('click', e => {
-    e.preventDefault(); // prevent default form submission
-    const bot = btn.getAttribute('data-bot');
-    const msg = btn.getAttribute('data-msg');
+    e.preventDefault(); // prevents form/iframe submit
+    const bot = btn.dataset.bot;
+    const msg = btn.dataset.msg;
 
-    // send POST via fetch
     fetch('/send-irc', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bot, msg })
-    }).catch(err => console.error('Send IRC error:', err));
+    }).catch(err => console.error(err));
   });
 });
 

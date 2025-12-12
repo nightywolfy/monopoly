@@ -833,18 +833,18 @@ if (!window.soundListenerAdded) {
 
 document.querySelectorAll('button[data-bot]').forEach(btn => {
   btn.addEventListener('click', e => {
-    e.preventDefault(); // prevent default form submission
-    const bot = btn.getAttribute('data-bot');
-    const msg = btn.getAttribute('data-msg');
+    e.preventDefault(); // prevents form/iframe submit
+    const bot = btn.dataset.bot;
+    const msg = btn.dataset.msg;
 
-    // send POST via fetch
     fetch('/send-irc', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ bot, msg })
-    }).catch(err => console.error('Send IRC error:', err));
+    }).catch(err => console.error(err));
   });
 });
+
 
 
 socket.on('piecesUpdate', updatePieces);
