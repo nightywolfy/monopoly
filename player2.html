@@ -836,22 +836,23 @@ if (!window.__SOUND_LISTENER_LOCK__) {
     console.log("Sound listener attached (single instance)");
 }
 
-/* Prevent ALL submits from navigating hiddenFrame */
-document.addEventListener("submit", function (e) {
+document.addEventListener("submit", function(e) {
     if (e.target.target === "hiddenFrame") {
-        e.preventDefault();   // <-- stops iframe reload
-        console.log("Prevented hiddenFrame reload");
-
-        // Manually send the form data using fetch()
+        e.preventDefault(); // stop iframe reload
         const form = e.target;
-        const data = new FormData(form);
+
+        // Build JSON payload from form inputs
+        const bot = form.querySelector('[name="bot"]').value;
+        const msg = form.querySelector('[name="msg"]').value;
 
         fetch(form.action, {
             method: form.method || "POST",
-            body: data
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bot, msg })
         }).catch(err => console.error(err));
     }
 });
+
 
 
 socket.on('piecesUpdate', updatePieces);
