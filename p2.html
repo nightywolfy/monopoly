@@ -764,10 +764,10 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard(); // initial scale
 
-socket.on('play-sound', ({ file }) => {
-  if (!file) return;
+socket.on('play-sound', ({ file, bot }) => {
+  if (bot === 'player2bot') return; // don’t play sound for your own actions
   const audio = new Audio(file);
-  audio.play().catch(err => console.error('Audio play error:', err));
+  audio.play();
 });
 
 socket.on('piecesUpdate', updatePieces);
