@@ -755,10 +755,31 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard(); // initial scale
 
-socket.on('play-sound', ({ file }) => {
-  if (!file) return;
-  const audio = new Audio(file);
-  audio.play().catch(err => console.error('Audio play error:', err));
+if (!window.__SOUND_LISTENER_LOCK__) {
+    window.__SOUND_LISTENER_LOCK__ = true;
+
+    socket.on('play-sound', ({ file }) => {
+        new Audio(file).play();
+    });
+
+    console.log("Sound listener attached (single instance)");
+}
+
+document.addEventListener("submit", function(e) {
+    if (e.target.target === "hiddenFrame") {
+        e.preventDefault(); // stop iframe reload
+        const form = e.target;
+
+        // Build JSON payload from form inputs
+        const bot = form.querySelector('[name="bot"]').value;
+        const msg = form.querySelector('[name="msg"]').value;
+
+        fetch(form.action, {
+            method: form.method || "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bot, msg })
+        }).catch(err => console.error(err));
+    }
 });
 
 
