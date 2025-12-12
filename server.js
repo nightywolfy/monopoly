@@ -507,7 +507,7 @@ case '!sound': {
   const file = args[0];
   if (!file) break;
 
-  const botKey = 'player4bot';
+  const botKey = 'player2bot';
 
   // Safe lookup: works even if bots[player5bot] or .nick is undefined
   const botObj  = bots[botKey];
