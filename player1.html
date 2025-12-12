@@ -752,16 +752,8 @@ modeButtons.forEach(btn => {
     });
 });
 
-// Play sound
-function playSound(filename) {
-    new Audio(filename).play().catch(()=>{});
-}
 
-// Sound URLs
-const soundURLs = {
-    redeem: 'https://raw.githubusercontent.com/nightywolfy/monopoly/main/redeem.mp3',
-    mortgage: 'https://raw.githubusercontent.com/nightywolfy/monopoly/main/mortgage.mp3'
-};
+
 
 // Generate board buttons
 allSpaces.forEach(spaceNum => {
