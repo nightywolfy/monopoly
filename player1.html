@@ -825,26 +825,18 @@ scaleBoard(); // initial scale
 if (!window.__SOUND_LISTENER_LOCK__) {
     window.__SOUND_LISTENER_LOCK__ = true;
 
-    socket.on('play-sound', ({ file, bot }) => {
-        if (bot === 'player1bot') return;
+    socket.on('play-sound', ({ file }) => {
         new Audio(file).play();
     });
 
     console.log("Sound listener attached (single instance)");
 }
 
-document.querySelectorAll('button[data-bot]').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.preventDefault(); // prevents form/iframe submit
-    const bot = btn.dataset.bot;
-    const msg = btn.dataset.msg;
-
-    fetch('/send-irc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ bot, msg })
-    }).catch(err => console.error(err));
-  });
+document.addEventListener("submit", e => {
+    if (e.target.target === "hiddenFrame") {
+        e.preventDefault();  // stop iframe reload
+        console.warn("Prevented iframe reload");
+    }
 });
 
 
