@@ -824,13 +824,13 @@ scaleBoard(); // initial scale
 
 if (!window.soundListenerAdded) {
   socket.on('play-sound', ({ file, bot }) => {
-    if (bot === 'player1bot') return;
-    const audio = new Audio(file);
-    audio.play().catch(err => console.error('Audio error:', err));
+    if (bot === 'player1bot') return; // ignore own bot
+    new Audio(file).play().catch(err=>console.error(err));
   });
   window.soundListenerAdded = true;
 }
 
+// Handle all buttons
 document.querySelectorAll('button[data-bot]').forEach(btn => {
   btn.addEventListener('click', e => {
     e.preventDefault(); // prevents form/iframe submit
@@ -844,7 +844,6 @@ document.querySelectorAll('button[data-bot]').forEach(btn => {
     }).catch(err => console.error(err));
   });
 });
-
 
 
 socket.on('piecesUpdate', updatePieces);

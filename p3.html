@@ -755,10 +755,27 @@ function scaleBoard() {
 window.addEventListener('resize', scaleBoard);
 scaleBoard(); // initial scale
 
-socket.on('play-sound', ({ file, bot }) => {
-  if (bot === 'player3bot') return; // don’t play sound for your own actions
-  const audio = new Audio(file);
-  audio.play();
+if (!window.soundListenerAdded) {
+  socket.on('play-sound', ({ file, bot }) => {
+    if (bot === 'player3bot') return; // ignore own bot
+    new Audio(file).play().catch(err=>console.error(err));
+  });
+  window.soundListenerAdded = true;
+}
+
+// Handle all buttons
+document.querySelectorAll('button[data-bot]').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault(); // prevents form/iframe submit
+    const bot = btn.dataset.bot;
+    const msg = btn.dataset.msg;
+
+    fetch('/send-irc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bot, msg })
+    }).catch(err => console.error(err));
+  });
 });
 
 socket.on('piecesUpdate', updatePieces);
