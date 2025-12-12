@@ -827,8 +827,8 @@ scaleBoard(); // initial scale
 
 if (!window.soundListenerAdded) {
   socket.on('play-sound', ({ file, bot }) => {
-    // ignore sounds triggered by your own bot
-    if (bot === player2bot) return;
+    if (bot === 'player2bot') return; // use string directly
+
     const audio = new Audio(file);
     audio.play().catch(err => console.error('Audio error:', err));
   });
