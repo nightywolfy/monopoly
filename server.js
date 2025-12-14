@@ -334,16 +334,31 @@ function createBot(nick, defaultTarget, options = {}) {
   const sendQueue = [], SEND_INTERVAL_MS = 900;
   let sendInterval = null;
 
+
   function startSendLoop() {
     if (sendInterval) return;
     sendInterval = setInterval(() => {
       if (!sendQueue.length || !isConnected) return;
-      const { msg, target } = sendQueue.shift();
-      try { client.say(target, msg); } catch (err) { console.error(`[${nick}] send error:`, err); }
+      const { target, msg } = sendQueue.shift();
+      try {
+        if (!target || !msg) return;
+        if (target.startsWith('#')) client.say(target, msg);      // channel
+        else client.privmsg(target, msg);                         // PM
+      } catch (err) {
+        console.error(`[${nick}] send error:`, err);
+      }
     }, SEND_INTERVAL_MS);
   }
   startSendLoop();
-  function stopSendLoop() { if (sendInterval) { clearInterval(sendInterval); sendInterval = null; } }
+  
+  function stopSendLoop() {
+    if (sendInterval) {
+      clearInterval(sendInterval);
+      sendInterval = null;
+    }
+  }
+
+
 
   function safeSay(target, msg) {
     if (!msg || typeof msg !== 'string') return;
@@ -352,18 +367,32 @@ function createBot(nick, defaultTarget, options = {}) {
     sendQueue.push({ target, msg: clean });
   }
 
-  function connectBot() {
+function connectBot() {
     if (destroyed || isConnecting || isConnected) return;
     isConnecting = true;
-    try { client.connect({ host, port, nick, secure, timeout: 20000, auto_reconnect: false }); } 
-    catch (err) { console.error(`${nick} connection error:`, err); isConnecting = false; reconnectDelay = Math.min(reconnectDelay*2,60000); setTimeout(connectBot,reconnectDelay); }
+    try {
+      client.connect({ host, port, nick, secure, timeout: 20000, auto_reconnect: false });
+    } catch (err) {
+      console.error(`${nick} connection error:`, err);
+      isConnecting = false;
+      reconnectDelay = Math.min(reconnectDelay * 2, 60000);
+      setTimeout(connectBot, reconnectDelay);
+    }
   }
   connectBot();
 
-  client.on('registered', () => {
-    reconnectDelay = 9000; isConnecting=false; isConnected=true;
-    if (defaultTarget) { try { client.join(defaultTarget); } catch {} }
-    if (nickServ?.identifyCommand) client.say('NickServ', nickServ.identifyCommand);
+client.on('registered', () => {
+    reconnectDelay = 9000;
+    isConnecting = false;
+    isConnected = true;
+
+    if (defaultTarget && defaultTarget.startsWith('#')) {
+      try { client.join(defaultTarget); } catch {}
+    }
+
+    if (nickServ?.identifyCommand) {
+      client.say('NickServ', nickServ.identifyCommand);
+    }
   });
 
   client.on('close', () => { 
@@ -379,8 +408,8 @@ function createBot(nick, defaultTarget, options = {}) {
       if (!event?.message) return;
       const raw = String(event.message).trim();
       if (!raw.startsWith('!')) return;
-      const nick = event.nick;
-      const target = event.target || nick;
+      const senderNick = event.nick;
+      const target = event.target || senderNick;
       const defaultTarget = event.target;
       const commands = raw.split(' !').map((c,i) => i>0?'!'+c:c);
       for (const fullCmd of commands) {
@@ -547,8 +576,11 @@ app.post('/send-irc', (req, res) => {
     if (!bot || !msg) return res.status(400).send('Missing bot or message');
     if (!bots[bot]) return res.status(400).send('Unknown bot');
 
-    const finalTarget = target || '##rento'; // fallback channel
-    bots[bot].say(finalTarget, String(msg)); // or .privmsg() if your library requires it
+    // If no target specified, fallback to bot's defaultTarget
+    const finalTarget = target || bots[bot].defaultTarget || '##rento';
+
+    // Use the bot factory's safe say method
+    bots[bot].say(finalTarget, String(msg));
 
     return res.redirect('/');
   } catch (err) {
@@ -556,6 +588,7 @@ app.post('/send-irc', (req, res) => {
     return res.status(500).send('Server error');
   }
 });
+
 
 
 io.on('connection',(socket)=>{
