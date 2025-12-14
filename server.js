@@ -472,39 +472,28 @@ const bots = {
   player4bot: createBot('player4bot', '##rento')
 };
 
-for (const botKey of Object.keys(bots)) {
-  const bot = bots[botKey];
-  const originalSay = bot.say;
-
-  bot.say = (target, msg) => {
-    if (!target || !msg) return;
-
-    const trimmed = target.trim();
-    if (trimmed.startsWith('#')) {
-      // Send to channel
-      originalSay(trimmed, msg);
-    } else {
-      // Send private message
-      originalSay(trimmed, msg);
-    }
-  };
-}
 
 
 
-// --- Express + Socket.IO endpoints ---
+
 app.post('/send-irc', (req, res) => {
   try {
     const { bot, target, msg } = req.body || {};
+
     if (!bot || !msg) return res.status(400).send('Missing bot or message');
     if (!bots[bot]) return res.status(400).send('Unknown bot');
 
-    // Default target: channel if empty
-    const finalTarget = (typeof target === 'string' && target.trim()) 
-      ? target.trim() 
-      : bots[bot].defaultTarget;
+    const cleanMsg = String(msg).trim();
+    if (!cleanMsg) return res.redirect('/');
 
-    bots[bot].say(finalTarget, String(msg));
+    // IMPORTANT:
+    // - target starting with # => channel
+    // - target without # => private message
+    const finalTarget = (typeof target === 'string' && target.trim())
+      ? target.trim()
+      : '##rento'; // default ONLY if no target provided
+
+    bots[bot].say(finalTarget, cleanMsg);
 
     return res.redirect('/');
   } catch (err) {
@@ -512,6 +501,7 @@ app.post('/send-irc', (req, res) => {
     return res.status(500).send('Server error');
   }
 });
+
 
 
 
