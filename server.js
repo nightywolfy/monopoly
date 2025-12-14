@@ -13,7 +13,6 @@ const __dirname = path.dirname(__filename);
 
 
 // --- Express + Socket.IO ---
-import express from "express";
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 1e6 });
