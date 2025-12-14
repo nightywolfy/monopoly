@@ -481,31 +481,31 @@ html, body {
 <iframe name="hiddenFrame" style="display:none;"></iframe>
 <div id="topButtons" style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px; justify-content:center; align-items:center;">
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player1bot">
 <input type="hidden" name="target" value="##rento">
 <input type="hidden" name="msg" value="!go1">
 <button type="submit" class="small-button">GO1</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player1bot">
 <input type="hidden" name="target" value="##rento">
 <input type="hidden" name="msg" value="!gooverride">
 <button type="submit" class="small-button">OR</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player1bot">
 <input type="hidden" name="target" value="rentobot">
 <input type="hidden" name="msg" value="!up">
 <button type="submit" class="small-button">UP</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player1bot">
 <input type="hidden" name="target" value="##rento">
 <input type="hidden" name="msg" value="!go3">
 <button type="submit" class="small-button">JA</button>
 </form>
 <form action="/send-irc" method="POST" target="hiddenFrame">
-<input type="hidden" name="bot" value="player5bot">
+<input type="hidden" name="bot" value="player1bot">
 <input type="hidden" name="target" value="rentobot">
 <input type="hidden" name="msg" value="1">
 <button type="submit">1</button>
@@ -901,6 +901,26 @@ if (!window.__SOUND_LISTENER_LOCK__) {
 
     console.log("Sound listener attached (single instance)");
 }
+
+document.addEventListener("submit", function(e) {
+    if (e.target.target === "hiddenFrame") {
+        e.preventDefault(); // stop iframe reload
+        const form = e.target;
+
+        // Build JSON payload from form inputs
+        const bot = form.querySelector('[name="bot"]').value;
+        const msg = form.querySelector('[name="msg"]').value;
+        const targetInput = form.querySelector('[name="target"]');
+        const target = targetInput ? targetInput.value : undefined;
+
+        fetch(form.action, {
+            method: form.method || "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bot, target, msg }) // include target
+        }).catch(err => console.error(err));
+    }
+});
+
 
 
 

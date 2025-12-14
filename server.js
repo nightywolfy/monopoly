@@ -533,10 +533,10 @@ function createBot(nick, defaultTarget, options = {}) {
 
 const bots = {
 
-  player5bot: createBot('player5bot', '##rento'),
-  player6bot: createBot('player6bot', '##rento'),
-  player7bot: createBot('player7bot', '##rento'),
-  player8bot: createBot('player8bot', '##rento')
+  player1bot: createBot('player1bot', '##rento'),
+  player2bot: createBot('player2bot', '##rento'),
+  player3bot: createBot('player3bot', '##rento'),
+  player4bot: createBot('player4bot', '##rento')
 };
 
 app.post('/send-irc', (req, res) => {
