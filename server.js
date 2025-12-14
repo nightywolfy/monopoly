@@ -540,15 +540,22 @@ const bots = {
 };
 
 // --- Express + Socket.IO endpoints ---
-app.post('/send-irc',(req,res)=>{
-  try{ 
-    const {bot,msg}=req.body||{}; 
-    if(!bot||!msg) return res.status(400).send('Missing bot or message'); 
-    if(!bots[bot]) return res.status(400).send('Unknown bot'); 
-    bots[bot].say(bots[bot].defaultTarget,String(msg)); 
-    return res.redirect('/'); 
+app.post('/send-irc', (req, res) => {
+  try {
+    const { bot, target, msg } = req.body || {};
+
+    if (!bot || !msg) return res.status(400).send('Missing bot or message');
+    if (!bots[bot]) return res.status(400).send('Unknown bot');
+
+    // Use the provided target or fallback to defaultTarget
+    const finalTarget = target || bots[bot].defaultTarget;
+    bots[bot].say(finalTarget, String(msg));
+
+    return res.redirect('/');
+  } catch (err) {
+    console.error('/send-irc error:', err);
+    return res.status(500).send('Server error');
   }
-  catch(err){ console.error('/send-irc error:',err); return res.status(500).send('Server error'); }
 });
 
 io.on('connection',(socket)=>{
