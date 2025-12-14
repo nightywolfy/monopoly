@@ -547,9 +547,8 @@ app.post('/send-irc', (req, res) => {
     if (!bot || !msg) return res.status(400).send('Missing bot or message');
     if (!bots[bot]) return res.status(400).send('Unknown bot');
 
-    // Use the provided target or fallback to defaultTarget
-    const finalTarget = target || bots[bot].defaultTarget;
-    bots[bot].say(finalTarget, String(msg));
+    const finalTarget = target || '##rento'; // fallback channel
+    bots[bot].say(finalTarget, String(msg)); // or .privmsg() if your library requires it
 
     return res.redirect('/');
   } catch (err) {
@@ -557,6 +556,7 @@ app.post('/send-irc', (req, res) => {
     return res.status(500).send('Server error');
   }
 });
+
 
 io.on('connection',(socket)=>{
   try{
