@@ -503,29 +503,18 @@ function createBot(nick, defaultTarget, options = {}) {
             break;
             
           }
-case '!sound': {
-  const file = args[0];
-  if (!file) break;
-
-  const botKey = 'player2bot';
-
-  // Safe lookup: works even if bots[player5bot] or .nick is undefined
-  const botObj  = bots[botKey];
-  const botNick = botObj?.nick || botKey;
-
-  // Only allow !sound if message was sent in PM to player5bot
-  const isPrivate = (target === botNick || target === botKey);
-
-  if (isPrivate) {
-    io.emit('play-sound', { file, bot: botKey });
-    console.log(`[Sound IRC] ${nick} triggered sound: ${file}`);
-  } else {
-    console.log(`[Sound IRC] Ignored !sound from non-PM target: ${target}`);
-  }
-
-  break;
-}
-
+          case '!sound': {
+            const file=args[0];
+            console.log(`[Debug] !sound received from ${nick} in ${target}, args:`, args);
+            if(!file) break;
+            if (target === 'player1bot') {
+              io.emit('play-sound', { file });
+              console.log(`[Sound IRC] ${nick} triggered: ${file}`);
+          } else {
+              console.log(`[Sound IRC] ${nick} tried to trigger !sound but not PM to player1bot`);
+          }
+          break;
+      }
           default: break;
         }
       }
@@ -543,12 +532,8 @@ case '!sound': {
 }
 
 const bots = {
-  dice1bot: createBot('dice1bot', 'rentobot'),
-  dice2bot: createBot('dice2bot', 'rentobot'),
-  player1bot: createBot('player1bot', '##rento'),
-  player2bot: createBot('player2bot', '##rento'),
-  player3bot: createBot('player3bot', '##rento'),
-  player4bot: createBot('player4bot', '##rento')
+
+  player44bot: createBot('player44bot', '##rento')
 };
 
 // --- Express + Socket.IO endpoints ---
