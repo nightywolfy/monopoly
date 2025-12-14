@@ -366,6 +366,10 @@ function createBot(nick, defaultTarget, options = {}) {
     if (!clean) return;
     sendQueue.push({ target, msg: clean });
   }
+  
+   function say(target, msg) {
+    safeSay(target, msg);
+  }
 
 function connectBot() {
     if (destroyed || isConnecting || isConnected) return;
@@ -403,20 +407,24 @@ client.on('registered', () => {
 
   client.on('error', (err) => console.error(`Error for ${nick}:`, err?.stack || err));
 
-  client.on('message', (event) => {
+client.on('message', (event) => {
     try {
       if (!event?.message) return;
       const raw = String(event.message).trim();
       if (!raw.startsWith('!')) return;
+
       const senderNick = event.nick;
-      const target = event.target || senderNick;
-      const defaultTarget = event.target;
-      const commands = raw.split(' !').map((c,i) => i>0?'!'+c:c);
+      const channelOrPM = event.target; // channel name or bot nick
+      const commands = raw.split(' !').map((c, i) => i > 0 ? '!' + c : c);
+
       for (const fullCmd of commands) {
         if (!fullCmd) continue;
         const parts = fullCmd.trim().split(/\s+/);
         const cmd = (parts.shift() || '').toLowerCase();
         const args = parts;
+
+        // Use PM if message came from private or override
+        const replyTarget = channelOrPM.startsWith('#') ? channelOrPM : senderNick;
 
         switch(cmd) {
           
@@ -576,10 +584,7 @@ app.post('/send-irc', (req, res) => {
     if (!bot || !msg) return res.status(400).send('Missing bot or message');
     if (!bots[bot]) return res.status(400).send('Unknown bot');
 
-    // If no target specified, fallback to bot's defaultTarget
-    const finalTarget = target || bots[bot].defaultTarget || '##rento';
-
-    // Use the bot factory's safe say method
+    const finalTarget = target || '##rento';
     bots[bot].say(finalTarget, String(msg));
 
     return res.redirect('/');
