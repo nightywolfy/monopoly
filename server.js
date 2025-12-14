@@ -325,8 +325,7 @@ let currentMap = 2;
 // ------------------------------------------------------------------
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
-  const host = options.host || 'irc.snoonet.org';
-  const port = options.port || 6667;
+  const host = options.host || 'irc.libera.chat
   const secure = !!options.secure;
   const nickServ = options.nickServ || null;
 
