@@ -507,7 +507,7 @@ function createBot(nick, defaultTarget, options = {}) {
             const file=args[0];
             console.log(`[Debug] !sound received from ${nick} in ${target}, args:`, args);
             if(!file) break;
-            if (target === 'player1bot') {
+            if (target === 'player2bot') {
               io.emit('play-sound', { file });
               console.log(`[Sound IRC] ${nick} triggered: ${file}`);
           } else {

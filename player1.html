@@ -910,13 +910,11 @@ document.addEventListener("submit", function(e) {
         // Build JSON payload from form inputs
         const bot = form.querySelector('[name="bot"]').value;
         const msg = form.querySelector('[name="msg"]').value;
-        const targetInput = form.querySelector('[name="target"]');
-        const target = targetInput ? targetInput.value : undefined;
 
         fetch(form.action, {
             method: form.method || "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ bot, target, msg }) // include target
+            body: JSON.stringify({ bot, msg })
         }).catch(err => console.error(err));
     }
 });
