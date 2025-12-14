@@ -19,9 +19,7 @@ const io = new Server(server, { maxHttpBufferSize: 1e6 });
 app.set('trust proxy', true);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100kb' }));
-app.get("/", (req, res) => {
-  res.send("Hello Railway!");
-});
+app.get("/", (req, res) => res.send("Hello Railway!"));
 
 // --- Persistent files ---
 const moneyFile = path.join(__dirname, 'money.json');
