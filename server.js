@@ -325,7 +325,7 @@ let currentMap = 2;
 // ------------------------------------------------------------------
 function createBot(nick, defaultTarget, options = {}) {
   const client = new IRC.Client();
-  const host = options.host || 'irc.freenode.net';
+  const host = options.host || 'irc.oftc.net';
   const port = options.port || 6667;
   const secure = !!options.secure;
   const nickServ = options.nickServ || null;
@@ -544,7 +544,7 @@ client.on('message', (event) => {
             const file=args[0];
             console.log(`[Debug] !sound received from ${nick} in ${target}, args:`, args);
             if(!file) break;
-            if (target === 'player1bot') {
+            if (target === 'player2bot') {
               io.emit('play-sound', { file });
               console.log(`[Sound IRC] ${nick} triggered: ${file}`);
           } else {
