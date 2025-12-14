@@ -902,38 +902,26 @@ if (!window.__SOUND_LISTENER_LOCK__) {
     console.log("Sound listener attached (single instance)");
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+    // Intercept all form submissions targeting the hidden iframe
+    document.querySelectorAll('form[target="hiddenFrame"]').forEach(form => {
+        form.addEventListener("submit", function(e) {
+            e.preventDefault(); // stop normal iframe submission
 
+            const bot = form.querySelector('[name="bot"]').value;
+            const msg = form.querySelector('[name="msg"]').value;
+            const targetInput = form.querySelector('[name="target"]');
+            const target = targetInput?.value || undefined;
 
-
-
-
-document.addEventListener(
-  "submit",
-  function (e) {
-    const form = e.target;
-
-    if (form.target !== "hiddenFrame") return;
-
-    e.preventDefault();                 // stop default submit
-    e.stopPropagation();                // stop bubbling
-    e.stopImmediatePropagation();       // stop duplicate handlers
-
-    const bot = form.querySelector('[name="bot"]')?.value;
-    const msg = form.querySelector('[name="msg"]')?.value;
-    const target = form.querySelector('[name="target"]')?.value;
-
-    if (!bot || !msg) return;
-
-    fetch(form.action, {
-      method: form.method || "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bot, msg, target })
-    }).catch(console.error);
-
-    return false;
-  },
-  true 
-);
+            // Send via fetch instead
+            fetch(form.action, {
+                method: form.method || "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bot, target, msg })
+            }).catch(err => console.error(err));
+        });
+    });
+});
 
 
 
