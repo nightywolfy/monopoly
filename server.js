@@ -472,33 +472,37 @@ const bots = {
   player4bot: createBot('player4bot', '##rento')
 };
 
-// Wrap say for all bots to default to PMing 'rentobot' if no target
 for (const botKey of Object.keys(bots)) {
   const bot = bots[botKey];
   const originalSay = bot.say;
+
   bot.say = (target, msg) => {
-    if (!target || target.trim() === '') {
-      originalSay('rentobot', msg);  // default PM
+    if (!target || !msg) return;
+
+    const trimmed = target.trim();
+    if (trimmed.startsWith('#')) {
+      // Send to channel
+      originalSay(trimmed, msg);
     } else {
-      originalSay(target, msg);      // use provided target
+      // Send private message
+      originalSay(trimmed, msg);
     }
   };
 }
+
 
 
 // --- Express + Socket.IO endpoints ---
 app.post('/send-irc', (req, res) => {
   try {
     const { bot, target, msg } = req.body || {};
-    console.log('[send-irc] bot:', bot, 'target:', target, 'msg:', msg);
-
     if (!bot || !msg) return res.status(400).send('Missing bot or message');
     if (!bots[bot]) return res.status(400).send('Unknown bot');
 
-    // Default to PM 'rentobot' if target is empty
+    // Default target: channel if empty
     const finalTarget = (typeof target === 'string' && target.trim()) 
       ? target.trim() 
-      : 'rentobot';
+      : bots[bot].defaultTarget;
 
     bots[bot].say(finalTarget, String(msg));
 
@@ -508,6 +512,7 @@ app.post('/send-irc', (req, res) => {
     return res.status(500).send('Server error');
   }
 });
+
 
 
 
