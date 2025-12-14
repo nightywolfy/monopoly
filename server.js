@@ -13,13 +13,16 @@ const __dirname = path.dirname(__filename);
 
 
 // --- Express + Socket.IO ---
+const express = require("express");
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { maxHttpBufferSize: 1e6 });
 app.set('trust proxy', true);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '100kb' }));
-
+app.get("/", (req, res) => {
+  res.send("Hello Railway!");
+});
 
 // --- Persistent files ---
 const moneyFile = path.join(__dirname, 'money.json');
@@ -685,5 +688,7 @@ async function gracefulShutdown(signal) {
 ['SIGINT','SIGTERM'].forEach(sig => process.on(sig, () => gracefulShutdown(sig)));
 
 // --- Start server ---
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`[Server] Running at http://localhost:${PORT}`));
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
