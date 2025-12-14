@@ -580,11 +580,12 @@ const bots = {
 app.post('/send-irc', (req, res) => {
   try {
     const { bot, target, msg } = req.body || {};
+    console.log('[send-irc] bot:', bot, 'target:', target, 'msg:', msg);
 
     if (!bot || !msg) return res.status(400).send('Missing bot or message');
     if (!bots[bot]) return res.status(400).send('Unknown bot');
 
-    const finalTarget = target || '##rento';
+    const finalTarget = (typeof target === 'string' && target.trim()) ? target.trim() : '##rento';
     bots[bot].say(finalTarget, String(msg));
 
     return res.redirect('/');
@@ -593,6 +594,7 @@ app.post('/send-irc', (req, res) => {
     return res.status(500).send('Server error');
   }
 });
+
 
 
 
