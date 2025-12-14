@@ -75,110 +75,7 @@ const saveDots = () => safeWriteJSON(dotsFile, activeDots);
 
 
 
-// ------------------------------
-// Player HTML files
-// ------------------------------
-const playerFiles = {
-    "player1": "player1.html",
-    "player2": "player2.html",
-    "p1": "p1.html",
-    "p2": "p2.html",
-    "p3": "p3.html",
-    "p4": "p4.html"
-};
 
-// ------------------------------
-// Active keys and claimed players (global to prevent redeclaration issues)
-// ------------------------------
-global.validKeys = global.validKeys || {};       // playerName -> { key, file, used, expires }
-global.claimedPlayers = global.claimedPlayers || {};  // playerName -> true if claimed
-
-// ------------------------------
-// Key generation
-// ------------------------------
-function generateKey() {
-    return Math.random().toString(36).substring(2, 12);
-}
-
-// ------------------------------
-// Key lifetime
-// ------------------------------
-const KEY_LIFETIME_MS = 15 * 60 * 1000; // 15 minutes
-
-// ------------------------------
-// Cleanup expired keys every 4 minutes (keeps behavior similar to your previous value)
-// ------------------------------
-setInterval(() => {
-    const now = Date.now();
-    for (const player in global.validKeys) {
-        const record = global.validKeys[player];
-        if (record.expires < now) {
-            console.log(`Key for ${player} expired automatically.`);
-            delete global.validKeys[player];
-            delete global.claimedPlayers[player];
-        }
-    }
-}, 240 * 1000);
-
-// ------------------------------
-// Get key route (called by index.html)
-// ------------------------------
-app.get("/getKey", (req, res) => {
-    const player = req.query.player;
-    const game = req.query.game;
-
-    if (!player || !game) return res.json({ ok: false, msg: "Missing player or game" });
-
-    if (global.claimedPlayers[player]) return res.json({ ok: false, msg: "Player already in use" });
-
-    let fileToUse;
-    if (game === "2p") {
-        if (!["player1", "player2"].includes(player)) return res.json({ ok: false });
-        fileToUse = `${player}.html`;
-    } else if (game === "4p") {
-        if (!["p1","p2","p3","p4"].includes(player)) return res.json({ ok: false });
-        fileToUse = `${player}.html`;
-    } else return res.json({ ok: false });
-
-    const key = generateKey();
-    global.validKeys[player] = {
-        key,
-        file: fileToUse,
-        used: false,
-        expires: Date.now() + KEY_LIFETIME_MS
-    };
-
-    global.claimedPlayers[player] = true;
-
-    console.log(`Generated key for ${player}: ${key} ? ${fileToUse}`);
-    res.json({ ok: true, key });
-});
-
-// ------------------------------
-// Player page route
-// ------------------------------
-app.get("/player", (req, res) => {
-    const player = req.query.name;
-    const auth = req.query.auth;
-
-    if (!player || !auth) return res.status(400).send("Missing player or key");
-
-    const record = global.validKeys[player];
-
-    if (!record || record.key !== auth) return res.status(403).send("Invalid key");
-
-    if (record.expires && Date.now() > record.expires) {
-        delete global.claimedPlayers[player];
-        delete global.validKeys[player];
-        return res.status(403).send("Key expired");
-    }
-
-    if (record.used) return res.status(403).send("Key already used");
-
-    record.used = true;
-
-    return res.sendFile(path.join(__dirname, record.file));
-});
 
 
 // --- Board spaces ---
@@ -569,12 +466,25 @@ client.on('message', (event) => {
 }
 
 const bots = {
-
   player1bot: createBot('player1bot', '##rento'),
   player2bot: createBot('player2bot', '##rento'),
   player3bot: createBot('player3bot', '##rento'),
   player4bot: createBot('player4bot', '##rento')
 };
+
+// Wrap say for all bots to default to PMing 'rentobot' if no target
+for (const botKey of Object.keys(bots)) {
+  const bot = bots[botKey];
+  const originalSay = bot.say;
+  bot.say = (target, msg) => {
+    if (!target || target.trim() === '') {
+      originalSay('rentobot', msg);  // default PM
+    } else {
+      originalSay(target, msg);      // use provided target
+    }
+  };
+}
+
 
 // --- Express + Socket.IO endpoints ---
 app.post('/send-irc', (req, res) => {
@@ -585,7 +495,11 @@ app.post('/send-irc', (req, res) => {
     if (!bot || !msg) return res.status(400).send('Missing bot or message');
     if (!bots[bot]) return res.status(400).send('Unknown bot');
 
-    const finalTarget = (typeof target === 'string' && target.trim()) ? target.trim() : '##rento';
+    // Default to PM 'rentobot' if target is empty
+    const finalTarget = (typeof target === 'string' && target.trim()) 
+      ? target.trim() 
+      : 'rentobot';
+
     bots[bot].say(finalTarget, String(msg));
 
     return res.redirect('/');
@@ -594,6 +508,7 @@ app.post('/send-irc', (req, res) => {
     return res.status(500).send('Server error');
   }
 });
+
 
 
 
