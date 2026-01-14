@@ -447,6 +447,7 @@ html, body {
 <div id="controlsInner">
 <iframe name="hiddenFrame" style="display:none;"></iframe>
 <div id="topButtons" style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:4px; justify-content:center; align-items:center;">
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!dice0-p2"><button type="submit" class="small-button">D0</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!dice1-p2"><button type="submit" class="small-button">D1</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!dice2-p2"><button type="submit" class="small-button">D2</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!dice3-p2"><button type="submit" class="small-button">D3</button></form>
@@ -454,7 +455,6 @@ html, body {
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!up"><button type="submit" class="small-button">UP2</button></form>
 <div style="width:2px; background:#888; margin:0 4px;"></div>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!add p2 -25"><button type="submit" class="small-button">-25</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!add p2 -5"><button type="submit" class="small-button">-5</button></form>
 <div style="width:4px; background:#888; margin:0 4px;"></div>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button">5</button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button">10</button></form>
