@@ -531,12 +531,12 @@ function createBot(nick, defaultTarget, options = {}) {
   };
 }
 
-const bots = {
-
-  player1bot: createBot('player1bot', '##rento'),
-  player2bot: createBot('player2bot', '##rento'),
-  player3bot: createBot('player3bot', '##rento'),
-  player4bot: createBot('player4bot', '##rento')
+// --- Create bots with staggered delays ---
+const bots={
+  player1bot: createBot('player1bot','##rento',{delay:0}),
+  player2bot: createBot('player2bot','##rento',{delay:7000}),
+  player3bot: createBot('player3bot','##rento',{delay:14000}),
+  player4bot: createBot('player4bot','##rento',{delay:21000})
 };
 
 app.post('/send-irc', (req, res) => {
