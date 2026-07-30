@@ -282,6 +282,16 @@ class MonopolyBot(SingleServerIRCBot):
                 lines.append(line)
             return"|".join(lines)
 
+        if m:=re.match(r"!payjail\s+(p\d+)",body):
+            pl=m.group(1)
+            if pl not in self.players:return f"{pl} is not in the game"
+            if not self.jailed.get(pl,False):return f"{pl} is not in jail"
+            self.players[pl]["money"]-=25
+            self.jailed[pl]=False
+            self.go_jail_key[pl]=False
+            self.jail_dice_key[pl]=False
+            return f"{pl} paid $25 bail Balance: {self.players[pl]['money']}"
+
         if m:=re.match(r"!gobonus\s+(p\d+)\s+(\d+)\s+(\d+)",body):
             pl,bonus,cap=m.groups();bonus=int(bonus);cap=int(cap)
             if pl not in self.players:return f"{pl} not in game"
