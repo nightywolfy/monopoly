@@ -431,5 +431,5 @@ async function gracefulShutdown(signal) {
 ['SIGINT','SIGTERM'].forEach(sig => process.on(sig, () => gracefulShutdown(sig)));
 
 // --- Start server ---
-const PORT = process.env.PORT || 80;
-server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.66:${PORT}`));
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
