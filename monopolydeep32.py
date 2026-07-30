@@ -358,7 +358,7 @@ class MonopolyBot(SingleServerIRCBot):
                     if a.get("bid_timer"):a["bid_timer"].cancel()
                     self.current_auction=None
 
-            auc["bid_timer"]=threading.Timer(10,auto_win);auc["bid_timer"].daemon=True;auc["bid_timer"].start()
+            auc["bid_timer"]=threading.Timer(18,auto_win);auc["bid_timer"].daemon=True;auc["bid_timer"].start()
             prop=self.active_board.get(auc["pos"],f"Position {auc['pos']}")
             msg=f"{player_key} is winning with {new_bid} on {prop}"
             try:
