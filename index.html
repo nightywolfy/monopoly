@@ -138,25 +138,21 @@
 <input type="hidden" name="msg" value="!map 6">
 <button type="submit" style="padding:6px 10px; border-radius:6px;">Map6</button>
 </form>
+</div>
+</div>
+<!-- Player selection buttons -->
+<div class="playerSection">
+<h2>2-Player Game</h2>
+<a href="player1.html" class="playerBtn">Player 1</a>
+<a href="player2.html" class="playerBtn">Player 2</a>
+</div>
 
-    </div>
-  </div>
-
-  <!-- Player selection buttons -->
-  <div class="playerSection">
-    <h2>2-Player Game</h2>
-    <button class="playerBtn" onclick="choosePlayer('player1','2p')">Player 1</button>
-    <button class="playerBtn" onclick="choosePlayer('player2','2p')">Player 2</button>
-  </div>
-
-  <div class="playerSection">
-    <h2>3-4 Player Game</h2>
-    <button class="playerBtn" onclick="choosePlayer('p1','4p')">Player 1</button>
-    <button class="playerBtn" onclick="choosePlayer('p2','4p')">Player 2</button>
-    <button class="playerBtn" onclick="choosePlayer('p3','4p')">Player 3</button>
-    <button class="playerBtn" onclick="choosePlayer('p4','4p')">Player 4</button>
-  </div>
-
+<div class="playerSection">
+<h2>3-4 Player Game</h2>
+<a href="p1.html" class="playerBtn">Player 1</a>
+<a href="p2.html" class="playerBtn">Player 2</a>
+<a href="p3.html" class="playerBtn">Player 3</a>
+<a href="p4.html" class="playerBtn">Player 4</a>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -253,12 +249,7 @@ function renderBuildings(data){
   }
 }
 
-async function choosePlayer(player,gameMode){
-  const res=await fetch(`/getKey?player=${player}&game=${gameMode}`);
-  const data=await res.json();
-  if(data.ok) window.location.href=`/player?name=${player}&auth=${data.key}`;
-  else alert('Error getting access key');
-}
+
 
 function scaleBoard() {
   const wrapper = document.getElementById('boardWrapper');
