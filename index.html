@@ -47,6 +47,7 @@
   .hotel,.house{ width:29px; height:29px; position:absolute; }
 
 /* Right: Controls */
+/* Right: Controls */
 #playerContainer {
     width: 50%;
     height: 100%;
@@ -54,22 +55,30 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: center;        /* was flex-start — center the sections horizontally */
     gap: 24px;
     box-shadow: inset 0 0 40px rgba(0, 212, 255, 0.3);
-    padding: 4px 24px 20px;   /* was 16px 24px — trimmed top padding */
-    margin-top: -20px;        /* pulls the whole block up */
+    padding: 4px 24px 20px;
+    margin-top: -20px;
 }
 
 .playerSection {
     width: 100%;
-    max-width: 320px;          /* was 420px, shrink to match smaller buttons */
+    max-width: 320px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(0, 212, 255, 0.25);
     border-radius: 14px;
-    padding: 16px 14px;        /* was 24px 20px */
-    text-align: left;
+    padding: 16px 14px;
+    text-align: center;         /* was left — center the h2 text */
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+.playerGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    justify-items: stretch;
+    justify-content: center;    /* was start — center the grid itself */
 }
 
 .playerSection h2 {
@@ -80,13 +89,7 @@
     text-shadow: 0 0 8px black;
 }
 
-.playerGrid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;                 /* was 16px */
-    justify-items: stretch;
-    justify-content: start;
-}
+
 
 .playerBtn {
     display: flex;
