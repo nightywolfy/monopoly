@@ -1,0 +1,48 @@
+new adjusted rules:
+
+for 2 player game:
+
+this game has a new rule such that instead of letting the dice throws be determined by chance,
+one person choooses one die and another person chooses the other die..
+so you can choose 6 and your opponent choose 2, you both choose at the same time so no one has information until the result is determined.
+then you add them up as normal, and you would move 8 squares.
+
+
+1. Log into chat with username of your choice. leave "password" part empty
+2. Push "GO" button when it is your turn then press 1 or 2 or 3 or 4 or 5 or 6 then wait until opponent does the same.
+3. When opponent pushed "GO' on their turn, you also have to press 1 or 2 or 3 or 4 or 5 or 6
+4. When you are in Jail push "Jail" button instead of "GO/DICE" button then press 1 or 2 or 3 or 4 or 5 or 6
+5. To mortgage your property: select "mortgage on menu" then press the property on the map itself
+6. To unmortgage your property: select "redeem on menu" then press the property on the map itself
+7. press 5/10/25/50 during auction is active. 
+8. once you are in jail.  first turn cost = $100  second turn cost = $50  third turn cost = $25  4th turn = free
+9. You can mortagage/unmortgage/buyhouse/sellhouse any time you want except during auction
+10. landing on treasure-chest =  you gain + $50
+11. Clover square = Tax on either property/house/totalbalance
+12. 1st Clover = pay property/house at $5
+13. 2nd Clover = $5 per house + 5% of your current money
+14. 3rd Clover = $10 per non mortgaged property + $5 per mortgaged property
+15. for 2-player game only: if you hit 3 doubles in a row: you have option to goto jail or pay $25 to keep rolling again
+16. Landing on "parking" gives you option to get free loan of $100 which you need to payback slowly over time
+17. Landing on 62 (inner) give you option to run auction on any unowned property of your choice.
+
+!start <number of players> <deep/regular>  example:  !start 3 deep
+!dicestart <number of players>   example:  !dicestart 4
+!diceoverride (use this command to override someone's turn)
+!gostart (initiate go-dice for head to head game)
+!map 1
+!map 2
+!alias p1 username
+!teleport p1 39 (teleport player1 to china without occuring fees or gains)
+!auction 39 (manually start auction on china)
+!offer-p1 5,15,25 p2 money:900  (p1 offers 5,15,25 for p2's $900)
+!accept or !reject
+!switch p1 p2 (used for deepboard space 54)
+!status
+!propertylist (use this command to put all the colored dot in the right place)
+!housestatus (use this command to put all the houses/hotel in the right place)
+!remove p1 (remove player1 from the game if they bankrupt or AFK)
+!diceremove p1  (remove player1 from the dice as well)
+!insert p4 500  (insert player4 with total amount of $500)
+!freeloan 100 25 (get a interest free loan of $100 right away which needs to payback everytime you pass go of 25 x 4)
+!gobonus 50 250 (bank owes you total of $250 which will be paid everytime you pass go of 50 x 5)
