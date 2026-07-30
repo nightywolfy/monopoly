@@ -48,50 +48,72 @@
 
 /* Right: Controls */
 #playerContainer {
-    width:50%;
-    height:100%;
-    background:#111;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-    align-items:center;
+    width: 50%;
+    height: 100%;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
     box-shadow: inset 0 0 40px rgba(0, 212, 255, 0.3);
-    padding-top:20px;
+    padding: 20px;
+}
+
+.playerSection {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-radius: 16px;
+    padding: 24px 20px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
 }
 
 .playerSection h2 {
-    color:#FFD700;
-    margin-bottom:20px;
-    text-shadow:0 0 8px black;
-}
-
-.playerBtn {
-    display:inline-block;
-    text-decoration:none;
-    background:linear-gradient(135deg,#6a0dad,#00d4ff);
-    color:white;
-    padding:12px 30px;
-    margin:8px;
-    border-radius:10px;
-    font-size:18px;
-    font-weight:bold;
-    cursor:pointer;
-    transition:0.2s ease;
-}
-
-.playerBtn:hover {
-    transform:scale(1.05);
-    box-shadow:0 0 20px #00d4ff,0 0 30px #6a0dad;
-}
-
-.playerBtn:active {
-    transform:scale(0.97);
+    color: #FFD700;
+    margin: 0 0 20px;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 8px black;
 }
 
 .playerGrid {
-    display:grid;
-    grid-template-columns:repeat(2, auto);
-    gap:20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    justify-items: stretch;
+}
+
+.playerBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: linear-gradient(135deg, #6a0dad, #00d4ff);
+    color: white;
+    padding: 14px 10px;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+    letter-spacing: 0.3px;
+}
+
+.playerBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #00d4ff, 0 0 30px #6a0dad;
+}
+
+.playerBtn:active {
+    transform: scale(0.97);
+}
+
+/* 2-player section only needs 1 column per button, centered */
+.playerSection:first-of-type .playerGrid {
+    grid-template-columns: repeat(2, 1fr);
 }
 
 #quickButtons {
@@ -199,17 +221,21 @@ Press different buttons for different maps and color themes
 
 <!-- Player selection buttons -->
 <div class="playerSection">
-<h2>2-Player Game</h2>
-<a href="player1.html" class="playerBtn">Player 1</a>
-<a href="player2.html" class="playerBtn">Player 2</a>
+    <h2>2-Player Game</h2>
+    <div class="playerGrid">
+        <a href="player1.html" class="playerBtn">Player 1</a>
+        <a href="player2.html" class="playerBtn">Player 2</a>
+    </div>
 </div>
 
 <div class="playerSection">
-<h2>3-4 Player Game</h2>
-<a href="p1.html" class="playerBtn">Player 1</a>
-<a href="p2.html" class="playerBtn">Player 2</a>
-<a href="p3.html" class="playerBtn">Player 3</a>
-<a href="p4.html" class="playerBtn">Player 4</a>
+    <h2>3-4 Player Game</h2>
+    <div class="playerGrid">
+        <a href="p1.html" class="playerBtn">Player 1</a>
+        <a href="p2.html" class="playerBtn">Player 2</a>
+        <a href="p3.html" class="playerBtn">Player 3</a>
+        <a href="p4.html" class="playerBtn">Player 4</a>
+    </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
