@@ -430,7 +430,6 @@ async function gracefulShutdown(signal) {
 }
 ['SIGINT','SIGTERM'].forEach(sig => process.on(sig, () => gracefulShutdown(sig)));
 
+// --- Start server ---
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Monopoly server running on port ${PORT}`);
-});
+server.listen(PORT, () => console.log(`[Server] Running at http://localhost:${PORT}`));
