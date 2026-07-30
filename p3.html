@@ -27,15 +27,15 @@ html, body {
 
 /* Board inner */
 #board {
-  position:relative;
-  width:100%;
-  max-width:900px;
-  aspect-ratio:1 / 1;
+  position: relative;
+  height: 900px;
+  width: 900px;
+
 }
-#board {
-  position:relative;
-  height:900px;
-  width:900px;
+#boardImg {
+  width: 100%;
+  height: 100%;
+ 
 }
 
 #boardWrapper {
@@ -84,27 +84,20 @@ html, body {
 #moneyContainer {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  max-width: 220px;
-  flex-shrink: 0;     /* prevent flexbox from collapsing this */
-  flex-grow: 0;
-  margin: 0 auto 10px auto;
+  gap: 20px;       /* slightly bigger gap */
+  width: 175px;    /* wider than before */
 }
 
 .moneyBox {
-  padding: 6px 10px;
-  border-radius: 8px;
-  width: 100%;
-  box-sizing: border-box;   /* keep padding from expanding beyond width */
+  padding: 10px 20px;   /* bigger padding */
+  border-radius: 12px;
+  width: 100%;          /* fills container */
   text-align: center;
   font-weight: bold;
-  font-size: 14px;          /* bumped up from 12px for readability */
+  font-size: 20px;      /* larger font */
   word-wrap: break-word;
-  box-shadow: 0 0 8px #6a0dad, 0 0 10px #00d4ff;
+  box-shadow: 0 0 18px #6a0dad, 0 0 24px #00d4ff;
   color: white;
-  position: relative;
-  z-index: 5;                /* make sure it renders above/isn't hidden by neighbors */
 }
 .moneyBox.red { background:#ff4d4d; }
 .moneyBox.blue { background:#3399ff; }
@@ -130,6 +123,21 @@ html, body {
   box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;
   word-wrap:break-word;
 }
+
+/* Quick links with absolute positioning */
+#propertyLink, #rulesLink{
+  position:absolute;
+  z-index:20;
+}
+#propertyLink img, #rulesLink img{
+  width:75px;
+  border-radius:8px;
+  box-shadow:0 0 6px rgba(255,255,255,0.5);
+}
+
+/* Example positions: */
+#propertyLink{ top:40%; left:265px; transform:translateY(-50%); }
+#rulesLink{ top:50%; right:560px; transform:translateY(-50%); }
 
 /* Buildings */
 .hotel,.house{
@@ -169,22 +177,6 @@ html, body {
   margin-top: -7px; /* closer to map.webp */
   z-index: 60;
   position: relative;
-}
-
-#topButtons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
-}
-
-.buttonRow {
-  display: flex;
-  flex-direction: row;
-  gap: 6px;
-  align-items: center;
-  justify-content: center;
 }
 
 #topButtons button:not(.small-button) {
@@ -233,12 +225,12 @@ html, body {
   box-sizing: border-box;
 }
 
+/* Chat iframe fills remaining space */
 #chatFrame {
   flex-grow: 1;
-  flex-shrink: 1;
   width: 100%;
   border: none;
-  min-height: 0;   /* already there — required so it doesn't force overflow */
+  min-height: 0;
 }
 
 /* + buttons green */
@@ -445,6 +437,7 @@ html, body {
 </form>
 
 
+</div>
 </div>
 </div>
 
