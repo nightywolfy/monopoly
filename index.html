@@ -46,18 +46,17 @@
   /* Buildings */
   .hotel,.house{ width:29px; height:29px; position:absolute; }
 
-/* Right: Controls */
 #playerContainer {
     width: 50%;
     height: 100%;
     background: #111;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 40px;
+    justify-content: flex-start;   /* was center */
+    align-items: flex-start;       /* was center */
+    gap: 24px;                     /* tightened from 40px so it sits higher */
     box-shadow: inset 0 0 40px rgba(0, 212, 255, 0.3);
-    padding: 20px;
+    padding: 16px 24px;
 }
 
 .playerSection {
@@ -66,17 +65,9 @@
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(0, 212, 255, 0.25);
     border-radius: 16px;
-    padding: 24px 20px;
-    text-align: center;
+    padding: 20px;
+    text-align: left;              /* was center */
     box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
-}
-
-.playerSection h2 {
-    color: #FFD700;
-    margin: 0 0 20px;
-    font-size: 22px;
-    letter-spacing: 0.5px;
-    text-shadow: 0 0 8px black;
 }
 
 .playerGrid {
@@ -84,31 +75,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     justify-items: stretch;
-}
-
-.playerBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    background: linear-gradient(135deg, #6a0dad, #00d4ff);
-    color: white;
-    padding: 14px 10px;
-    border-radius: 10px;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s ease;
-    letter-spacing: 0.3px;
-}
-
-.playerBtn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px #00d4ff, 0 0 30px #6a0dad;
-}
-
-.playerBtn:active {
-    transform: scale(0.97);
+    justify-content: start;        /* keeps grid left-aligned, not centered in parent */
 }
 
 /* 2-player section only needs 1 column per button, centered */
@@ -121,7 +88,7 @@
     padding:15px;
     border-radius:15px;
     box-shadow:0 0 20px #000;
-    text-align:center;
+    text-align:left;   /* was center */
 }
 
 /* MAP 1 - Blue */
@@ -190,12 +157,9 @@
 
 <!-- Right: Player Selection -->
 <div id="playerContainer">
-
-<div style="text-align:center; color:#FFD700; font-weight:bold; margin-bottom:10px; text-shadow:0 0 4px black;">
+<div style="text-align:left; color:#FFD700; font-weight:bold; margin-bottom:10px; text-shadow:0 0 4px black;">
 Press different buttons for different maps and color themes
 </div>
-
-  <!-- Images + Map buttons -->
 <div style="position:relative; width:100%; margin-bottom:20px; display:flex; justify-content:center; align-items:flex-start;">
 <div style="position:absolute; left:30px; top:240px; display:flex; flex-direction:column; gap:10px;">
 <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
