@@ -25,17 +25,14 @@ html, body {
   background: black;
 }
 
-/* Board inner */
 #board {
   position: relative;
   height: 900px;
   width: 900px;
-
 }
 #boardImg {
   width: 100%;
   height: 100%;
- 
 }
 
 #boardWrapper {
@@ -203,60 +200,6 @@ html, body {
   object-fit:contain;
 }
 
-
-/* Right: Controls */
-#controlsContainer {
-  width: 50%;
-  height: 100%;
-  background: #111;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Inner container for buttons + chat */
-#controlsInner {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-/* Chat iframe fills remaining space */
-#chatFrame {
-  flex-grow: 1;
-  width: 100%;
-  border: none;
-  min-height: 0;
-}
-
-/* Money panel on right side */
-#moneyContainer {
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-  width:220px;
-  margin:15px auto;
-  z-index:100;
-}
-
-.moneyBox {
-    width:220px;
-    padding:12px;
-    border-radius:12px;
-    text-align:center;
-    font-size:20px;
-    font-weight:bold;
-    box-shadow:0 0 15px #00d4ff;
-}
-
-
-
-.moneyBox.red { background:#ff4d4d; }
-.moneyBox.blue { background:#3399ff; }
-.moneyBox.yellow { background:goldenrod; color:black; }
-.moneyBox.green { background:limegreen; color:black; }
-
 /* + buttons green */
 .white-btn.plus {
   background-color: #28a745 !important;  /* green */
@@ -292,6 +235,53 @@ html, body {
   border:2px solid black; /* outer black border */
   box-shadow: 0 0 1px 1px white; /* optional inner border/highlight */
 }
+
+/* Right: Controls */
+#controlsContainer {
+  width: 50%;
+  height: 100%;
+  background: #111;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner container for buttons + chat */
+#controlsInner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+
+
+/* Money panel on right side */
+#moneyContainer {
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  width:220px;
+  margin:15px auto;
+  z-index:100;
+}
+
+.moneyBox {
+    width:220px;
+    padding:12px;
+    border-radius:12px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    box-shadow:0 0 15px #00d4ff;
+}
+
+.moneyBox.red { background:#ff4d4d; }
+.moneyBox.blue { background:#3399ff; }
+.moneyBox.yellow { background:goldenrod; color:black; }
+.moneyBox.green { background:limegreen; color:black; }
+
+
 
 </style>
 </head>
@@ -469,7 +459,6 @@ html, body {
 <div id="money-p3-overlay" class="moneyBox yellow">Player3: $0</div>
 <div id="money-p4-overlay" class="moneyBox green">Player4: $0</div>
 </div>
-<iframe id="chatFrame">
 </div>
 </div>
 
