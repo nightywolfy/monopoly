@@ -50,7 +50,18 @@
   #playerContainer { width:50%; height:100%; background:#111; display:flex; flex-direction:column; justify-content:flex-start; align-items:center; box-shadow: inset 0 0 40px rgba(0, 212, 255, 0.3); padding-top:20px; }
   .playerSection { background: rgba(0,0,0,0.5); padding:25px 30px; border-radius:16px; margin-bottom:20px; width:300px; text-align:center; box-shadow:0 0 15px #6a0dad,0 0 25px #00d4ff; }
   .playerSection h2 { color:#FFD700; margin-bottom:20px; text-shadow:0 0 8px black; }
-  .playerBtn { background:linear-gradient(135deg,#6a0dad,#00d4ff); color:white; border:none; padding:12px 30px; margin:8px; font-size:18px; border-radius:10px; cursor:pointer; font-weight:bold; box-shadow:0 0 12px #00d4ff,0 0 16px #6a0dad; transition:0.2s ease; }
+
+.playerBtn {
+    display:inline-block;
+    text-decoration:none;
+    background:linear-gradient(135deg,#6a0dad,#00d4ff);
+    color:white;
+    padding:12px 30px;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:bold;
+}
+
   .playerBtn:hover { transform:scale(1.05); box-shadow:0 0 20px #00d4ff,0 0 30px #6a0dad; }
   .playerBtn:active { transform:scale(0.97); }
   #quickButtons button { background:#222; color:white; font-weight:bold; }
