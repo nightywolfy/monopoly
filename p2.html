@@ -85,19 +85,26 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 110px;
+  width: 100%;
+  max-width: 220px;
+  flex-shrink: 0;     /* prevent flexbox from collapsing this */
+  flex-grow: 0;
+  margin: 0 auto 10px auto;
 }
 
 .moneyBox {
-  padding: 4px 8px;
+  padding: 6px 10px;
   border-radius: 8px;
   width: 100%;
+  box-sizing: border-box;   /* keep padding from expanding beyond width */
   text-align: center;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 14px;          /* bumped up from 12px for readability */
   word-wrap: break-word;
-  box-shadow: 0 0 10px #6a0dad, 0 0 14px #00d4ff;
+  box-shadow: 0 0 8px #6a0dad, 0 0 10px #00d4ff;
   color: white;
+  position: relative;
+  z-index: 5;                /* make sure it renders above/isn't hidden by neighbors */
 }
 .moneyBox.red { background:#ff4d4d; }
 .moneyBox.blue { background:#3399ff; }
@@ -226,12 +233,12 @@ html, body {
   box-sizing: border-box;
 }
 
-/* Chat iframe fills remaining space */
 #chatFrame {
   flex-grow: 1;
+  flex-shrink: 1;
   width: 100%;
   border: none;
-  min-height: 0;
+  min-height: 0;   /* already there — required so it doesn't force overflow */
 }
 
 /* + buttons green */
