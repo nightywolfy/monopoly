@@ -161,7 +161,7 @@ html, body {
   gap: 6px;
   align-items: center;
   justify-content: center;
-  transform: translateY(-60px); /* move all 9 buttons higher */
+  transform: translateY(-50px); /* move all 9 buttons higher */
 }
 
 .buttonRow {
@@ -268,16 +268,17 @@ html, body {
     box-sizing:border-box;
 }
 
-/* Smaller money boxes */
 .moneyBox {
-    width:150px;          /* wider horizontally */
-    height:35px;           /* fixed short height */
-    padding:5px 8px;       /* small vertical padding */
+    width:150px;
+    height:35px;
+    padding:0 8px;
     border-radius:8px;
+    display:flex;
+    align-items:center;      /* vertical center */
+    justify-content:center;  /* horizontal center */
     text-align:center;
     font-size:16px;
     font-weight:bold;
-    line-height:35px;      /* centers text vertically */
     box-shadow:0 0 10px #00d4ff;
     color:white;
     box-sizing:border-box;
