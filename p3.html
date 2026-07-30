@@ -81,31 +81,7 @@ html, body {
   z-index: 10;
 }
 
-/* Money panel on right side */
-#moneyContainer {
-  display:flex;
-  flex-direction:column;
-  gap:15px;
-  width:220px;
-  margin:15px auto;
-  z-index:100;
-}
 
-.moneyBox {
-  padding:12px 20px;
-  border-radius:12px;
-  text-align:center;
-  font-weight:bold;
-  font-size:20px;
-  box-shadow:0 0 18px #6a0dad, 0 0 24px #00d4ff;
-  color:white;
-}
-
-
-.moneyBox.red { background:#ff4d4d; }
-.moneyBox.blue { background:#3399ff; }
-.moneyBox.yellow { background:goldenrod; color:black; }
-.moneyBox.green { background:limegreen; color:black; }
 
 /* Display boxes */
 #displayContainer{
@@ -253,6 +229,33 @@ html, body {
   border: none;
   min-height: 0;
 }
+
+/* Money panel on right side */
+#moneyContainer {
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  width:220px;
+  margin:15px auto;
+  z-index:100;
+}
+
+.moneyBox {
+    width:220px;
+    padding:12px;
+    border-radius:12px;
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    box-shadow:0 0 15px #00d4ff;
+}
+
+
+
+.moneyBox.red { background:#ff4d4d; }
+.moneyBox.blue { background:#3399ff; }
+.moneyBox.yellow { background:goldenrod; color:black; }
+.moneyBox.green { background:limegreen; color:black; }
 
 /* + buttons green */
 .white-btn.plus {
@@ -458,18 +461,17 @@ html, body {
 </div>
 </div>
 
+<div id="controlsContainer">
 <div id="controlsInner">
-<!-- Money display on right side -->
 <div id="moneyContainer">
-  <div id="money-p1-overlay" class="moneyBox red">Player1: $0</div>
-  <div id="money-p2-overlay" class="moneyBox blue">Player2: $0</div>
-  <div id="money-p3-overlay" class="moneyBox yellow">Player3: $0</div>
-  <div id="money-p4-overlay" class="moneyBox green">Player4: $0</div>
+<div id="money-p1-overlay" class="moneyBox red">Player1: $0</div>
+<div id="money-p2-overlay" class="moneyBox blue">Player2: $0</div>
+<div id="money-p3-overlay" class="moneyBox yellow">Player3: $0</div>
+<div id="money-p4-overlay" class="moneyBox green">Player4: $0</div>
 </div>
-
-<!-- Chat iframe fills remaining space -->
 <iframe id="chatFrame">
-
+</div>
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
