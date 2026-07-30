@@ -65,7 +65,7 @@ class MonopolyBot(SingleServerIRCBot):
         if msg.lower().startswith(("!mortgage","!redeem")):
             self.schedule_auto_up()
         if r: 
-            if msg.lower().startswith(("!start","!move","!add","!teleport","!addonehouse","!removeonehouse","!remove","!freeloan","!gobonus")):
+            if msg.lower().startswith(("!start","!move","!add","!teleport","!addonehouse","!removeonehouse","!remove","!freeloan","!gobonus","!jailpay")):
                 self.auto_up()
             c.privmsg(self.channel,r)
         self.handle_go_session_command(c,nick,msg)
@@ -90,7 +90,6 @@ class MonopolyBot(SingleServerIRCBot):
         self.dice4_streak={}
         self.switch_required=False
         self.auction_required=False
-        self.jail_dice_key = {}
         self.dice_rolls = {}
         self.passgo_bonus = {}
         self.free_loans={}
@@ -282,15 +281,19 @@ class MonopolyBot(SingleServerIRCBot):
                 lines.append(line)
             return"|".join(lines)
 
-        if m:=re.match(r"!payjail\s+(p\d+)",body):
+        if m:=re.match(r"!jailpay\s+(p\d+)",body):
             pl=m.group(1)
             if pl not in self.players:return f"{pl} is not in the game"
             if not self.jailed.get(pl,False):return f"{pl} is not in jail"
-            self.players[pl]["money"]-=25
+            turn=self.dice4_streak.get(pl,0)
+            cost=[100,50,25][min(turn,2)]
+            if self.players[pl]["money"]<cost:return f"{pl} does not have enough money to pay bail ({cost})"
+            self.players[pl]["money"]-=cost
             self.jailed[pl]=False
-            self.go_jail_key[pl]=False
-            self.jail_dice_key[pl]=False
-            return f"{pl} paid $25 bail Balance: {self.players[pl]['money']}"
+            self.dice4_streak[pl]=0
+            try:self.connection.privmsg("player2bot","!sound key.mp3")
+            except:pass
+            return f"{pl} paid ${cost} bail (turn {turn+1}) and is now out of jail. Balance: {self.players[pl]['money']}"
 
         if m:=re.match(r"!gobonus\s+(p\d+)\s+(\d+)\s+(\d+)",body):
             pl,bonus,cap=m.groups();bonus=int(bonus);cap=int(cap)
@@ -700,7 +703,6 @@ class MonopolyBot(SingleServerIRCBot):
 
 
         if new==54:self.switch_required=True;msg+=" | Must use !switch before next dice roll"
-        #if new==62:self.auction_required=True;msg+=" | Auction required before next dice roll"
 
         if owner and owner!=p:
             if new in self.mortgaged:msg+=" | Property is mortgaged, no rent"
@@ -741,7 +743,6 @@ class MonopolyBot(SingleServerIRCBot):
         if m.startswith("!dicestop"): self._handle_dicestop(c); return
         if x := re.match(r"!dicedisable\s+([0-4])", m): self._handle_dicedisable(c, int(x.group(1))); return
         if m.startswith("!diceoverride"): self._handle_diceoverride(c, nick); return
-        if x := re.match(r"!dicejailkey\s+(p[1-6])", m): self._handle_dicejailkey(c, x.group(1)); return
         if x := re.match(r"!diceremove\s+p([1-6])", m): self._handle_diceremove(c, int(x.group(1))); return
         for d in ("dice0","dice1","dice2","dice3","dice4"):
             if x := re.match(rf"!{d}-p([1-{self.num_players}])", m):
@@ -783,12 +784,12 @@ class MonopolyBot(SingleServerIRCBot):
             if i<=self.expected_player_index and self.expected_player_index>0:self.expected_player_index-=1
             if not self.dice_order:self.dice_mode=False;c.privmsg(self.channel,"All players removed. Dice mode stopped.");return
         c.privmsg(self.channel,f"Player p{pn} removed. Order: {self.dice_order}")
+
     def _handle_dice_command(self,c,d,p,nick):
         pl_key=f"p{p}"
         if self.switch_required:
             c.privmsg(self.channel,"!switch is required before next dice roll.");return
-        if self.auction_required:
-            c.privmsg(self.channel,"!auction is required before next dice roll.");return  
+        
         with self.dice_lock:
             if not self.dice_mode: c.privmsg(self.channel,"Dice commands disabled. Use !dicestart <number of players>"); return
             if d in self.disabled_dice: c.privmsg(self.channel, f"{d} is currently disabled."); return
@@ -796,35 +797,29 @@ class MonopolyBot(SingleServerIRCBot):
             exp=self.dice_order[self.expected_player_index]
             if not(self.dice_override or p==exp): c.privmsg(self.channel,f"Not your turn. Next: p{exp}. Use !diceoverride to allow."); return
             if self.dice_override: self.dice_override=False; self.expected_player_index=self.dice_order.index(p)
-            if self.jailed.get(pl_key, False) and self.jail_dice_key.get(pl_key, False) and d == "dice4":
-                c.privmsg(self.channel, f"{pl_key} used !dicejailkey - dice4 is not allowed."); return
+
             if d=="dice4":
                 if not self.jailed.get(pl_key, False): c.privmsg(self.channel,"!dice4 cannot be used. This player is not in jail."); return
-            elif d in ("dice0","dice1","dice2","dice3"):
+            else:
                 if self.jailed.get(pl_key, False):
-                    if not self.jail_dice_key.get(pl_key, False): c.privmsg(self.channel,f"{pl_key} is in jail! Use !dicejailkey {pl_key} to roll {d}."); return
-                    else: self.jail_dice_key[pl_key]=False
-            if d=="dice4":self.dice4_streak[pl_key]=self.dice4_streak.get(pl_key,0)+1
-            else:self.dice4_streak[pl_key]=0
+                    c.privmsg(self.channel,f"{pl_key} is in jail! Only !dice4 can be used."); return
+
+            if d=="dice4": self.dice4_streak[pl_key]=self.dice4_streak.get(pl_key,0)+1
+            else: self.dice4_streak[pl_key]=0
+
         getattr(self,f"_handle_{d}",lambda*a:None)(c,p)
+
         if d == "dice4" and self.dice4_streak.get(pl_key, 0) >= 3:
             self.dice4_streak[pl_key] = 0
-            c.privmsg(self.channel, f"{pl_key} rolled dice4 three times in a row! Auto jail key used.")
-            self._handle_dicejailkey(c, pl_key)
+            self.jailed[pl_key] = False
+            c.privmsg(self.channel, f"{pl_key} rolled dice4 three times in a row! Released from jail for free.")
+            try: c.privmsg("player2bot", "!sound key.mp3")
+            except: pass
+
         with self.dice_lock:
             r=self.dice_rolls.get(p)
             if r and r[0]!=r[1]: self.expected_player_index=(self.expected_player_index+1)%len(self.dice_order)
-    def _handle_dicejailkey(self, c, pl_key):
-        pl_key = pl_key.lower()
-        if pl_key not in self.jailed:
-            c.privmsg(self.channel, f"{pl_key} is not a valid player."); return
-        with self.dice_lock:
-            if not self.jailed[pl_key]:
-                c.privmsg(self.channel, f"{pl_key} is not in jail. !dicejailkey not needed."); return
-            self.jail_dice_key[pl_key] = True
-        c.privmsg(self.channel, f"{pl_key} activated !dicejailkey. Next dice0-3 roll in jail is allowed.")
-        try: c.privmsg("player2bot", "!sound key.mp3")
-        except: pass
+
     def _handle_dice0(self,c,p):self._roll_and_handle(c,p,[1,2,3,4,5,6],[1,2,3,4,5,6],"dice0",True)
     def _handle_dice1(self,c,p):self._roll_and_handle(c,p,[1,1,2,2,3,3],[1,1,2,2,3,3],"dice1",True)
     def _handle_dice2(self,c,p):self._roll_and_handle(c,p,[1,1,2,2,3,3],[4,4,5,5,6,6],"dice2",True)
