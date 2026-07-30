@@ -95,9 +95,41 @@
 }
 
 #quickButtons button {
-    background:#222;
     color:white;
     font-weight:bold;
+    padding:8px 14px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+    transition:0.2s ease;
+    box-shadow:0 0 8px rgba(255,255,255,0.3);
+}
+
+#quickButtons button:hover {
+    transform:scale(1.08);
+}
+
+/* Map colors */
+#quickButtons .map1 {
+    background:linear-gradient(135deg,#0077ff,#00d4ff);
+    box-shadow:0 0 12px #00d4ff;
+}
+
+#quickButtons .map2 {
+    background:linear-gradient(135deg,#6a0dad,#ff00ff);
+    box-shadow:0 0 12px #ff00ff;
+}
+
+#quickButtons .map3 {
+    background:linear-gradient(135deg,#009933,#66ff66);
+    color:black;
+    box-shadow:0 0 12px #66ff66;
+}
+
+#quickButtons .map4 {
+    background:linear-gradient(135deg,#ff6600,#ffcc00);
+    color:black;
+    box-shadow:0 0 12px #ffcc00;
 }
 
 </style>
@@ -134,48 +166,34 @@
 <!-- Right: Player Selection -->
 <div id="playerContainer">
 
-  <div style="text-align:center; color:#FFD700; font-weight:bold; margin-bottom:10px; text-shadow:0 0 4px black;">
-      Press different buttons for different maps and color themes
-  </div>
+<div style="text-align:center; color:#FFD700; font-weight:bold; margin-bottom:10px; text-shadow:0 0 4px black;">
+Press different buttons for different maps and color themes
+</div>
 
   <!-- Images + Map buttons -->
-  <div style="position:relative; width:100%; margin-bottom:20px; display:flex; justify-content:center; align-items:flex-start;">
-    <div style="position:absolute; left:30px; top:240px; display:flex; flex-direction:column; gap:10px;">
-      <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
-        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #00d4ff;" />
-      </a>
-      <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
-        <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #6a0dad;" />
-      </a>
-    </div>
+<div style="position:relative; width:100%; margin-bottom:20px; display:flex; justify-content:center; align-items:flex-start;">
+<div style="position:absolute; left:30px; top:240px; display:flex; flex-direction:column; gap:10px;">
+<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #00d4ff;" />
+</a>
+<a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #6a0dad;" />
+</a>
+</div>
 
-    <div id="quickButtons" style="text-align:center;">
-      <iframe name="hiddenFrame" style="display:none;"></iframe>
-      
-      
-<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
+<div id="quickButtons">
+<form action="/send-irc" method="POST" target="hiddenFrame">
 <input type="hidden" name="bot" value="player1bot">
-<input type="hidden" name="msg" value="!map 1">
-<button type="submit" style="padding:6px 10px; border-radius:6px;">Map1</button>
-</form>
-<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-<input type="hidden" name="bot" value="player1bot">
-<input type="hidden" name="msg" value="!map 2">
-<button type="submit" style="padding:6px 10px; border-radius:6px;">Map2</button>
-</form>
-<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-<input type="hidden" name="bot" value="player1bot">
-<input type="hidden" name="msg" value="!map 3">
-<button type="submit" style="padding:6px 10px; border-radius:6px;">Map3</button>
-</form>
-<form action="/send-irc" method="POST" target="hiddenFrame" style="display:inline-block; margin:5px;">
-<input type="hidden" name="bot" value="player1bot">
-<input type="hidden" name="msg" value="!map 4">
-<button type="submit" style="padding:6px 10px; border-radius:6px;">Map4</button>
-</form>
 
+<button name="msg" value="!map 1">Map1</button>
+<button name="msg" value="!map 2">Map2</button>
+<button name="msg" value="!map 3">Map3</button>
+<button name="msg" value="!map 4">Map4</button>
+
+</form>
 </div>
 </div>
+
 <!-- Player selection buttons -->
 <div class="playerSection">
 <h2>2-Player Game</h2>
