@@ -22,18 +22,17 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
 .buttonRow{display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center}
 #topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
-.small-button{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
+.small-button{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
 .small-button img{width:100%;height:100%;object-fit:contain}
-.white-btn.plus{background:#28a745!important;border:1px solid #1e7e34!important;color:#fff!important;border-radius:3px;cursor:pointer}
-.white-btn.minus{background:#dc3545!important;border:1px solid #b02a37!important;color:#fff!important;border-radius:3px;cursor:pointer}
-.white-btn.plus:hover{background:#218838!important}.white-btn.minus:hover{background:#c82333!important}
 .dot{width:12px;height:12px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 #controlsContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column}
 #controlsInner{display:flex;flex-direction:column;height:100%;padding:10px;box-sizing:border-box}
 #chatFrame{flex-grow:1;width:100%;margin-top:15px;border:none;min-height:0}
-#moneyContainer{display:grid;grid-template-columns:repeat(3,160px);gap:10px;justify-content:center;width:100%;padding:10px;box-sizing:border-box}
-.moneyBox{width:150px;height:35px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;box-shadow:0 0 10px #00d4ff;color:white;box-sizing:border-box}
+
+#moneyContainer{display:grid;grid-template-columns:repeat(3,250px);gap:10px;justify-content:center;width:100%;padding:10px;box-sizing:border-box}
+.moneyBox{width:250px;height:35px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;box-shadow:0 0 10px #00d4ff;color:white;box-sizing:border-box}
 .moneyBox.red{background:#ff4d4d}.moneyBox.blue{background:#3399ff}.moneyBox.orange{background:#ff8c1a;color:black}.moneyBox.green{background:limegreen;color:black}.moneyBox.purple{background:#8a2be2}.moneyBox.white{background:#eee;color:black}
+
 .piece { width:32px; height:32px; border-radius:50%; position:absolute; display:flex; align-items:center; justify-content:center; font-weight:bold; border:3px solid transparent; box-shadow:0 0 6px rgba(0,0,0,0.4); transition:left 0.4s ease, top 0.4s ease; color:white; }
 .red { background:#ff4d4d; border-color:#ff8080; }
 .blue { background:#3399ff; border-color:#66a3ff; }
@@ -41,6 +40,10 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .green { background:limegreen; border-color:#aaffaa; color:black; }
 .purple { background:#9933ff; border-color:#cc99ff; }
 .white { background:#ffffff; border-color:#cccccc; color:black; }
+.white-btn.plus { background-color:#28a745 !important; border:1px solid #1e7e34 !important; color:white !important; padding:.1px .1px; border-radius:3px; font-weight:bold; cursor:pointer; }
+.white-btn.minus { background-color:#dc3545 !important; border:1px solid #b02a37 !important; color:white !important; padding:.1px .1px; border-radius:3px; font-weight:bold; cursor:pointer; }
+.white-btn.plus:hover { background-color:#218838 !important; }
+.white-btn.minus:hover { background-color:#c82333 !important; }
 </style>
 </head>
 <body>
