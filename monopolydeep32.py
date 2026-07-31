@@ -55,11 +55,13 @@ class MonopolyBot(SingleServerIRCBot):
         return any(p["money"] < 0 for p in self.players.values())
     def on_pubmsg(self,c,e): self.handle_channel_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
     def on_privmsg(self,c,e): self.handle_private_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
-    def handle_private_message(self,c,nick,msg):
-        if msg.lower().startswith("!add"):
-            return c.privmsg(nick,"!add can only be used in ##rento")
-        if r:=self.handle_command(nick,msg): c.privmsg(nick,r)
-        self.handle_go_privmsg(c,nick,msg)
+    def handle_private_message(self, c, nick, msg):
+        if msg.lower().startswith(("!add","!freeloan","!gobonus")):
+            cmd = msg.lower().split()[0]
+            return c.privmsg(nick, f"{cmd} can only be used in ##rento")
+        if r := self.handle_command(nick, msg):
+            c.privmsg(nick, r)
+        self.handle_go_privmsg(c, nick, msg)
     def handle_channel_message(self,c,nick,msg):
         r=self.handle_command(nick,msg)
         if msg.lower().startswith(("!mortgage","!redeem")):
@@ -191,10 +193,13 @@ class MonopolyBot(SingleServerIRCBot):
                 self.switch_required=False
                 self.auto_up()
             return f"{k1} and {k2} switched"
+
+            
         m=re.match(r"!remove\s+(p\d+)",body)
         if m:
             rm=m.group(1)
             if rm not in self.players:return f"{rm} is not in the game"
+            self._handle_diceremove(self.connection,int(rm[1:]))
             del self.players[rm]
             if rm in self.aliases:self.aliases[rm].clear()
             to_del=[pos for pos,owner in self.properties.items() if owner==rm]
@@ -204,20 +209,6 @@ class MonopolyBot(SingleServerIRCBot):
                 if pos in self.mortgaged:self.mortgaged.remove(pos)
                 old=self.active_board.get(pos,f"Position {pos}");nm=old.split("-",1)[-1]
                 self.active_board[pos]=f"x-{nm}"
-            auc=self.current_auction
-            if auc and "active_players" in auc and rm in auc["active_players"]:
-                auc["active_players"].remove(rm)
-                if not auc["active_players"]:
-                    self.current_auction=None
-                else:
-                    if auc.get("current_index",0)>=len(auc["active_players"]):auc["current_index"]=0
-                    if len(auc["active_players"])==1:
-                        winner=auc["active_players"][0];pos=auc["pos"]
-                        pname=self.active_board.get(pos,f"Position {pos}")
-                        amt=auc["bids"].get(winner,0)
-                        self.properties[pos]=winner;self.players[winner]["money"]-=amt
-                        self.current_auction=None
-                        return f"{winner} automatically wins {pname} for {amt}"
             return f"{rm} has been removed"
 
         if m:=re.match(r"!insert\s+(p\d+)\s+(-?\d+)",body):
@@ -358,7 +349,7 @@ class MonopolyBot(SingleServerIRCBot):
                     if a.get("bid_timer"):a["bid_timer"].cancel()
                     self.current_auction=None
 
-            auc["bid_timer"]=threading.Timer(18,auto_win);auc["bid_timer"].daemon=True;auc["bid_timer"].start()
+            auc["bid_timer"]=threading.Timer(16,auto_win);auc["bid_timer"].daemon=True;auc["bid_timer"].start()
             prop=self.active_board.get(auc["pos"],f"Position {auc['pos']}")
             msg=f"{player_key} is winning with {new_bid} on {prop}"
             try:
