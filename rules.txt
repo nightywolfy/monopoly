@@ -9,9 +9,9 @@ then you add them up as normal, and you would move 8 squares.
 
 
 1. Log into chat with username of your choice. leave "password" part empty
-2. Push "GO" button when it is your turn then press 1 or 2 or 3 or 4 or 5 or 6 then wait until opponent does the same.
-3. When opponent pushed "GO' on their turn, you also have to press 1 or 2 or 3 or 4 or 5 or 6
-4. When you are in Jail push "Jail" button instead of "GO/DICE" button then press 1 or 2 or 3 or 4 or 5 or 6
+2. Push "DICE" button when it is your turn then press 1 or 2 or 3 or 4 or 5 or 6 then wait until opponent does the same.
+3. When opponent pushed "DICE' on their turn, you also have to press 1 or 2 or 3 or 4 or 5 or 6
+4. When you are in Jail push "JAIL" button instead of "DICE" button then press 1 or 2 or 3 or 4 or 5 or 6
 5. To mortgage your property: select "mortgage on menu" then press the property on the map itself
 6. To unmortgage your property: select "redeem on menu" then press the property on the map itself
 7. press 5/10/25/50 during auction is active. 
@@ -43,6 +43,6 @@ then you add them up as normal, and you would move 8 squares.
 !housestatus (use this command to put all the houses/hotel in the right place)
 !remove p1 (remove player1 from the game if they bankrupt or AFK)
 !diceremove p1  (remove player1 from the dice as well)
-!insert p4 500  (insert player4 with total amount of $500)
-!freeloan 100 25 (get a interest free loan of $100 right away which needs to payback everytime you pass go of 25 x 4)
-!gobonus 50 250 (bank owes you total of $250 which will be paid everytime you pass go of 50 x 5)
+!insert p4 500  (insert player4 in the middle of game with total amount of $500)
+!freeloan p1 100 25 (get a interest free loan of $100 right away which needs to payback everytime you pass go of 25 x 4)
+!gobonus p2 50 250 (bank owes you total of $250 which will be paid everytime you pass go of 50 x 5)

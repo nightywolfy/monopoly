@@ -27,7 +27,6 @@ class MonopolyBot(SingleServerIRCBot):
         self.go_numbers = {}
         self.go_timer = None
         self.go_lock = threading.Lock()
-        self.go_jail_attempts={'p1':0,'p2':0}
         self.turn = 'p1'
         self.override_next_turn = False
         self.go_input_users = users or ['player1bot','player2bot']
@@ -55,13 +54,18 @@ class MonopolyBot(SingleServerIRCBot):
         return any(p["money"] < 0 for p in self.players.values())
     def on_pubmsg(self,c,e): self.handle_channel_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
     def on_privmsg(self,c,e): self.handle_private_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
-    def handle_private_message(self, c, nick, msg):
+
+    def handle_private_message(self,c,nick,msg):
         if msg.lower().startswith(("!add","!freeloan","!gobonus")):
-            cmd = msg.lower().split()[0]
-            return c.privmsg(nick, f"{cmd} can only be used in ##rento")
-        if r := self.handle_command(nick, msg):
-            c.privmsg(nick, r)
-        self.handle_go_privmsg(c, nick, msg)
+            cmd=msg.lower().split()[0]
+            return c.privmsg(nick,f"{cmd} can only be used in ##rento")
+        if re.match(r"!dice[0-4]-p\d+",msg.strip().lower()):
+            self._handle_dice_pub(c,nick,msg);return
+        if re.match(r"!go[1-4](?:\s+\d+)?",msg.strip()):
+            self.handle_go_command(c,msg.strip(),nick);return
+        if r:=self.handle_command(nick,msg): c.privmsg(nick,r)
+        self.handle_go_privmsg(c,nick,msg)
+
     def handle_channel_message(self,c,nick,msg):
         r=self.handle_command(nick,msg)
         if msg.lower().startswith(("!mortgage","!redeem")):
@@ -74,7 +78,6 @@ class MonopolyBot(SingleServerIRCBot):
         self.override_turn(c,nick,msg)
         self.handle_go_command(c,msg,nick)
         self._handle_dice_pub(c,nick,msg)
-        self.handle_gojailkey(c,msg)
     def reset_state(self):
         self.players={}
         self.properties={}
@@ -87,7 +90,6 @@ class MonopolyBot(SingleServerIRCBot):
         self.non_property=set(getattr(self,'non_property_regular',set()))
         self.max_pos=39
         self.jailed = {}
-        self.go_jail_key={'p1':False,'p2':False}
         self.consecutive_doubles={}
         self.dice4_streak={}
         self.switch_required=False
@@ -95,6 +97,7 @@ class MonopolyBot(SingleServerIRCBot):
         self.dice_rolls = {}
         self.passgo_bonus = {}
         self.free_loans={}
+        self.go_jail_attempts={'p1':0,'p2':0}
     def _process_queue(self):
         while True:
             try: self.cmd_queue.get()()
@@ -276,11 +279,12 @@ class MonopolyBot(SingleServerIRCBot):
             pl=m.group(1)
             if pl not in self.players:return f"{pl} is not in the game"
             if not self.jailed.get(pl,False):return f"{pl} is not in jail"
-            turn=self.dice4_streak.get(pl,0)
+            turn=max(self.go_jail_attempts.get(pl,0),self.dice4_streak.get(pl,0))
             cost=[100,50,25][min(turn,2)]
             if self.players[pl]["money"]<cost:return f"{pl} does not have enough money to pay bail ({cost})"
             self.players[pl]["money"]-=cost
             self.jailed[pl]=False
+            self.go_jail_attempts[pl]=0
             self.dice4_streak[pl]=0
             try:self.connection.privmsg("player2bot","!sound key.mp3")
             except:pass
@@ -624,7 +628,7 @@ class MonopolyBot(SingleServerIRCBot):
         old=self.players[p]["pos"];in_reg=old<=39
         new=(old+sp)%40 if in_reg else ((old-40+sp)%24)+40
         if self.jailed.get(p,False) and old==10 and new!=10:
-            self.jailed[p]=False;self.go_jail_key[p]=False;self.connection.privmsg(self.channel,f"{p} is now out of jail")
+            self.jailed[p]=False;self.connection.privmsg(self.channel,f"{p} is now out of jail")
         bonus_data=self.passgo_bonus.get(p);loan=self.free_loans.get(p);loan_msg="";bonus_msg=""
         if in_reg and old+sp>39:
             base=200;extra=0
@@ -723,7 +727,7 @@ class MonopolyBot(SingleServerIRCBot):
 
         send_msg(f"{p} lands on {name}{msg}")
         return name,msg
-    # -------- Dice1-4 --------
+    # -------- Dice0-4 --------
     def _handle_dice_pub(self, c, nick, msg):
         m = msg.strip().lower()
         if self.current_auction and re.match(r"!dice[0-4]-p\d+", m):
@@ -878,24 +882,17 @@ class MonopolyBot(SingleServerIRCBot):
         else:c.privmsg(self.channel,f"{nick}, not allowed");return
         if (p=='p1' and cmd not in ('1','3')) or (p=='p2' and cmd not in ('2','4')):
             c.privmsg(self.channel,f"{nick}, wrong GO command");return
-        jail=self.jailed.get(p,False); key=self.go_jail_key.get(p,False)
-        if cmd in ('1','2') and jail and not key:        
-            c.privmsg(self.channel,f"{nick}, use !gojailkey {p} first");return
-        if cmd in ('3','4') and (not jail or key):
-            c.privmsg(self.channel,f"!go{cmd} jailkeyused use go1 or go2");return
+        jail=self.jailed.get(p,False)
+        if cmd in ('1','2') and jail:
+            other=3 if p=='p1' else 4
+            c.privmsg(self.channel,f"{nick}, you are in jail. Use !go{other} or !jailpay {p}");return
+        if cmd in ('3','4') and not jail:
+            other=1 if p=='p1' else 2
+            c.privmsg(self.channel,f"{nick}, not in jail. Use !go{other}");return
         if not self.override_next_turn and self.turn!=p:
             c.privmsg(self.channel,f"{nick}, not your turn. Use !gooverride");return
         self.override_next_turn=False;self.go_owner=p;self.start_go(c,m)
-    def handle_gojailkey(self,c,msg):
-        m=re.match(r"!gojailkey\s+(p[1-2])",msg.lower())
-        if not m:return
-        p=m.group(1)
-        if not self.jailed.get(p,False):c.privmsg(self.channel,f"{p} is not in jail.");return
-        self.go_jail_key[p]=True
-        self.go_jail_attempts[p]=0
-        c.privmsg(self.channel,f"{p} !gojailkey activated")
-        try:c.privmsg("player2bot","!sound key.mp3")
-        except:pass
+
     def handle_go_privmsg(self,c,user,msg):
         if not self.go_active or user not in self.go_input_users:return
         if not msg.isdigit() or not 0<=int(msg)<=7:c.privmsg(user,"number must be 0-7");return
@@ -926,9 +923,9 @@ class MonopolyBot(SingleServerIRCBot):
             if jail and self.jailed.get(p,False) and not double:
                 self.go_jail_attempts[p]+=1
                 if self.go_jail_attempts[p]>=3:
-                    self.go_jail_key[p]=True
+                    self.jailed[p]=False
                     self.go_jail_attempts[p]=0
-                    c.privmsg(self.channel,f"{p} automatically activated !gojailkey")
+                    c.privmsg(self.channel,f"{p} used !go{self.go_active} three times. Released from jail for free.")
                     try:c.privmsg("player2bot","!sound key.mp3")
                     except:pass
             else:
