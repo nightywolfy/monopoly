@@ -461,7 +461,6 @@ modeButtons.forEach(btn => {
 });
 
 
-
 // Generate board buttons
 allSpaces.forEach(spaceNum => {
     const coords = boardSpaces.find(b => b.number === spaceNum);
@@ -493,10 +492,9 @@ allSpaces.forEach(spaceNum => {
     btn.style.zIndex = 50;
     btn.style.cursor = 'pointer';
 
-    btn.addEventListener('click', () => {
-        socket.emit('sendMessage', { bot: 'player1bot', msg: `!${currentMode} ${spaceNum}` });
-        
-    });
+    btn.addEventListener('click', () =>
+        socket.emit('sendMessage', { bot: 'player1bot', target: 'rentobot', msg: `!${currentMode} ${spaceNum}` })
+    );
 
     boardButtonsContainer.appendChild(btn);
 });
