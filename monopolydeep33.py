@@ -625,7 +625,6 @@ class MonopolyBot(SingleServerIRCBot):
             return True, "Trade rejected."
         return True, None
 
-
     def move_player(self,p,sp):
         def play_rent_sound():self.connection.privmsg("player2bot","!sound rent.mp3")
         old=self.players[p]["pos"];in_reg=old<=39

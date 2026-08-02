@@ -37,21 +37,21 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .orange { background:goldenrod; border-color:#ffde59; color:black; }
 .green { background:limegreen; border-color:#aaffaa; color:black; }
 .purple { background:#9933ff; border-color:#cc99ff; }
-.white{background:#ffffff;border-color:#cccccc;color:black;}
-.white-btn.plus{background-color:#28a745!important;border:1px solid #1e7e34!important;color:white!important;padding:.1px .1px;border-radius:3px;font-weight:bold;cursor:pointer;}
-.white-btn.minus{background-color:#dc3545!important;border:1px solid #b02a37!important;color:white!important;padding:.1px .1px;border-radius:3px;font-weight:bold;cursor:pointer;}
-.white-btn.clr-brown { background-color:#7D4900 !important; border-color:#5c3600 !important; color:white !important; }
-.white-btn.clr-dblue { background-color:#02497F !important; border-color:#01324f !important; color:white !important; }
-.white-btn.clr-blue { background-color:#00BFF5 !important; border-color:#0090b8 !important; color:black !important; }
-.white-btn.clr-green { background-color:#38B74C !important; border-color:#2a8a39 !important; color:white !important; }
-.white-btn.clr-yellow { background-color:#FFEF03 !important; border-color:#c9bc00 !important; color:black !important; }
-.white-btn.clr-pink { background-color:#ED008C !important; border-color:#b8006b !important; color:white !important; }
-.white-btn.clr-orange { background-color:#F8941C !important; border-color:#c7740f !important; color:black !important; }
-.white-btn.clr-red { background-color:#FE0000 !important; border-color:#c00000 !important; color:white !important; }
-.white-btn.clr-white { background-color:#DCE6F0 !important; border-color:#a9b8c9 !important; color:black !important; }
-.white-btn.clr-aqua { background-color:#01EA97 !important; border-color:#019c68 !important; color:black !important; }
-.white-btn.clr-purple { background-color:#59017C !important; border-color:#3d0155 !important; color:white !important; }
-.white-btn.clr-black { background-color:#010101 !important; border-color:#555555 !important; color:white !important; }
+.white { background:#ffffff; border-color:#cccccc; color:black; }
+.white-btn.plus { background-color:#28a745 !important; border:1px solid #1e7e34 !important; color:white !important; padding:.1px .1px; border-radius:3px; font-weight:bold; cursor:pointer; }
+.white-btn.minus { background-color:#dc3545 !important; border:1px solid #b02a37 !important; color:white !important; padding:.1px .1px; border-radius:3px; font-weight:bold; cursor:pointer; }
+.white-btn.clr-brown:hover { background-color:#7D4900 !important; border-color:#5c3600 !important; color:white !important; }
+.white-btn.clr-dblue:hover { background-color:#02497F !important; border-color:#01324f !important; color:white !important; }
+.white-btn.clr-blue:hover { background-color:#00BFF5 !important; border-color:#0090b8 !important; color:black !important; }
+.white-btn.clr-green:hover { background-color:#38B74C !important; border-color:#2a8a39 !important; color:white !important; }
+.white-btn.clr-yellow:hover { background-color:#FFEF03 !important; border-color:#c9bc00 !important; color:black !important; }
+.white-btn.clr-pink:hover { background-color:#ED008C !important; border-color:#b8006b !important; color:white !important; }
+.white-btn.clr-orange:hover { background-color:#F8941C !important; border-color:#c7740f !important; color:black !important; }
+.white-btn.clr-red:hover { background-color:#FE0000 !important; border-color:#c00000 !important; color:white !important; }
+.white-btn.clr-white:hover { background-color:#DCE6F0 !important; border-color:#a9b8c9 !important; color:black !important; }
+.white-btn.clr-aqua:hover { background-color:#01EA97 !important; border-color:#019c68 !important; color:black !important; }
+.white-btn.clr-purple:hover { background-color:#59017C !important; border-color:#3d0155 !important; color:white !important; }
+.white-btn.clr-black:hover { background-color:#010101 !important; border-color:#555555 !important; color:white !important; }
 </style>
 </head>
 <body>
@@ -71,16 +71,21 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <div id="centralDisplayContainer">
 <div id="topButtons">
 <div class="buttonRow">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice0-p6"><button type="submit" class="small-button"><img src="dice.jpg" alt="dice"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice4-p6"><button type="submit" class="small-button"><img src="jail.jpg" alt="jail"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="msg" value="!jailpay p6"><button type="submit" class="small-button"><img src="p6.jpg" alt="P6"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice0-p5"><button type="submit" class="small-button"><img src="dice.jpg" alt="dice"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice4-p5"><button type="submit" class="small-button"><img src="jail.jpg" alt="jail"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!jailpay p5"><button type="submit" class="small-button"><img src="p5.jpg" alt="P5"></button></form>
 </div>
 <div class="buttonRow">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button"><img src="5.jpg" alt="5"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button"><img src="10.jpg" alt="10"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 25"><button type="submit" class="small-button"><img src="25.jpg" alt="25"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 50"><button type="submit" class="small-button"><img src="50.jpg" alt="50"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button"><img src="fold.jpg" alt="Fold"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!propertylist"><button type="submit" class="small-button"><img src="p.jpg" alt="P5"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!housestatus"><button type="submit" class="small-button"><img src="h.jpg" alt="P5"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!save"><button type="submit" class="small-button"><img src="s.jpg" alt="P5"></button></form>
+</div>
+<div class="buttonRow">
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button"><img src="5.jpg" alt="5"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button"><img src="10.jpg" alt="10"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 25"><button type="submit" class="small-button"><img src="25.jpg" alt="25"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 50"><button type="submit" class="small-button"><img src="50.jpg" alt="50"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button"><img src="fold.jpg" alt="Fold"></button></form>
 </div>
 </div>
 <div id="displayContainer">
@@ -91,32 +96,32 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 </div>
 
 <div id="modeToggle">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse dblue"><button class="white-btn plus clr-dblue">DB+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse brown"><button class="white-btn plus clr-brown">BR+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse blue"><button class="white-btn plus clr-blue">BL+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse green"><button class="white-btn plus clr-green">GR+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse yellow"><button class="white-btn plus clr-yellow">YE+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse pink"><button class="white-btn plus clr-pink">PI+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse orange"><button class="white-btn plus clr-orange">OR+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse red"><button class="white-btn plus clr-red">RE+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse white"><button class="white-btn plus clr-white">WH+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse aqua"><button class="white-btn plus clr-aqua">AQ+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse purple"><button class="white-btn plus clr-purple">PU+</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse black"><button class="white-btn plus clr-black">BL+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse dblue"><button class="white-btn plus clr-dblue">DB+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse brown"><button class="white-btn plus clr-brown">BR+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse blue"><button class="white-btn plus clr-blue">BL+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse green"><button class="white-btn plus clr-green">GR+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse yellow"><button class="white-btn plus clr-yellow">YE+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse pink"><button class="white-btn plus clr-pink">PI+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse orange"><button class="white-btn plus clr-orange">OR+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse red"><button class="white-btn plus clr-red">RE+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse white"><button class="white-btn plus clr-white">WH+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse aqua"><button class="white-btn plus clr-aqua">AQ+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse purple"><button class="white-btn plus clr-purple">PU+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse black"><button class="white-btn plus clr-black">BL+</button></form>
 <button type="button" class="mode-btn active" data-mode="mortgage">Mortgage</button>
 <button type="button" class="mode-btn" data-mode="redeem">Redeem</button>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse dblue"><button class="white-btn minus clr-dblue">DB-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse brown"><button class="white-btn minus clr-brown">BR-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse blue"><button class="white-btn minus clr-blue">BL-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse green"><button class="white-btn minus clr-green">GR-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse yellow"><button class="white-btn minus clr-yellow">YE-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse pink"><button class="white-btn minus clr-pink">PI-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse orange"><button class="white-btn minus clr-orange">OR-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse red"><button class="white-btn minus clr-red">RE-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse white"><button class="white-btn minus clr-white">WH-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse aqua"><button class="white-btn minus clr-aqua">AQ-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse purple"><button class="white-btn minus clr-purple">PU-</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player6bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse black"><button class="white-btn minus clr-black">BL-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse dblue"><button class="white-btn minus clr-dblue">DB-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse brown"><button class="white-btn minus clr-brown">BR-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse blue"><button class="white-btn minus clr-blue">BL-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse green"><button class="white-btn minus clr-green">GR-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse yellow"><button class="white-btn minus clr-yellow">YE-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse pink"><button class="white-btn minus clr-pink">PI-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse orange"><button class="white-btn minus clr-orange">OR-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse red"><button class="white-btn minus clr-red">RE-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse white"><button class="white-btn minus clr-white">WH-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse aqua"><button class="white-btn minus clr-aqua">AQ-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse purple"><button class="white-btn minus clr-purple">PU-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse black"><button class="white-btn minus clr-black">BL-</button></form>
 </div>
 </div>
 </div>
@@ -351,7 +356,7 @@ btn.style.border='1px solid rgba(255,255,255,0.6)';
 btn.style.color='white';
 btn.style.zIndex=50;
 btn.style.cursor='pointer';
-btn.addEventListener('click',()=>socket.emit('sendMessage',{bot:'player6bot',msg:`!${currentMode} ${spaceNum}`}));
+btn.addEventListener('click',()=>socket.emit('sendMessage',{bot:'player5bot',msg:`!${currentMode} ${spaceNum}`}));
 boardButtonsContainer.appendChild(btn);
 });
 
