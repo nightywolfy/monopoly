@@ -55,14 +55,29 @@ class MonopolyBot(SingleServerIRCBot):
     def on_pubmsg(self,c,e): self.handle_channel_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
     def on_privmsg(self,c,e): self.handle_private_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
     def handle_private_message(self,c,nick,msg):
-        if msg.lower().startswith(("!add","!freeloan","!gobonus")):cmd=msg.lower().split()[0];return c.privmsg(nick,f"{cmd} can only be used in ##rento")
+        low=msg.lower()
+        if low.startswith(("!add","!freeloan","!gobonus")) and not low.startswith(("!addonehouse","!removeonehouse")):
+            cmd=low.split()[0];return c.privmsg(nick,f"{cmd} can only be used in ##rento")
         if re.match(r"!dice[0-4]-p\d+",msg.strip().lower()):self._handle_dice_pub(c,nick,msg);return
         if re.match(r"!go[1-4](?:\s+\d+)?",msg.strip()):self.handle_go_command(c,msg.strip(),nick);return
         success,r=self.handle_command(nick,msg)
         if r:
-            if msg.lower().startswith(("!bidadd","!fold")):c.privmsg(self.channel,r)
+            if low.startswith(("!bidadd","!fold","!addonehouse","!removeonehouse")):c.privmsg(self.channel,r)
             else:c.privmsg(nick,r)
         self.handle_go_privmsg(c,nick,msg)
+        
+    def handle_private_message(self,c,nick,msg):
+        low=msg.lower()
+        if low.startswith(("!add","!freeloan","!gobonus")) and not low.startswith(("!addonehouse","!removeonehouse")):
+            cmd=low.split()[0];return c.privmsg(nick,f"{cmd} can only be used in ##rento")
+        if re.match(r"!dice[0-4]-p\d+",msg.strip().lower()):self._handle_dice_pub(c,nick,msg);return
+        if re.match(r"!go[1-4](?:\s+\d+)?",msg.strip()):self.handle_go_command(c,msg.strip(),nick);return
+        success,r=self.handle_command(nick,msg)
+        if r:
+            if low.startswith(("!bidadd","!fold","!addonehouse","!removeonehouse")):c.privmsg(self.channel,r)
+            else:c.privmsg(nick,r)
+        self.handle_go_privmsg(c,nick,msg)
+
     def handle_channel_message(self,c,nick,msg):
         success,r=self.handle_command(nick,msg)
         if r:
@@ -232,24 +247,22 @@ class MonopolyBot(SingleServerIRCBot):
             except Exception as e:
                 return False, f"Could not process property list: {e}"
 
-        if body.lower() == "!housestatus":
+        if body.lower()=="!housestatus":
             import time
-            result_lines=[]
+            try:self.connection.privmsg("player1bot","!clearall")
+            except Exception:pass
+            time.sleep(1)
+            result_lines=[];house_positions=[];hotel_positions=[]
             for color,positions in self.color_positions.items():
-                props=self.color_sets[color]
-                total=sum(self.houses.get(p,0) for p in props)
+                props=self.color_sets[color];total=sum(self.houses.get(p,0) for p in props)
                 result_lines.append(f"{color}:{total}")
-                try:
-                    if all(self.houses.get(p,0)>=5 for p in props):
-                        self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,positions))}")
-                    elif total>0:
-                        self.connection.privmsg("player1bot",f"!house {' '.join(map(str,positions))}")
-                    else:
-                        self.connection.privmsg("player1bot",f"!unbuilding {' '.join(map(str,positions))}")
-                    time.sleep(1)
-                except Exception:
-                    pass
-            return True, " ".join(result_lines)
+                if total>0:house_positions.extend(positions)
+                if all(self.houses.get(p,0)>=5 for p in props):hotel_positions.extend(positions)
+            try:
+                if house_positions:self.connection.privmsg("player1bot",f"!house {' '.join(map(str,house_positions))}");time.sleep(1)
+                if hotel_positions:self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,hotel_positions))}");time.sleep(1)
+            except Exception:pass
+            return True," ".join(result_lines)
 
         if body.lower()=="!status":
             if not self.players:return False, "No game in progress."

@@ -274,9 +274,11 @@ function createBot(nick, defaultTarget, options = {}) {
           case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }
           case '!dot': {
             if(args.length>=1){
-              const n=args[0]; const color=args[1]||'red';
-              if(updateDot(n,color)) safeSay(defaultTarget,`Dot set: ${n} -> ${color}`);
-              else safeSay(defaultTarget,`Invalid number: ${n}`);
+              const color=args[args.length-1]||'red';
+              const nums=args.slice(0,-1);
+              let ok=true;
+              nums.forEach(n=>{if(!updateDot(n,color))ok=false;});
+              safeSay(defaultTarget,ok?`Dots set: ${nums.join(',')} -> ${color}`:`Invalid number`);
             }
             break;
           }
@@ -340,9 +342,6 @@ const bots = {
   player5bot: createBot('player5bot', '##rento', { delay: 28000 }),
   player6bot: createBot('player6bot', '##rento', { delay: 35000 })
 };
-
-
-
 
 app.post('/send-irc', (req, res) => {
   try {

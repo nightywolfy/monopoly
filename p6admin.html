@@ -356,8 +356,7 @@ btn.style.border='1px solid rgba(255,255,255,0.6)';
 btn.style.color='white';
 btn.style.zIndex=50;
 btn.style.cursor='pointer';
-btn.addEventListener('click',()=>socket.emit('sendMessage',{bot:'player6bot',msg:`!${currentMode} ${spaceNum}`}));
-boardButtonsContainer.appendChild(btn);
+btn.addEventListener('click',()=>socket.emit('sendMessage',{bot:'player6bot',target:'rentobot',msg:`!${currentMode} ${spaceNum}`}));boardButtonsContainer.appendChild(btn);
 });
 
 boardButtonsContainer.querySelectorAll('button').forEach(btn=>{
