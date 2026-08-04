@@ -1,26 +1,28 @@
-update/fix
+# MonopolyBot Update Notes
 
-1. Prevented dice rolling while an auction is active.
-2. Fixed major bug where houses were not showing on the 40-63 inner board.
-3. Changed auction system from player-turn auction to Richup-style auction.
-4. Added automatic fold after 14 seconds of no auction action.
-5. Added automatic !update instead of requiring manual updates.
-6. Added automatic jail release after 3 turns in jail without rolling a double.
-7. Added !jailpay command with correct bail amount based on jail turn count.
-8. Added !freeloan command for space 20 (Free Parking).
-9. Added !insert command to add players in the middle of an active game.
-10. Added !gobonus command.
-11. Added admin ability to force trades for other players.
-12. Added myself and crinjal to admin status for trade management.
-13. Changed space 62 (Go To Jail) into an auction space.
-14. Moved all map buttons to the center of the board with improved styling.
-15. Moved the player total box to the right side of the map.
-16. Increased player support from 4 players to 6 players.
-17. Added separate colors for add/remove house buttons.
-18. Reduced !housestatus execution time from 30 seconds to 5 seconds.
-19. Reduced !propertylist execution time from 60 seconds to 15 seconds.
-20. Fixed minor bug: !jailpay can now only be used during the player's turn.
-21. Changed house controls to allow adding/removing one house at a time instead of changing 3 houses at once.
-22. Add a way to display how many houses each property has (1-4 houses).
+1. Prevented dice rolls while an auction is currently active to maintain proper game flow.
+2. Resolved a major issue where houses were not displaying correctly on the inner board (spaces 40-63).
+3. Updated the auction system from a player-turn-based format to a Richup-style auction system.
+4. Implemented an automatic fold feature after 14 seconds of auction inactivity.
+5. Added automatic `!update` execution to reduce the need for manual updates.
+6. Implemented automatic jail release after three turns in jail without successfully rolling a double.
+7. Added the `!jailpay` command with an adjusted bail system based on the player's number of jail turns.
+8. Added the `!freeloan` command for Free Parking (space 20).
+9. Added the `!insert` command, allowing players to join an active game session.
+10. Added the `!gobonus` command for managing GO bonus features.
+11. Added administrative controls allowing forced trades between players.
+12. Added myself and crinjal as administrators for trade management and moderation.
+13. Converted space 62 (Go To Jail) into an auction-enabled space.
+14. Redesigned and repositioned map buttons to the center of the board with improved visual styling.
+15. Relocated the player total display box to the right side of the board for improved visibility.
+16. Expanded player support from four players to six players.
+17. Added separate color styling for house addition and removal controls.
+18. Improved command response performance by reducing `!housestatus` execution time from approximately 30 seconds to 5 seconds.
+19. Improved command response performance by reducing `!propertylist` execution time from approximately 60 seconds to 15 seconds.
+20. Fixed an issue where `!jailpay` could be used outside of the player's turn.
+21. Updated house management controls to allow adding or removing one house at a time instead of modifying three houses simultaneously.
+22. Added property house-count display support, showing the number of houses built on each property (1-4 houses).
+23. Added dedicated mobile pages for Player-1 through Player-6.
+
 
 
