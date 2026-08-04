@@ -245,17 +245,18 @@ class MonopolyBot(SingleServerIRCBot):
             try:self.connection.privmsg("player1bot","!clearall")
             except Exception:pass
             time.sleep(2)
-            result_lines=[];house_positions=[];hotel_positions=[]
-            for color,positions in self.color_positions.items():
-                props=self.color_sets[color];total=sum(self.houses.get(p,0) for p in props)
-                result_lines.append(f"{color}:{total}")
-                if total>0:house_positions.extend(positions)
-                if all(self.houses.get(p,0)>=5 for p in props):hotel_positions.extend(positions)
+            groups={1:[],2:[],3:[],4:[],"hotel":[]}
+            for color,positions in self.color_sets.items():
+                for p in positions:
+                    h=self.houses.get(p,0)
+                    if h==5:groups["hotel"].append(p)
+                    elif 1<=h<=4:groups[h].append(p)
             try:
-                if house_positions:self.connection.privmsg("player1bot",f"!house {' '.join(map(str,house_positions))}");time.sleep(1)
-                if hotel_positions:self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,hotel_positions))}");time.sleep(1)
+                for n in (1,2,3,4):
+                    if groups[n]:self.connection.privmsg("player1bot",f"!house{n} {' '.join(map(str,groups[n]))}");time.sleep(2)
+                if groups["hotel"]:self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,groups['hotel']))}");time.sleep(2)
             except Exception:pass
-            return True," ".join(result_lines)
+            return True,None
 
         if body.lower()=="!status":
             if not self.players:return False, "No game in progress."

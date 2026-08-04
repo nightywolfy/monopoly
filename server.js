@@ -110,7 +110,7 @@ function setBuilding(space, type, unset = false) {
 
 function bulkUpdateBuildings(spaces, type = null, unset = false) {
   let changed = false;
-  const sanitized = spaces.map(s => Number(s)).filter(n => !Number.isNaN(n) && n >= 0 && n <= 39);
+  const sanitized = spaces.map(s => Number(s)).filter(n => !Number.isNaN(n) && n >= 0 && n <= 63);
   sanitized.forEach(space => {
     const key = String(space);
     if (unset) { if (buildings[key]) { delete buildings[key]; changed = true; } }
@@ -281,14 +281,7 @@ function createBot(nick, defaultTarget, options = {}) {
               if(changed)safeSay(defaultTarget,`Set hotel(s) on spaces: ${spaces.join(', ')}`);
               break;
           }
-          case '!unbuilding': {
-              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
-              if(spaces.length===0){safeSay(defaultTarget,'Usage: !unbuilding <space>');break;}
-              const removed=bulkUpdateBuildings(spaces,null,true);
-              if(removed)safeSay(defaultTarget,`Removed building(s) from spaces: ${spaces.join(', ')}`);
-              else safeSay(defaultTarget,`No buildings removed (none present on provided spaces).`);
-              break;
-          }
+
           case '!clearall': {
               const count=clearAllBuildings();
               safeSay(defaultTarget,`All buildings cleared (${count} removed).`);
@@ -355,8 +348,6 @@ function createBot(nick, defaultTarget, options = {}) {
     getState:()=>({nick,isConnected,reconnectDelay})
   };
 }
-
-
 
 const bots = {
   player1bot: createBot('player1bot', '##rento', { delay: 0 }),
