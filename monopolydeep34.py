@@ -17,7 +17,6 @@ class MonopolyBot(SingleServerIRCBot):
         self.house_numbers = {"red":(2,4,6,8),"dblue":(2,4,6,8),"orange":(3,6,9,12),"yellow":(3,6,9,12),"green":(3,6,9,12),"blue":(3,6,9,12),"pink":(3,6,9,12),"brown":(3,6,9,12),"white":(3,6,9,12),"aqua":(3,6,9,12),"purple":(3,6,9,12),"black":(3,6,9,12)}
         self.hotel_numbers = {"red":10,"dblue":10,"orange":15,"yellow":15,"green":15,"blue":15,"pink":15,"brown":15,"white":15,"aqua":15,"purple":15,"black":15}
         self.color_sets={"dblue":[1,3],"brown":[6,8,9],"blue":[11,12,14],"green":[16,17,19],"yellow":[21,22,24],"pink":[26,28,29],"orange":[31,33,34],"red":[37,39],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
-        self.color_positions={"dblue":[1,3],"brown":[6,8,9],"blue":[11,12,14],"green":[16,17,19],"yellow":[21,22,24],"pink":[26,28,29],"orange":[31,33,34],"red":[37,39],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
         self.unmortgaged_colors = {"p1":"red","p2":"blue","p3":"orange","p4":"green","p5":"purple","p6":"white"}
         self.mortgaged_colors = {"p1":"lightpink","p2":"lightblue","p3":"#FFFD01","p4":"lightgreen","p5":"plum","p6":"black"}
         self.mortgaged2_colors = {"m1":"lightpink","m2":"lightblue","m3":"#FFFD01","m4":"lightgreen","m5":"plum","m6":"black"}
@@ -71,7 +70,7 @@ class MonopolyBot(SingleServerIRCBot):
     def handle_channel_message(self,c,nick,msg):
         success,r=self.handle_command(nick,msg)
         if r:
-            if success and msg.lower().startswith(("!start","!move","!add","!teleport","!addonehouse","!removeonehouse","!remove","!freeloan","!gobonus","!jailpay","!switch","!insert")):self.auto_up()
+            if success and msg.lower().startswith(("!start","!move","!add","!teleport","!addonehouse","!removeonehouse","!remove","!freeloan","!gobonus","!jailpay","!switch","!insert","!accept")):self.auto_up()
             c.privmsg(self.channel,r)
         self.handle_go_session_command(c,nick,msg)
         self.override_turn(c,nick,msg)
@@ -204,6 +203,8 @@ class MonopolyBot(SingleServerIRCBot):
                 if pos in self.mortgaged:self.mortgaged.remove(pos)
                 old=self.active_board.get(pos,f"Position {pos}");nm=old.split("-",1)[-1]
                 self.active_board[pos]=f"x-{nm}"
+            try:self.handle_command(caller,"!propertylist");self.handle_command(caller,"!housestatus")
+            except Exception:pass
             return True, f"{rm} has been removed"
 
         if m:=re.match(r"!insert\s+(p[1-6])\s+(-?\d+)",body):
@@ -244,7 +245,7 @@ class MonopolyBot(SingleServerIRCBot):
             import time
             try:self.connection.privmsg("player1bot","!clearall")
             except Exception:pass
-            time.sleep(2)
+            time.sleep(1)
             groups={1:[],2:[],3:[],4:[],"hotel":[]}
             for color,positions in self.color_sets.items():
                 for p in positions:
@@ -353,7 +354,7 @@ class MonopolyBot(SingleServerIRCBot):
                     except:pass
                     if a.get("bid_timer"):a["bid_timer"].cancel()
                     self.current_auction=None
-            auc["bid_timer"]=threading.Timer(12,auto_win);auc["bid_timer"].daemon=True;auc["bid_timer"].start()
+            auc["bid_timer"]=threading.Timer(4,auto_win);auc["bid_timer"].daemon=True;auc["bid_timer"].start()
             prop=self.active_board.get(auc["pos"],f"Position {auc['pos']}")
             msg=f"{player_key} is winning with {new_bid} on {prop}"
             try:
@@ -609,6 +610,8 @@ class MonopolyBot(SingleServerIRCBot):
             transfer(t["left_props"],t["offerer"],t["other"])
             transfer(t["right_props"],t["other"],t["offerer"])
             self.current_trade=None
+            try:self.handle_command(caller,"!propertylist");self.handle_command(caller,"!housestatus")
+            except Exception:pass
             return True, "Trade accepted and completed."
 
         if body.lower()=="!reject":

@@ -4,43 +4,54 @@
 <meta charset="UTF-8">
 <title>Monopoly Player Selection</title>
 <style>
-html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family:sans-serif;display:flex;overflow:hidden;color:white;}
-#boardWrapper{width:50%;height:100%;display:flex;justify-content:center;align-items:center;position:relative;background:black;}
-#board{position:relative;height:900px;width:900px;display:flex;flex-direction:column;align-items:center;}
-#boardImg{width:900px;height:900px;}
-.piece{width:32px;height:32px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid transparent;box-shadow:0 0 6px rgba(0,0,0,.4);transition:left .4s ease,top .4s ease;color:white;}
-.red{background:#ff4d4d;border-color:#ff8080;}
-.blue{background:#3399ff;border-color:#66a3ff;}
-.orange{background:goldenrod;border-color:#ffde59;color:black;}
-.green{background:limegreen;border-color:#aaffaa;color:black;}
-.purple{background:#9933ff;border-color:#cc99ff;}
-.white{background:#fff;border-color:#ccc;color:black;}
-.dot{width:12px;height:12px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white;}
-#centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10;}
-#moneyContainer{display:flex;flex-direction:column;gap:20px;width:175px;}
-.moneyBox{padding:10px 20px;border-radius:12px;width:100%;text-align:center;font-weight:bold;font-size:20px;word-wrap:break-word;box-shadow:0 0 18px #6a0dad,0 0 24px #00d4ff;color:white;}
-.moneyBox.red{background:#ff4d4d;}
-.moneyBox.blue{background:#3399ff;}
-.moneyBox.yellow{background:goldenrod;color:black;}
-.moneyBox.green{background:limegreen;color:black;}
-.moneyBox.orange{background:orange;color:black;}
-#displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;}
-.displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word;}
-.hotel,.house{width:29px;height:29px;position:absolute;}
-#playerContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:24px;box-shadow:inset 0 0 40px rgba(0,212,255,.3);padding:4px 24px 20px;margin-top:-20px;}
-.playerSection{width:100%;max-width:320px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:16px 14px;text-align:center;box-shadow:0 0 25px rgba(0,0,0,.4);}
-.playerGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;justify-items:stretch;justify-content:center;}
-.playerSection h2{color:#FFD700;margin:0 0 12px;font-size:18px;letter-spacing:.5px;text-shadow:0 0 8px black;}
+html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family:sans-serif;display:flex;overflow:hidden;color:white}
+#boardWrapper{width:50%;height:100%;display:flex;justify-content:center;align-items:center;position:relative;background:black}
+#board{position:relative;height:900px;width:900px;display:flex;flex-direction:column;align-items:center}
+#boardImg{width:900px;height:900px}
+.piece{width:32px;height:32px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid transparent;box-shadow:0 0 6px rgba(0,0,0,.4);transition:left .4s ease,top .4s ease;color:white}
+.red{background:#ff4d4d;border-color:#ff8080}
+.blue{background:#3399ff;border-color:#66a3ff}
+.orange{background:goldenrod;border-color:#ffde59;color:black}
+.green{background:limegreen;border-color:#aaffaa;color:black}
+.purple{background:#9933ff;border-color:#cc99ff}
+.white{background:#fff;border-color:#ccc;color:black}
+.dot{width:12px;height:12px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
+#centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
 
-.playerBtn{display:flex;align-items:center;justify-content:center;text-decoration:none;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;padding:14px 10px;border-radius:10px;font-size:17px;font-weight:bold;cursor:pointer;transition:.2s ease;letter-spacing:.3px;min-height:45px;}
-.playerBtn:hover{transform:scale(1.05);box-shadow:0 0 20px #00d4ff,0 0 30px #6a0dad;}
-.playerBtn:active{transform:scale(.97);}
-#quickButtons{background:linear-gradient(135deg,#111,#333);padding:15px;border-radius:15px;box-shadow:0 0 20px #000;text-align:center;}
-#quickButtons .map1{background:linear-gradient(135deg,#0044aa,#00c3ff);color:white!important;box-shadow:0 0 14px #00c3ff;}
-#quickButtons .map2{background:linear-gradient(135deg,#5a0099,#d400ff);color:white!important;box-shadow:0 0 14px #d400ff;}
-#quickButtons .map3{background:linear-gradient(135deg,#00733e,#00e676);color:white!important;box-shadow:0 0 14px #00e676;}
-#quickButtons .map4{background:linear-gradient(135deg,#b34700,#ff9100);color:white!important;box-shadow:0 0 14px #ff9100;}
-#quickButtons button:hover{transform:scale(1.08);filter:brightness(1.25);}
+#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:320px}
+
+.moneyBox{padding:3px 8px;border-radius:10px;width:100%;height:45px;box-sizing:border-box;text-align:center;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;word-wrap:break-word;box-shadow:0 0 10px rgba(0,212,255,.8),0 0 15px rgba(106,13,173,.6);border:2px solid rgba(255,255,255,.5);color:black}
+
+.moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
+.moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
+.moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
+.moneyBox.green{background:linear-gradient(135deg,#32cd32,#b6ffb6);color:black}
+.moneyBox.purple{background:linear-gradient(135deg,#8a2be2,#d9a7ff);color:black}
+.moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
+
+#displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center}
+.displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
+.hotel,.house{width:29px;height:29px;position:absolute}
+#playerContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:15px;box-shadow:inset 0 0 40px rgba(0,212,255,.3);padding:10px;box-sizing:border-box;overflow-y:auto}
+.playerSection{width:100%;max-width:260px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:10px;text-align:center;box-shadow:0 0 25px rgba(0,0,0,.4)}
+.playerGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.playerSection h2{color:#FFD700;margin:0 0 10px;font-size:16px;text-shadow:0 0 8px black}
+.playerBtn{display:flex;align-items:center;justify-content:center;text-decoration:none;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;padding:10px 6px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer;transition:.2s;min-height:35px}
+.playerBtn:hover{transform:scale(1.05);box-shadow:0 0 20px #00d4ff,0 0 30px #6a0dad}
+.playerBtn:active{transform:scale(.97)}
+#quickButtons{background:linear-gradient(135deg,#111,#333);padding:15px;border-radius:15px;box-shadow:0 0 20px #000;text-align:center}
+#quickButtons .map1{background:linear-gradient(135deg,#0044aa,#00c3ff);color:white!important}
+#quickButtons .map2{background:linear-gradient(135deg,#5a0099,#d400ff);color:white!important}
+#quickButtons .map3{background:linear-gradient(135deg,#00733e,#00e676);color:white!important}
+#quickButtons .map4{background:linear-gradient(135deg,#b34700,#ff9100);color:white!important}
+#quickButtons button:hover{transform:scale(1.08);filter:brightness(1.25)}
+.sixPlayerSection{width:100%;max-width:320px;padding:10px}
+.sixPlayerSection .playerGrid{grid-template-columns:repeat(2,1fr);gap:10px}
+.sixPlayerSection .playerBtn{font-size:16px;padding:12px;min-height:45px}
+.mobilePlayers{display:none;width:100%;max-width:320px}
+.mobilePlayers .playerGrid{grid-template-columns:repeat(2,1fr);gap:10px}
+.mobilePlayers .playerBtn{font-size:16px;padding:12px;min-height:45px}
+.mobileOnly,.desktopOnly{display:block}
 
 </style>
 </head>
@@ -58,10 +69,12 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <div id="p6" class="piece white">p6</div>
 <div id="centralDisplayContainer">
 <div id="moneyContainer">
-<div id="money-p1-overlay" class="moneyBox red">Player1: $0</div>
-<div id="money-p2-overlay" class="moneyBox blue">Player2: $0</div>
-<div id="money-p3-overlay" class="moneyBox yellow">Player3: $0</div>
-<div id="money-p4-overlay" class="moneyBox green">Player4: $0</div>
+<div id="money-p1-overlay" class="moneyBox red">P1: $0</div>
+<div id="money-p2-overlay" class="moneyBox blue">P2: $0</div>
+<div id="money-p3-overlay" class="moneyBox orange">P3: $0</div>
+<div id="money-p4-overlay" class="moneyBox green">P4: $0</div>
+<div id="money-p5-overlay" class="moneyBox purple">P5: $0</div>
+<div id="money-p6-overlay" class="moneyBox white">P6: $0</div>
 </div>
 <div id="displayContainer">
 <div id="display1" class="displayBox">Display 1</div>
@@ -75,35 +88,53 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <div id="playerContainer">
 
 
-  <!-- Images + Map buttons -->
-<div style="position:relative; width:100%; margin-bottom:20px; display:flex; justify-content:center; align-items:flex-start;">
-<div style="position:absolute; left:30px; top:240px; display:flex; flex-direction:column; gap:10px;">
+<!-- Images + Map buttons -->
+<div style="position:relative;width:100%;margin-bottom:20px;display:flex;justify-content:center;align-items:flex-start;">
+<div style="position:absolute;left:30px;top:240px;display:flex;flex-direction:column;gap:10px;">
 <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
-<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #00d4ff;" />
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:80px;height:auto;border-radius:10px;box-shadow:0 0 12px #00d4ff;">
 </a>
 <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" target="_blank">
-<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:80px; height:auto; border-radius:10px; box-shadow:0 0 12px #6a0dad;" />
+<img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/rules.jpg" style="width:80px;height:auto;border-radius:10px;box-shadow:0 0 12px #6a0dad;">
 </a>
 </div>
 </div>
+
 <!-- Player selection buttons -->
 <div class="playerSection">
-    <h2>2-Player Game</h2>
-    <div class="playerGrid">
-        <a href="player1.html" class="playerBtn">Player 1</a>
-        <a href="player2.html" class="playerBtn">Player 2</a>
-    </div>
+<h2>2-Player Game</h2>
+<div class="playerGrid">
+<a href="player1.html" class="playerBtn">Player 1</a>
+<a href="player2.html" class="playerBtn">Player 2</a>
 </div>
+</div>
+
+<div class="desktopOnly">
+<div class="playerSection sixPlayerSection">
+<h2>6 Player Game</h2>
+<div class="playerGrid">
+<a href="p1.html" class="playerBtn">Player 1</a>
+<a href="p2.html" class="playerBtn">Player 2</a>
+<a href="p3.html" class="playerBtn">Player 3</a>
+<a href="p4.html" class="playerBtn">Player 4</a>
+<a href="p5.html" class="playerBtn">Player 5</a>
+<a href="p6.html" class="playerBtn">Player 6</a>
+</div>
+</div>
+</div>
+
+<div class="mobileOnly mobilePlayers">
 <div class="playerSection">
-    <h2>3-4 Player Game</h2>
-    <div class="playerGrid">
-        <a href="p1.html" class="playerBtn">Player 1</a>
-        <a href="p2.html" class="playerBtn">Player 2</a>
-        <a href="p3.html" class="playerBtn">Player 3</a>
-        <a href="p4.html" class="playerBtn">Player 4</a>
-        <a href="p5.html" class="playerBtn">Player 5</a>
-        <a href="p6.html" class="playerBtn">Player 6</a>
-    </div>
+<h2>Mobile 6 Player</h2>
+<div class="playerGrid">
+<a href="p1m.html" class="playerBtn">Player 1</a>
+<a href="p2m.html" class="playerBtn">Player 2</a>
+<a href="p3m.html" class="playerBtn">Player 3</a>
+<a href="p4m.html" class="playerBtn">Player 4</a>
+<a href="p5m.html" class="playerBtn">Player 5</a>
+<a href="p6m.html" class="playerBtn">Player 6</a>
+</div>
+</div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -219,10 +250,12 @@ function renderDotsFromServer(data){
 function updateDisplay1(text){ document.getElementById('display1').innerText=text||''; }
 function updateDisplay2(text){ document.getElementById('display2').innerText=text||''; }
 function updateMoney(data){
-  document.getElementById('money-p1-overlay').textContent='Player1: $'+data.p1;
-  document.getElementById('money-p2-overlay').textContent='Player2: $'+data.p2;
-  document.getElementById('money-p3-overlay').textContent='Player3: $'+data.p3;
-  document.getElementById('money-p4-overlay').textContent='Player4: $'+data.p4;
+document.getElementById('money-p1-overlay').textContent='P1: $'+data.p1;
+document.getElementById('money-p2-overlay').textContent='P2: $'+data.p2;
+document.getElementById('money-p3-overlay').textContent='P3: $'+data.p3;
+document.getElementById('money-p4-overlay').textContent='P4: $'+data.p4;
+document.getElementById('money-p5-overlay').textContent='P5: $'+data.p5;
+document.getElementById('money-p6-overlay').textContent='P6: $'+data.p6;
 }
 
 function renderBuildings(data){
