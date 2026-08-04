@@ -164,18 +164,18 @@ const buildingPositions={
 34:{x:793,y:370},
 37:{x:793,y:590},
 39:{x:793,y:730},
-0:{x:595,y:680},
-4:{x:525,y:680},
-5:{x:678,y:590},
-10:{x:305,y:680},
-13:{x:218,y:590},
-15:{x:380,y:680},
-20:{x:218,y:305},
-25:{x:218,y:375},
-27:{x:304,y:220},
-30:{x:595,y:220},
-35:{x:678,y:305},
-38:{x:523,y:220}
+41:{x:595,y:680},
+42:{x:525,y:680},
+63:{x:678,y:590},
+44:{x:305,y:680},
+45:{x:218,y:590},
+47:{x:380,y:680},
+50:{x:218,y:305},
+51:{x:218,y:375},
+53:{x:304,y:220},
+56:{x:595,y:220},
+57:{x:678,y:305},
+59:{x:523,y:220}
 };
 
 function renderDotsFromServer(data){
@@ -413,11 +413,7 @@ fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.tex
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/building.json').then(r=>r.json()).then(renderBuildings);
-fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
-fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
-fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
-fetch('/money.json').then(res=>res.json()).then(updateMoney);
-fetch('/building.json').then(r=>r.json()).then(renderBuildings);
+
 </script>
 </body>
 </html>

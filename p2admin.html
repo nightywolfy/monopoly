@@ -24,6 +24,7 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
 .small-button{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
 .small-button img{width:100%;height:100%;object-fit:contain}
+.small-button.tiny-button{width:32px;height:32px}
 .dot{width:12px;height:12px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 #controlsContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column}
 #controlsInner{display:flex;flex-direction:column;height:100%;padding:10px;box-sizing:border-box}
@@ -76,9 +77,9 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!jailpay p2"><button type="submit" class="small-button"><img src="p2.jpg" alt="P2"></button></form>
 </div>
 <div class="buttonRow">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!propertylist"><button type="submit" class="small-button"><img src="p.jpg" alt="P2"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!housestatus"><button type="submit" class="small-button"><img src="h.jpg" alt="P2"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!save"><button type="submit" class="small-button"><img src="s.jpg" alt="P2"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!propertylist"><button type="submit" class="small-button tiny-button"><img src="p.jpg" alt="P2"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!housestatus"><button type="submit" class="small-button tiny-button"><img src="h.jpg" alt="P2"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="msg" value="!save"><button type="submit" class="small-button tiny-button"><img src="s.jpg" alt="P2"></button></form>
 </div>
 <div class="buttonRow">
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player2bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button"><img src="5.jpg" alt="5"></button></form>
@@ -169,18 +170,18 @@ const buildingPositions={
 34:{x:793,y:370},
 37:{x:793,y:590},
 39:{x:793,y:730},
-0:{x:595,y:680},
-4:{x:525,y:680},
-5:{x:678,y:590},
-10:{x:305,y:680},
-13:{x:218,y:590},
-15:{x:380,y:680},
-20:{x:218,y:305},
-25:{x:218,y:375},
-27:{x:304,y:220},
-30:{x:595,y:220},
-35:{x:678,y:305},
-38:{x:523,y:220}
+41:{x:595,y:680},
+42:{x:525,y:680},
+63:{x:678,y:590},
+44:{x:305,y:680},
+45:{x:218,y:590},
+47:{x:380,y:680},
+50:{x:218,y:305},
+51:{x:218,y:375},
+53:{x:304,y:220},
+56:{x:595,y:220},
+57:{x:678,y:305},
+59:{x:523,y:220}
 };
 
 function renderDotsFromServer(data){
@@ -256,15 +257,16 @@ if(!data)return;
 for(const [space,type] of Object.entries(data)){
 const pos=buildingPositions[space];
 if(!pos)continue;
+const isHouse=type.startsWith('house');
 const el=document.createElement('img');
-el.src=type==='house'?'house.webp':'hotel.webp';
-el.className=type;
+el.src=isHouse?`${type}.jpg`:'hotel.jpg';
+el.className=isHouse?'house':'hotel';
 el.style.position='absolute';
 el.style.left=(pos.x-14)+'px';
 el.style.top=(pos.y-14)+'px';
 el.style.width='29px';
 el.style.height='29px';
-el.style.zIndex=type==='house'?25:26;
+el.style.zIndex=isHouse?25:26;
 board.appendChild(el);
 }
 }
@@ -417,11 +419,7 @@ fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.tex
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/building.json').then(r=>r.json()).then(renderBuildings);
-fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
-fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
-fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
-fetch('/money.json').then(res=>res.json()).then(updateMoney);
-fetch('/building.json').then(r=>r.json()).then(renderBuildings);
+
 </script>
 </body>
 </html>

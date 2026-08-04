@@ -420,11 +420,7 @@ fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.tex
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/building.json').then(r=>r.json()).then(renderBuildings);
-fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
-fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
-fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
-fetch('/money.json').then(res=>res.json()).then(updateMoney);
-fetch('/building.json').then(r=>r.json()).then(renderBuildings);
+
 </script>
 </body>
 </html>

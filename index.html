@@ -112,14 +112,41 @@ const socket = io();
 let currentMap = 1;
 let activeDots = {};
 const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
-const buildingPositions = {
-  1:{x:740,y:795},3:{x:595,y:795},6:{x:373,y:795},8:{x:232,y:795},9:{x:160,y:795},
-  11:{x:105,y:735},12:{x:105,y:665},14:{x:105,y:515},16:{x:105,y:375},17:{x:105,y:300},
-  19:{x:105,y:155},21:{x:156,y:104},22:{x:230,y:104},24:{x:375,y:104},26:{x:520,y:104},
-  28:{x:665,y:104},29:{x:740,y:104},31:{x:793,y:155},33:{x:793,y:300},34:{x:793,y:370},
-  37:{x:793,y:590},39:{x:793,y:734},0:{x:595,y:681},4:{x:525,y:681},5:{x:679,y:590},
-  10:{x:305,y:681},13:{x:218,y:590},15:{x:380,y:681},20:{x:218,y:305},25:{x:218,y:375},
-  27:{x:304,y:220},30:{x:595,y:220},35:{x:679,y:303},38:{x:523,y:220}
+const buildingPositions={
+1:{x:740,y:795},
+3:{x:595,y:795},
+6:{x:373,y:795},
+8:{x:232,y:795},
+9:{x:160,y:795},
+11:{x:105,y:735},
+12:{x:105,y:665},
+14:{x:105,y:515},
+16:{x:105,y:375},
+17:{x:105,y:300},
+19:{x:105,y:155},
+21:{x:156,y:105},
+22:{x:230,y:105},
+24:{x:375,y:105},
+26:{x:520,y:105},
+28:{x:665,y:105},
+29:{x:740,y:105},
+31:{x:793,y:155},
+33:{x:793,y:300},
+34:{x:793,y:370},
+37:{x:793,y:590},
+39:{x:793,y:730},
+41:{x:595,y:680},
+42:{x:525,y:680},
+63:{x:678,y:590},
+44:{x:305,y:680},
+45:{x:218,y:590},
+47:{x:380,y:680},
+50:{x:218,y:305},
+51:{x:218,y:375},
+53:{x:304,y:220},
+56:{x:595,y:220},
+57:{x:678,y:305},
+59:{x:523,y:220}
 };
 
 function updatePieces(data){
@@ -199,23 +226,24 @@ function updateMoney(data){
 }
 
 function renderBuildings(data){
-  const board = document.getElementById('board');
-  document.querySelectorAll('.house, .hotel').forEach(el => el.remove());
-  if(!data) return;
-  for(const [space, type] of Object.entries(data)){
-      const pos = buildingPositions[space]; 
-      if(!pos) continue;
-      const el = document.createElement('img');
-      el.src = type==='house'?'house.webp':'hotel.webp';
-      el.className = type;
-      el.style.position='absolute';
-      el.style.left=(pos.x-14)+'px';
-      el.style.top=(pos.y-14)+'px';
-      el.style.width='29px';
-      el.style.height='29px';
-      el.style.zIndex = type==='house'?25:26;
-      board.appendChild(el);
-  }
+const board=document.getElementById('board');
+document.querySelectorAll('.house,.hotel').forEach(el=>el.remove());
+if(!data)return;
+for(const [space,type] of Object.entries(data)){
+const pos=buildingPositions[space];
+if(!pos)continue;
+const isHouse=type.startsWith('house');
+const el=document.createElement('img');
+el.src=isHouse?`${type}.jpg`:'hotel.jpg';
+el.className=isHouse?'house':'hotel';
+el.style.position='absolute';
+el.style.left=(pos.x-14)+'px';
+el.style.top=(pos.y-14)+'px';
+el.style.width='29px';
+el.style.height='29px';
+el.style.zIndex=isHouse?25:26;
+board.appendChild(el);
+}
 }
 
 

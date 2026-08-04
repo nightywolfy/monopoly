@@ -243,15 +243,35 @@ function createBot(nick, defaultTarget, options = {}) {
             updatePiece(player,x,y);
             break;
           }
-          case '!house1':
-          case '!house2':
-          case '!house3':
-          case '!house4': {
-              const count=command.slice(-1);
+          case '!house1': {
               const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
-              if(spaces.length===0){safeSay(defaultTarget,`Usage: !house${count} <space>`);break;}
-              const changed=bulkUpdateBuildings(spaces,`house${count}`,false);
-              if(changed)safeSay(defaultTarget,`Set house${count} on spaces: ${spaces.join(', ')}`);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house1 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house1',false);
+              if(changed)safeSay(defaultTarget,`Set house1 on spaces: ${spaces.join(', ')}`);
+              break;
+          }
+
+          case '!house2': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house2 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house2',false);
+              if(changed)safeSay(defaultTarget,`Set house2 on spaces: ${spaces.join(', ')}`);
+              break;
+          }
+
+          case '!house3': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house3 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house3',false);
+              if(changed)safeSay(defaultTarget,`Set house3 on spaces: ${spaces.join(', ')}`);
+              break;
+          }
+
+          case '!house4': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house4 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house4',false);
+              if(changed)safeSay(defaultTarget,`Set house4 on spaces: ${spaces.join(', ')}`);
               break;
           }
           case '!hotel': {
