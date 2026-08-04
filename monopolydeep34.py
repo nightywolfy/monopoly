@@ -16,7 +16,8 @@ class MonopolyBot(SingleServerIRCBot):
         self.color_sets = {"red":[37,39],"orange":[34,33,31],"pink":[26,28,29],"yellow":[24,22,21],"green":[19,17,16],"blue":[14,12,11],"brown":[6,8,9],"dblue":[1,3],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
         self.house_numbers = {"red":(2,4,6,8),"dblue":(2,4,6,8),"orange":(3,6,9,12),"yellow":(3,6,9,12),"green":(3,6,9,12),"blue":(3,6,9,12),"pink":(3,6,9,12),"brown":(3,6,9,12),"white":(3,6,9,12),"aqua":(3,6,9,12),"purple":(3,6,9,12),"black":(3,6,9,12)}
         self.hotel_numbers = {"red":10,"dblue":10,"orange":15,"yellow":15,"green":15,"blue":15,"pink":15,"brown":15,"white":15,"aqua":15,"purple":15,"black":15}
-        self.color_positions = {"red":[37,39],"dblue":[1,3],"orange":[34,33,31],"yellow":[24,22,21],"green":[19,17,16],"blue":[14,12,11],"pink":[26,28,29],"brown":[6,8,9],"white":[0,4,5],"aqua":[10,13,15],"purple":[20,25,27],"black":[30,35,38]}
+        self.color_sets={"dblue":[1,3],"brown":[6,8,9],"blue":[11,12,14],"green":[16,17,19],"yellow":[21,22,24],"pink":[26,28,29],"orange":[31,33,34],"red":[37,39],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
+        self.color_positions={"dblue":[1,3],"brown":[6,8,9],"blue":[11,12,14],"green":[16,17,19],"yellow":[21,22,24],"pink":[26,28,29],"orange":[31,33,34],"red":[37,39],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
         self.unmortgaged_colors = {"p1":"red","p2":"blue","p3":"orange","p4":"green","p5":"purple","p6":"white"}
         self.mortgaged_colors = {"p1":"lightpink","p2":"lightblue","p3":"#FFFD01","p4":"lightgreen","p5":"plum","p6":"black"}
         self.mortgaged2_colors = {"m1":"lightpink","m2":"lightblue","m3":"#FFFD01","m4":"lightgreen","m5":"plum","m6":"black"}
@@ -499,7 +500,7 @@ class MonopolyBot(SingleServerIRCBot):
             target=candidates[0];cost=self.house_costs.get(color,0)
             if self.players[owner]['money']<cost:return False,f"{owner} does not have enough money to buy a house ({cost} required)"
             self.houses[target]=self.houses.get(target,0)+1;self.players[owner]['money']-=cost
-            self.connection.privmsg("player2bot","!sound build2.mp3")
+            self.connection.privmsg("player2bot","!sound build1.mp3")
             return True,f"Added 1 house to property {target} in {color} set. {owner} charged {cost}"
 
         m=re.match(r"!removeonehouse\s+(\w+)",body)
@@ -519,7 +520,7 @@ class MonopolyBot(SingleServerIRCBot):
             candidates.sort(key=lambda x:(-self.houses.get(x,0),-x))
             target=candidates[0];refund=self.house_costs.get(color,0)//2
             self.houses[target]=self.houses.get(target,0)-1;self.players[owner]['money']+=refund
-            self.connection.privmsg("player2bot","!sound destroy2.mp3")
+            self.connection.privmsg("player2bot","!sound destroy1.mp3")
             return True,f"Removed 1 house from property {target} in {color} set. {owner} refunded {refund}"
 
         m=re.match(r"!save\s*(\S+)?",body)

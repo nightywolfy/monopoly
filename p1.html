@@ -251,15 +251,16 @@ if(!data)return;
 for(const [space,type] of Object.entries(data)){
 const pos=buildingPositions[space];
 if(!pos)continue;
+const isHouse=type.startsWith('house');
 const el=document.createElement('img');
-el.src=type==='house'?'house.webp':'hotel.webp';
-el.className=type;
+el.src=isHouse?`${type}.jpg`:'hotel.jpg';
+el.className=isHouse?'house':'hotel';
 el.style.position='absolute';
 el.style.left=(pos.x-14)+'px';
 el.style.top=(pos.y-14)+'px';
 el.style.width='29px';
 el.style.height='29px';
-el.style.zIndex=type==='house'?25:26;
+el.style.zIndex=isHouse?25:26;
 board.appendChild(el);
 }
 }

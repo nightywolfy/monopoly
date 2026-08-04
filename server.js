@@ -243,32 +243,36 @@ function createBot(nick, defaultTarget, options = {}) {
             updatePiece(player,x,y);
             break;
           }
-          case '!house': {
-            const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
-            if (spaces.length === 0) { safeSay(defaultTarget, 'Usage: !house <space>'); break; }
-            const changed = bulkUpdateBuildings(spaces, 'house', false);
-            if (changed) safeSay(defaultTarget, `Set house(s) on spaces: ${spaces.join(', ')}`);
-            break;
+          case '!house1':
+          case '!house2':
+          case '!house3':
+          case '!house4': {
+              const count=command.slice(-1);
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,`Usage: !house${count} <space>`);break;}
+              const changed=bulkUpdateBuildings(spaces,`house${count}`,false);
+              if(changed)safeSay(defaultTarget,`Set house${count} on spaces: ${spaces.join(', ')}`);
+              break;
           }
           case '!hotel': {
-            const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
-            if (spaces.length === 0) { safeSay(defaultTarget, 'Usage: !hotel <space>'); break; }
-            const changed = bulkUpdateBuildings(spaces, 'hotel', false);
-            if (changed) safeSay(defaultTarget, `Set hotel(s) on spaces: ${spaces.join(', ')}`);
-            break;
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !hotel <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'hotel',false);
+              if(changed)safeSay(defaultTarget,`Set hotel(s) on spaces: ${spaces.join(', ')}`);
+              break;
           }
           case '!unbuilding': {
-            const spaces = args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=39);
-            if (spaces.length === 0) { safeSay(defaultTarget, 'Usage: !unbuilding <space>'); break; }
-            const removed = bulkUpdateBuildings(spaces, null, true);
-            if (removed) safeSay(defaultTarget, `Removed building(s) from spaces: ${spaces.join(', ')}`);
-            else safeSay(defaultTarget, `No buildings removed (none present on provided spaces).`);
-            break;
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !unbuilding <space>');break;}
+              const removed=bulkUpdateBuildings(spaces,null,true);
+              if(removed)safeSay(defaultTarget,`Removed building(s) from spaces: ${spaces.join(', ')}`);
+              else safeSay(defaultTarget,`No buildings removed (none present on provided spaces).`);
+              break;
           }
           case '!clearall': {
-            const count = clearAllBuildings();
-            safeSay(defaultTarget, `All buildings cleared (${count} removed).`);
-            break;
+              const count=clearAllBuildings();
+              safeSay(defaultTarget,`All buildings cleared (${count} removed).`);
+              break;
           }
           case '!d1': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d1 <text>'); break; } updateDisplay1(msgText); break; }
           case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }

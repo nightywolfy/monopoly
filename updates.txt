@@ -21,7 +21,6 @@ update/fix
 19. Reduced !propertylist execution time from 60 seconds to 15 seconds.
 20. Fixed minor bug: !jailpay can now only be used during the player's turn.
 21. Changed house controls to allow adding/removing one house at a time instead of changing 3 houses at once.
+22. Add a way to display how many houses each property has (1-4 houses).
 
-TODO:
 
-1. Add a way to display how many houses each property has (1-4 houses).
