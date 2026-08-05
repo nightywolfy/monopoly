@@ -12,7 +12,7 @@ MonopolyBot Update Summary
 10. Added the !gobonus command for managing GO bonus features.
 11. Added administrative controls for forcing trades between players.
 12. Added myself and Crinjal as administrators for trade management and moderation.
-13. Converted space 62 (Go To Jail) into an auction-enabled space.
+13. Converted space 62 (Go To Jail) into an auction space.
 14. Redesigned and repositioned map buttons to the center of the board with improved visual styling.
 15. Relocated the player total display box to the right side of the board for improved visibility.
 16. Expanded player support from four players to six players.
@@ -25,11 +25,9 @@ MonopolyBot Update Summary
 23. Added dedicated mobile-phone pages for improved mobile support.
 24. Added a restriction preventing !switch from being used with players currently in jail.
 25. Updated turn-ending messages from "Player 2 turn ended" to correctly display the next player's turn (example: "Player 3 turn").
-26. Added button press visual effects for improved user interaction.
-27. Updated the !start command to support custom starting money.
-    Example: !start 4 deep 1500 starts a four-player deep game with each player receiving $1500.
-    Default starting money remains $1000 when no amount is specified.
-
+26. Added smoother button transitions when switching between mortgage and redeem modes.
+27. Added button press visual effects for improved user interaction.
+28. Added !propertylist, !housestatus, and !save buttons to the admin page for easier management.
 
 
 

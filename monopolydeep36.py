@@ -48,6 +48,8 @@ class MonopolyBot(SingleServerIRCBot):
         self.up_timer = None
         self.up_timer_lock = threading.Lock()
         self.admin_users = {u.lower() for u in {"juntao", "crinjal"}}
+        self.house_cmd_queues = {}
+        self.house_cmd_lock = threading.Lock()
 
     def on_welcome(self,c,e): c.join(self.channel)
     def any_player_negative(self):
@@ -112,6 +114,14 @@ class MonopolyBot(SingleServerIRCBot):
             self.up_timer=threading.Timer(delay,self.auto_up)
             self.up_timer.daemon=True
             self.up_timer.start()
+    def _house_cmd_rate_limited(self,caller):
+        with self.house_cmd_lock:
+            q=self.house_cmd_queues.setdefault(caller,queue.Queue(maxsize=1))
+        try:q.put_nowait(True)
+        except queue.Full:return True
+        threading.Timer(2,q.get_nowait).start()
+        return False
+          
     def auto_up(self):
         if not self.players:return
         pos=[];money=[];props=[];houses=[]
@@ -186,7 +196,7 @@ class MonopolyBot(SingleServerIRCBot):
             k2=next((k for k,a in self.aliases.items() if p2.lower() in a or p2.lower()==k),None)
             if not k1 or not k2:return False,"Player does not exist"
             if k1 not in self.players or k2 not in self.players:return False,"One or both players are not in the game"
-            if self.jailed.get(k1,False) or self.jailed.get(k2,False):return False,"Cannot switch with a player in jail"
+            if self.jailed.get(k1,False) or self.jailed.get(k2,False):return True,"Cannot switch with a player in jail"
             self.players[k1]["pos"],self.players[k2]["pos"]=self.players[k2]["pos"],self.players[k1]["pos"]
             if self.switch_required:self.switch_required=False
             return True,f"{k1} and {k2} switched"
@@ -479,6 +489,8 @@ class MonopolyBot(SingleServerIRCBot):
 
         m=re.match(r"!addonehouse\s+(\w+)",body)
         if m:
+            if self._house_cmd_rate_limited(caller):
+                return False, None
             if self.current_auction:return False,"Cannot add houses during an auction"
             color=m.group(1)
             if color not in self.color_sets:return False,f"Color {color} does not exist"
@@ -502,6 +514,8 @@ class MonopolyBot(SingleServerIRCBot):
 
         m=re.match(r"!removeonehouse\s+(\w+)",body)
         if m:
+            if self._house_cmd_rate_limited(caller):
+                return False, None
             if self.current_auction:return False,"Cannot remove houses during an auction"
             color=m.group(1)
             if color not in self.color_sets:return False,f"Color {color} does not exist"
@@ -630,19 +644,19 @@ class MonopolyBot(SingleServerIRCBot):
             base=200;extra=0
             if bonus_data:
                 rem=bonus_data["cap"]-bonus_data["used"];extra=min(bonus_data["outer"],rem);bonus_data["used"]+=extra
-                if extra:bonus_msg=f" | GO bonus +{extra}"
+                if extra:bonus_msg=f" GO bonus +{extra}"
             self.players[p]["money"]+=base+extra
             if loan and loan["owed"]>0:
-                pay=min(loan["outer"],loan["owed"]);self.players[p]["money"]-=pay;loan["owed"]-=pay;loan_msg=f" | Loan payment -{pay}"
+                pay=min(loan["outer"],loan["owed"]);self.players[p]["money"]-=pay;loan["owed"]-=pay;loan_msg=f" Loan payment -{pay}"
                 if loan["owed"]<=0:self.free_loans.pop(p,None)
         elif not in_reg and old+sp>63:
             base=100;extra=0
             if bonus_data:
                 rem=bonus_data["cap"]-bonus_data["used"];extra=min(bonus_data["inner"],rem);bonus_data["used"]+=extra
-                if extra:bonus_msg=f" | GO bonus +{extra}"
+                if extra:bonus_msg=f" GO bonus +{extra}"
             self.players[p]["money"]+=base+extra
             if loan and loan["owed"]>0:
-                pay=min(loan["inner"],loan["owed"]);self.players[p]["money"]-=pay;loan["owed"]-=pay;loan_msg=f" | Loan payment -{pay}"
+                pay=min(loan["inner"],loan["owed"]);self.players[p]["money"]-=pay;loan["owed"]-=pay;loan_msg=f" Loan payment -{pay}"
                 if loan["owed"]<=0:self.free_loans.pop(p,None)
         self.players[p]["pos"]=new;name=self.active_board.get(new,f"Position {new}")
         owner=self.properties.get(new);msg="";fee=0
@@ -656,61 +670,71 @@ class MonopolyBot(SingleServerIRCBot):
                 if not owner and str(self.active_board.get(new,"")).startswith("x-") and not self.current_auction:
                     self.current_auction={"pos":new,"bids":{},"last_bidder":None,"bid_timer":None,"active":set(self.players.keys())}
                     raw=self.active_board.get(new,"")
-                    msg+=f" | Auction started for {raw[2:] if raw.startswith('x-') else raw}."
+                    msg+=f"Auction started for {raw[2:] if raw.startswith('x-') else raw}."
                 elif owner and owner!=p:
-                    if new in self.mortgaged:msg+=" | Property is mortgaged, no rent"
-                    elif self.jailed.get(owner,False):msg+=" | owner in jail, no rent"
+                    if new in self.mortgaged:msg+="Property is mortgaged, no rent"
+                    elif self.jailed.get(owner,False):msg+="Owner in jail, no rent"
                     else:
                         rc=[x for x in (5,15,25,35) if self.properties.get(x)==owner and x not in self.mortgaged]
                         rent={1:25,2:50,3:100,4:200}.get(len(rc),25)
-                        self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f" | {p} pays {rent} to {owner}"
+                        self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{p} pays {rent} to {owner}"
             if self.max_pos>39:
                 target=rails[new];self.players[p]["pos"]=target;new=target;name=self.active_board.get(new,f"Position {new}")
                 owner=self.properties.get(new)
                 if owner and owner!=p:
-                    if new in self.mortgaged:msg+=" | Property is mortgaged, no rent"
-                    elif self.jailed.get(owner,False):msg+=" | owner in jail, no rent"
+                    if new in self.mortgaged:msg+="Property is mortgaged, no rent"
+                    elif self.jailed.get(owner,False):msg+="Owner in jail, no rent"
                     else:
                         rc=[x for x in (5,15,25,35) if self.properties.get(x)==owner and x not in self.mortgaged]
                         rent={1:25,2:50,3:100,4:200}.get(len(rc),25)
-                        self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f" | {p} pays {rent} to {owner}"
+                        self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{p} pays {rent} to {owner}"
         total_houses=sum(h for pos,h in self.houses.items() if self.properties.get(pos)==p)
         total_props=sum(1 for o in self.properties.values() if o==p)
         if new in (2,18,36,48):
-            self.players[p]["money"]+=50;msg+=" +50";self.connection.privmsg("player2bot","!sound bonus.mp3")
+            self.players[p]["money"]+=50;msg+=f"{p} received +50";self.connection.privmsg("player2bot","!sound bonus.mp3")
         elif new in (7,60):
-            fee=total_houses*5+total_props*5;self.players[p]["money"]-=fee;msg+=f" pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
+            fee=total_houses*5+total_props*5;self.players[p]["money"]-=fee;msg+=f"{p} pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
         elif new==23:
-            fee=total_houses*5+max(0,int(self.players[p]["money"]*0.05));self.players[p]["money"]-=fee;msg+=f" pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
+            fee=total_houses*5+max(0,int(self.players[p]["money"]*0.05));self.players[p]["money"]-=fee;msg+=f"{p} pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
         elif new==32:
             unmortgaged=sum(1 for pos,o in self.properties.items() if o==p and pos not in self.mortgaged)
             mortgaged=sum(1 for pos,o in self.properties.items() if o==p and pos in self.mortgaged)
-            fee=unmortgaged*10+mortgaged*5;self.players[p]["money"]-=fee;msg+=f" pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
+            fee=unmortgaged*10+mortgaged*5;self.players[p]["money"]-=fee;msg+=f"{p} pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
         elif new==20:
             self.handle_command("dicebot",f"!freeloan {p} 100 25")
+            msg+=f"{p} received 100 free loan"
+        elif new==62:
+            msg+=f"{p} can auction any unowned property"
+            
         elif new==30:
-            self.jailed[p]=True;self.players[p]["pos"]=10;msg+=" goes to jail";self.connection.privmsg("player2bot","!sound jail.mp3")
-            send_msg(f"{p} goes to jail{msg}");return "Jail",msg
-        if new==54:self.switch_required=True;msg+=" | Must use !switch before next dice roll"
+            self.jailed[p]=True
+            self.players[p]["pos"]=10
+            msg+=" goes to jail"
+            self.connection.privmsg("player2bot","!sound jail.mp3")
+            send_msg(f"{p} {msg}")
+            return "Jail",msg
+        if new==54:
+            self.switch_required=True
+            msg+="Must use !switch before next dice roll"
         if owner and owner!=p:
-            if new in self.mortgaged:msg+=" | Property is mortgaged, no rent"
-            elif self.jailed.get(owner,False):msg+=" | owner in jail, no rent"
+            if new in self.mortgaged:msg+="Property is mortgaged, no rent"
+            elif self.jailed.get(owner,False):msg+="Owner in jail, no rent"
             else:
                 if new in (4,13,27,38):
                     group=(4,13,27,38);u=[x for x in group if self.properties.get(x)==owner and x not in self.mortgaged]
                     mult={1:4,2:8,3:16,4:25}.get(len(u),4);rent=abs(sp)*mult
-                    self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f" | Utility {sp}*{mult}={rent}"
+                    self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{p} pays to {owner} {sp}*{mult}={rent}"
                 elif new in (40,46,52,58):
                     group=(40,46,52,58);u=[x for x in group if self.properties.get(x)==owner and x not in self.mortgaged]
                     mult={1:4,2:8,3:16,4:25}.get(len(u),5);rent=abs(sp)*mult
-                    self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f" | Utility {sp}*{mult}={rent}"
+                    self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{p} pays to {owner} {sp}*{mult}={rent}"
                 else:
                     hc=self.houses.get(new,0);rents=self.house_rents.get(new,[0]);hc=min(hc,len(rents)-1);rent=rents[hc]
                     for color,props in self.color_sets.items():
                         if new in props:
                             if all(self.properties.get(x)==owner for x in props) and all(self.houses.get(x,0)==0 for x in props):rent*=2
                             break
-                    self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f" | {p} pays {rent} to {owner}"
+                    self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{p} pays {rent} to {owner}"
         if new not in self.non_property and str(self.active_board.get(new,"")).startswith("x-") and new not in self.properties and not self.current_auction and new not in (43,49,55,61):
             self.current_auction={"pos":new,"bids":{},"last_bidder":None,"bid_timer":None,"active":set(self.players.keys())}
             raw=self.active_board.get(new,"")
@@ -718,7 +742,9 @@ class MonopolyBot(SingleServerIRCBot):
             try:self.connection.privmsg("player1bot",f"!d2 Auction started for {prop}")
             except:pass
             return name,""
-        send_msg(f"{p} lands on {name}{msg}")
+        if msg:
+            self.connection.privmsg(self.channel,msg+bonus_msg+loan_msg)
+            self.connection.privmsg("player1bot",f"!d2 {msg}{bonus_msg}{loan_msg}")
         return name,msg
         
     # -------- Dice0-4 --------
