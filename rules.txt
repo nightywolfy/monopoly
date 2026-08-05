@@ -26,21 +26,25 @@ then you add them up as normal, and you would move 8 squares.
 16. Landing on "parking" gives you option to get free loan of $100 which you need to payback slowly over time
 17. Landing on 62 (inner) give you option to run auction on any unowned property of your choice.
 
-!start <number of players> <deep/regular> (amount> example:  !start 3 deep 1500
+!start <number of players> <deep/regular> <amount>   example:  !start 3 deep 1500
 !diceoverride (use this command to override someone's turn)
 !gostart (initiate go-dice for head to head game)
-!map 1
-!map 2
+!map 1 (choose smaller map)
+!map 2 (choose bigger map)
 !alias p1 username
-!teleport p1 39 (teleport player1 to china without occuring fees or gains)
 !auction 39 (manually start auction on china)
-!offer-p1 5,15,25 p2 money:900  (p1 offers 5,15,25 for p2's $900)
-!accept or !reject
+!resetauction
 !switch p1 p2 (used for deepboard space 54)
-!status
+
+!offer-p1 5,15,25 p2 money:900  (p1 offers 5,15,25 for p2's $900)
+!accept
+!reject
+
 !remove p1 (remove player1 from the game if they bankrupt or AFK)
 !insert p4 500  (insert player4 in the middle of game with total amount of $500)
 !gobonus p2 50 250 (bank owes you total of $250 which will be paid everytime you pass go of 50 x 5)
+!save (save game)
 
 !propertylist (use this command to put all the colored dot in the right place)
 !housestatus (use this command to put all the houses/hotel in the right place)
+!status
