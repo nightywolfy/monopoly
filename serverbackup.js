@@ -47,26 +47,26 @@ const saveDisplay1 = () => safeWriteJSON(display1File, display1);
 const saveDisplay2 = () => safeWriteJSON(display2File, display2);
 const saveDots = () => safeWriteJSON(dotsFile, activeDots);
 
-const boardSpaces = [
-  { number: 0, x: 825, y: 825 }, { number: 1, x: 722, y: 825 }, { number: 2, x: 650, y: 825 }, { number: 3, x: 577, y: 825 },
-  { number: 4, x: 505, y: 825 }, { number: 5, x: 430, y: 825 }, { number: 6, x: 360, y: 825 }, { number: 7, x: 287, y: 825 },
-  { number: 8, x: 215, y: 825 }, { number: 9, x: 143, y: 825 }, { number: 10, x: 35, y: 825 }, { number: 11, x: 35, y: 720 },
-  { number: 12, x: 35, y: 648 }, { number: 13, x: 35, y: 575 }, { number: 14, x: 35, y: 503 }, { number: 15, x: 35, y: 430 },
-  { number: 16, x: 35, y: 360 }, { number: 17, x: 35, y: 288 }, { number: 18, x: 35, y: 215 }, { number: 19, x: 35, y: 143 },
-  { number: 20, x: 35, y: 40 }, { number: 21, x: 140, y: 40 }, { number: 22, x: 210, y: 40 }, { number: 23, x: 285, y: 40 },
-  { number: 24, x: 358, y: 40 }, { number: 25, x: 430, y: 40 }, { number: 26, x: 503, y: 40 }, { number: 27, x: 575, y: 40 },
-  { number: 28, x: 650, y: 40 }, { number: 29, x: 720, y: 40 }, { number: 30, x: 820, y: 40 }, { number: 31, x: 820, y: 140 },
-  { number: 32, x: 820, y: 212 }, { number: 33, x: 820, y: 285 }, { number: 34, x: 820, y: 355 }, { number: 35, x: 820, y: 425 },
-  { number: 36, x: 820, y: 500 }, { number: 37, x: 820, y: 575 }, { number: 38, x: 820, y: 645 }, { number: 39, x: 820, y: 717 },
-  { number: 40, x: 685, y: 710 }, { number: 41, x: 577, y: 710 }, { number: 42, x: 505, y: 710 }, { number: 43, x: 432, y: 710 },
-  { number: 44, x: 360, y: 710 }, { number: 45, x: 288, y: 710 }, { number: 46, x: 150, y: 710 }, { number: 47, x: 150, y: 580 },
-  { number: 48, x: 150, y: 505 }, { number: 49, x: 150, y: 430 }, { number: 50, x: 150, y: 360 }, { number: 51, x: 150, y: 290 },
-  { number: 52, x: 150, y: 150 }, { number: 53, x: 285, y: 150 }, { number: 54, x: 358, y: 150 }, { number: 55, x: 430, y: 150 },
-  { number: 56, x: 500, y: 150 }, { number: 57, x: 575, y: 150 }, { number: 58, x: 710, y: 150 }, { number: 59, x: 710, y: 285 },
-  { number: 60, x: 710, y: 355 }, { number: 61, x: 710, y: 430 }, { number: 62, x: 710, y: 500 }, { number: 63, x: 710, y: 575 }
+const boardSpaces=[
+  {number:0,x:825,y:825},{number:1,x:722,y:825},{number:2,x:650,y:825},{number:3,x:577,y:825},
+  {number:4,x:505,y:825},{number:5,x:430,y:825},{number:6,x:360,y:825},{number:7,x:287,y:825},
+  {number:8,x:215,y:825},{number:9,x:143,y:825},{number:10,x:35,y:825},{number:11,x:35,y:720},
+  {number:12,x:35,y:648},{number:13,x:35,y:575},{number:14,x:35,y:503},{number:15,x:35,y:430},
+  {number:16,x:35,y:360},{number:17,x:35,y:288},{number:18,x:35,y:215},{number:19,x:35,y:143},
+  {number:20,x:35,y:40},{number:21,x:140,y:40},{number:22,x:210,y:40},{number:23,x:285,y:40},
+  {number:24,x:358,y:40},{number:25,x:430,y:40},{number:26,x:503,y:40},{number:27,x:575,y:40},
+  {number:28,x:650,y:40},{number:29,x:720,y:40},{number:30,x:820,y:40},{number:31,x:820,y:140},
+  {number:32,x:820,y:212},{number:33,x:820,y:285},{number:34,x:820,y:355},{number:35,x:820,y:425},
+  {number:36,x:820,y:500},{number:37,x:820,y:575},{number:38,x:820,y:645},{number:39,x:820,y:717},
+  {number:40,x:685,y:710},{number:41,x:577,y:710},{number:42,x:505,y:710},{number:43,x:432,y:710},
+  {number:44,x:360,y:710},{number:45,x:288,y:710},{number:46,x:150,y:710},{number:47,x:150,y:580},
+  {number:48,x:150,y:505},{number:49,x:150,y:430},{number:50,x:150,y:360},{number:51,x:150,y:290},
+  {number:52,x:150,y:150},{number:53,x:285,y:150},{number:54,x:358,y:150},{number:55,x:430,y:150},
+  {number:56,x:500,y:150},{number:57,x:575,y:150},{number:58,x:710,y:150},{number:59,x:710,y:285},
+  {number:60,x:710,y:355},{number:61,x:710,y:430},{number:62,x:710,y:500},{number:63,x:710,y:575}
 ];
 
-const colorMap = { p1: 'red', p2: 'blue', p3: 'orange', p4: 'green', p5: 'purple', p6: 'white' };
+const colorMap={p1:'red',p2:'blue',p3:'orange',p4:'green',p5:'purple',p6:'white'};
 
 function initializeDefaults() {
   Object.keys(colorMap).forEach(p => { if (money[p] === undefined) money[p] = 10; });
@@ -350,12 +350,12 @@ function createBot(nick, defaultTarget, options = {}) {
 }
 
 const bots={
-player1bot:createBot('player1bot','##rento',{delay:0}),
-player2bot:createBot('player2bot','##rento',{delay:7000}),
-player3bot:createBot('player3bot','##rento',{delay:14000}),
-player4bot:createBot('player4bot','##rento',{delay:21000}),
-player5bot:createBot('player5bot','##rento',{delay:28000}),
-player6bot:createBot('player6bot','##rento',{delay:35000})
+  player1bot:createBot('player1bot','##rento',{delay:0}),
+  player2bot:createBot('player2bot','##rento',{delay:7000}),
+  player3bot:createBot('player3bot','##rento',{delay:14000}),
+  player4bot:createBot('player4bot','##rento',{delay:21000}),
+  player5bot:createBot('player5bot','##rento',{delay:28000}),
+  player6bot:createBot('player6bot','##rento',{delay:35000})
 };
 
 app.post('/send-irc', (req, res) => {

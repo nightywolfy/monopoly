@@ -6,7 +6,6 @@
 <title>Monopoly Board</title>
 <style>
 html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family:sans-serif;display:flex;overflow-x:hidden}#boardWrapper{width:25%;height:100%;display:flex;justify-content:center;align-items:center;background:black;overflow:hidden}
-
 #controlsContainer{width:100%;height:100%;background:#111;display:flex;flex-direction:column}
 #boardWrapper{width:15%;height:100%;display:flex;justify-content:center;align-items:flex-start;background:black;overflow:visible}
 #boardContainer{width:100%;height:auto;min-height:100%;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;position:relative}
@@ -14,27 +13,26 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #boardImg{width:100%;height:100%}
 #centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;transform:translateY(-35px)}
-.displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
+.displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:35px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
 #propertyLink,#rulesLink{position:absolute;z-index:20}
 #propertyLink img,#rulesLink img{width:75px;border-radius:8px;box-shadow:0 0 6px rgba(255,255,255,0.5)}
 #propertyLink{top:40%;left:265px;transform:translateY(-50%)}#rulesLink{top:50%;right:560px;transform:translateY(-50%)}
 .hotel,.house{width:29px;height:29px;position:absolute}
 #topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
+#topButtons+#modeToggle{border-top:3px solid #00d4ff;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}.buttonRow{display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:center;width:100%}
+.small-button{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
+.small-button img{width:100%;height:100%;object-fit:contain}
+#topButtons{display:flex;flex-direction:column;gap:15px;align-items:center;justify-content:center;transform:translateY(3px)}
 .buttonRow{display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:center;width:100%}
 .small-button{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
 .small-button img{width:100%;height:100%;object-fit:contain}
-#topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
-.buttonRow{display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:center;width:100%}
-.small-button{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
-.small-button img{width:100%;height:100%;object-fit:contain}
-.buttonRow:first-child .small-button{width:80px;height:80px}
-.buttonRow:nth-child(2) .small-button{width:80px;height:80px}
+.buttonRow:first-child .small-button{width:150px;height:150px}
+.buttonRow:nth-child(2) .small-button{width:150px;height:150px}
 .dot{width:12px;height:12px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 #controlsInner{display:flex;flex-direction:column;height:100%;padding:10px 0;box-sizing:border-box}
 #chatFrame{flex-grow:1;width:100%;margin-top:15px;border:none;min-height:0}
-#moneyContainer{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;justify-content:center;width:100%;padding:10px 0;box-sizing:border-box}
-.moneyBox{width:100%;height:44px;padding:0 4px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;box-shadow:0 0 14px #00d4ff;color:white;box-sizing:border-box;white-space:nowrap}
-.moneyBox{width:250px;height:35px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;box-shadow:0 0 10px #00d4ff;color:white;box-sizing:border-box}
+#moneyContainer{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;justify-content:center;width:100%;padding:10px 0;box-sizing:border-box;transform:translateY(-60px)}
+.moneyBox{width:250px;height:35px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:bold;box-shadow:0 0 10px #00d4ff;color:white;box-sizing:border-box}
 .moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
 .moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
 .moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
@@ -49,9 +47,12 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .purple { background:#9933ff; border-color:#cc99ff; }
 .white{background:#ffffff;border-color:#cccccc;color:black;}
 .mode-btn{padding:6px 40px;font-size:.9em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
-.mode-btn.active{background:#0077ff;color:#fff;border-color:#00aaff}.mode-btn:hover{background:#333}
+.mode-btn.active,.mode-btn:focus{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
+.mode-btn:hover{background:#333}
+.mode-btn.active:hover{background:#0077ff!important}
 #modeToggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-top:20px;z-index:60;position:relative}
 .modeRow{display:flex;justify-content:center;gap:14px}
+.modeRow+.colorRow{border-top:3px solid #00d4ff;margin-top:12px;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}
 .colorRow{display:flex;gap:4px;justify-content:center;flex-wrap:nowrap}
 .colorRow+.colorRow{border-top:3px solid #00d4ff;margin-top:12px;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}
 .white-btn.plus{background:#28a745!important;border:1px solid #1e7e34!important;color:white!important;padding:10px 20px;font-size:1em;border-radius:5px;font-weight:bold;cursor:pointer}
@@ -70,6 +71,7 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #chatFrame{width:100%;height:100vh;min-height:100vh;border:none;display:block}
 @media(max-width:900px){html,body{flex-direction:column;height:auto;min-height:100%;overflow-y:auto}#boardWrapper{width:100%;aspect-ratio:1/1;height:auto}#boardContainer{width:100%}#controlsContainer{width:100%;height:auto}#controlsInner{height:auto}#moneyContainer{grid-template-columns:repeat(3,1fr);width:100%;gap:6px}.moneyBox{width:100%;height:44px}}
 </style>
+
 </head>
 <body>
 <!-- Left: Board -->
@@ -85,6 +87,20 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <div id="p6" class="piece white">p6</div>
 <div id="boardButtons"></div>
 <div id="centralDisplayContainer">
+<div id="moneyContainer">
+<div id="money-p1-overlay" class="moneyBox red">P1: $0</div>
+<div id="money-p2-overlay" class="moneyBox blue">P2: $0</div>
+<div id="money-p3-overlay" class="moneyBox orange">P3: $0</div>
+<div id="money-p4-overlay" class="moneyBox green">P4: $0</div>
+<div id="money-p5-overlay" class="moneyBox purple">P5: $0</div>
+<div id="money-p6-overlay" class="moneyBox white">P6: $0</div>
+</div>
+<div id="displayContainer">
+<div id="display1" class="displayBox">Display 1</div>
+<div id="display2" class="displayBox">Display 2</div>
+</div>
+</div>
+</div>
 <div id="topButtons">
 <div class="buttonRow">
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice0-p5"><button type="submit" class="small-button"><img src="dice.jpg" alt="dice"></button></form>
@@ -98,20 +114,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 50"><button type="submit" class="small-button"><img src="50.jpg" alt="50"></button></form>
 <form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button"><img src="fold.jpg" alt="Fold"></button></form>
 </div>
-</div>
-<div id="displayContainer">
-<div id="display1" class="displayBox">Display 1</div>
-<div id="display2" class="displayBox">Display 2</div>
-</div>
-</div>
-</div>
-<div id="moneyContainer">
-<div id="money-p1-overlay" class="moneyBox red">P1: $0</div>
-<div id="money-p2-overlay" class="moneyBox blue">P2: $0</div>
-<div id="money-p3-overlay" class="moneyBox orange">P3: $0</div>
-<div id="money-p4-overlay" class="moneyBox green">P4: $0</div>
-<div id="money-p5-overlay" class="moneyBox purple">P5: $0</div>
-<div id="money-p6-overlay" class="moneyBox white">P6: $0</div>
 </div>
 <div id="modeToggle">
 <div class="modeRow">
