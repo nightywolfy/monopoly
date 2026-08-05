@@ -9,7 +9,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #boardContainer{width:50%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
 #board{position:relative;height:900px;width:900px}
 #boardImg{width:100%;height:100%}
-#centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;transform:translateY(-35px)}
 .displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
 #propertyLink,#rulesLink{position:absolute;z-index:20}
@@ -60,6 +59,9 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .mode-btn.active{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
 .mode-btn:hover{background:#333}
 .mode-btn.active:hover{background:#0077ff!important}
+.small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}
+#centralDisplayContainer{position:absolute;top:53%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
 </style>
 </head>
 <body>

@@ -1,28 +1,35 @@
-# MonopolyBot Update Notes
+MonopolyBot Update Summary
 
-1. Prevented dice rolls while an auction is currently active to maintain proper game flow.
-2. Resolved a major issue where houses were not displaying correctly on the inner board (spaces 40-63).
-3. Updated the auction system from a player-turn-based format to a Richup-style auction system.
-4. Implemented an automatic fold feature after 14 seconds of auction inactivity.
-5. Added automatic `!update` execution to reduce the need for manual updates.
-6. Implemented automatic jail release after three turns in jail without successfully rolling a double.
-7. Added the `!jailpay` command with an adjusted bail system based on the player's number of jail turns.
-8. Added the `!freeloan` command for Free Parking (space 20).
-9. Added the `!insert` command, allowing players to join an active game session.
-10. Added the `!gobonus` command for managing GO bonus features.
-11. Added administrative controls allowing forced trades between players.
-12. Added myself and crinjal as administrators for trade management and moderation.
+1. Prevented dice rolls while an auction is active to maintain proper game flow and prevent conflicts between auctions and player turns.
+2. Fixed the issue where houses were not displaying correctly on the inner board (spaces 40-63).
+3. Updated the auction system from a traditional player-turn-based format to a Richup-style auction system.
+4. Added an automatic fold feature that activates after 14 seconds of auction inactivity.
+5. Added automatic !update execution to reduce the need for manual updates.
+6. Implemented automatic jail release after three turns in jail if the player does not successfully roll a double.
+7. Added the !jailpay command with an adjusted bail system based on the number of turns a player has spent in jail.
+8. Added the !freeloan command for Free Parking (space 20).
+9. Added the !insert command, allowing additional players to join an active game session.
+10. Added the !gobonus command for managing GO bonus features.
+11. Added administrative controls for forcing trades between players.
+12. Added myself and Crinjal as administrators for trade management and moderation.
 13. Converted space 62 (Go To Jail) into an auction-enabled space.
 14. Redesigned and repositioned map buttons to the center of the board with improved visual styling.
 15. Relocated the player total display box to the right side of the board for improved visibility.
 16. Expanded player support from four players to six players.
 17. Added separate color styling for house addition and removal controls.
-18. Improved command response performance by reducing `!housestatus` execution time from approximately 30 seconds to 5 seconds.
-19. Improved command response performance by reducing `!propertylist` execution time from approximately 60 seconds to 15 seconds.
-20. Fixed an issue where `!jailpay` could be used outside of the player's turn.
+18. Improved command response performance by reducing !housestatus execution time from approximately 30 seconds to 5 seconds.
+19. Improved command response performance by reducing !propertylist execution time from approximately 60 seconds to 15 seconds.
+20. Fixed an issue where !jailpay could be used outside of the player's active turn.
 21. Updated house management controls to allow adding or removing one house at a time instead of modifying three houses simultaneously.
 22. Added property house-count display support, showing the number of houses built on each property (1-4 houses).
-23. Added dedicated mobile pages for Player-1 through Player-6.
+23. Added dedicated mobile-phone pages for improved mobile support.
+24. Added a restriction preventing !switch from being used with players currently in jail.
+25. Updated turn-ending messages from "Player 2 turn ended" to correctly display the next player's turn (example: "Player 3 turn").
+26. Added button press visual effects for improved user interaction.
+27. Updated the !start command to support custom starting money.
+    Example: !start 4 deep 1500 starts a four-player deep game with each player receiving $1500.
+    Default starting money remains $1000 when no amount is specified.
+
 
 
 
