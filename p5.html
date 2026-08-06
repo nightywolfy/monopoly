@@ -18,8 +18,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
 .buttonRow{display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center}
 #topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
-.small-button{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
-.small-button img{width:100%;height:100%;object-fit:contain}
 .dot{width:12px;height:12px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 #controlsContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column}
 #controlsInner{display:flex;flex-direction:column;height:100%;padding:10px;box-sizing:border-box}
@@ -60,12 +58,13 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .white-btn.clr-black { background-color:#010101 !important; border-color:#555555 !important; color:white !important; }
 .small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}
 .small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}
+.small-button{width:60px;height:60px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#222;cursor:pointer;transform:translateY(-5px)}
+.small-button img{width:100%;height:100%;object-fit:contain}
 #centralDisplayContainer{position:absolute;top:53%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
 </style>
 </head>
 <body>
 
-<!-- Left: Board -->
 <div id="boardWrapper">
 <div id="boardContainer">
 <div id="board">
@@ -80,16 +79,17 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <div id="centralDisplayContainer">
 <div id="topButtons">
 <div class="buttonRow">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice0-p5"><button type="submit" class="small-button"><img src="dice.jpg" alt="dice"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice4-p5"><button type="submit" class="small-button"><img src="jail.jpg" alt="jail"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!jailpay p5"><button type="submit" class="small-button"><img src="p5.jpg" alt="P5"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice0-p5"><button type="submit" class="small-button"><img src="dice.jpg"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!dice4-p5"><button type="submit" class="small-button"><img src="jail.jpg"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="msg" value="!jailpay p5"><button type="submit" class="small-button"><img src="key.jpg"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!housestatus"><button type="submit" class="small-button"><img src="p5.jpg"></button></form>
 </div>
 <div class="buttonRow">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button"><img src="5.jpg" alt="5"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button"><img src="10.jpg" alt="10"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 25"><button type="submit" class="small-button"><img src="25.jpg" alt="25"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 50"><button type="submit" class="small-button"><img src="50.jpg" alt="50"></button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button"><img src="fold.jpg" alt="Fold"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 5"><button type="submit" class="small-button"><img src="5.jpg"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 10"><button type="submit" class="small-button"><img src="10.jpg"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 25"><button type="submit" class="small-button"><img src="25.jpg"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!bidadd 50"><button type="submit" class="small-button"><img src="50.jpg"></button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player5bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!fold"><button type="submit" class="small-button"><img src="fold.jpg"></button></form>
 </div>
 </div>
 <div id="displayContainer">

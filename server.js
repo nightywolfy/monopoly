@@ -370,7 +370,7 @@ const bots={
   player4bot:createBot('player4bot','##rento',{delay:21000}),
   player5bot:createBot('player5bot','##rento',{delay:28000}),
   player6bot:createBot('player6bot','##rento',{delay:35000})
-};
+}
 
 
 app.post('/send-irc',(req,res)=>{
