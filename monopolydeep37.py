@@ -100,7 +100,6 @@ class MonopolyBot(SingleServerIRCBot):
         self.go_jail_attempts={'p1':0,'p2':0}
         self.custom_names={}
         self.use_custom_names=True
-    
 
     def pname(self,msg):
         if not msg or not self.use_custom_names:return msg
@@ -135,7 +134,7 @@ class MonopolyBot(SingleServerIRCBot):
             q=self.house_cmd_queues.setdefault(caller,queue.Queue(maxsize=1))
         try:q.put_nowait(True)
         except queue.Full:return True
-        threading.Timer(2,q.get_nowait).start()
+        threading.Timer(1.5,q.get_nowait).start()
         return False
           
     def auto_up(self):
@@ -590,7 +589,7 @@ class MonopolyBot(SingleServerIRCBot):
                 with open(fn,"wb")as f:pickle.dump(state,f)
                 return True,self.pname(f"Game state saved to '{fn}'")
             except Exception as e:return False,f"Failed to save game: {e}"
-  
+            
         m=re.match(r"!restore\s*(\S+)?",body)
         if m:
             fn=m.group(1)or"1.pkl"
@@ -605,17 +604,15 @@ class MonopolyBot(SingleServerIRCBot):
                 self.active_board=state["active_board"];self.non_property=state["non_property"]
                 self.num_players=state["num_players"];self.max_pos=state["max_pos"]
                 self.consecutive_doubles={f"p{i}":0 for i in range(1,self.num_players+1)}
+                try:self.handle_command("restorebot","!propertylist");self.handle_command("restorebot","!housestatus")
+                except Exception:pass
                 return True,f"Game state restored from '{fn}'"
             except Exception as e:return False,f"Failed to restore game: {e}"
 
         m=re.match(r"!offer-(\w+)\s+(.+)",body)
         if m:
-            offerer_token=m.group(1).lower();text=m.group(2).strip()
-            offerer=self.resolve_player(offerer_token)
+            offerer_token=m.group(1).lower();text=m.group(2).strip();offerer=self.resolve_player(offerer_token)
             if not offerer:return False,f"{offerer_token} is not a valid player."
-            caller_player=next((k for k,s in self.aliases.items() if caller in s or caller==k),None)
-            if caller in self.admin_users:caller_player=offerer
-            if caller_player!=offerer:return False,f"Only {self.pname(offerer)} or their alias can make this offer."
             if self.current_trade:return False,"A trade is already active. !accept or !reject it first."
             parts=text.split()
             other=next((self.resolve_player(p) for p in parts if self.resolve_player(p) and self.resolve_player(p)!=offerer),None)
@@ -633,8 +630,7 @@ class MonopolyBot(SingleServerIRCBot):
                         for p in t.split(","):
                             if p.strip().isdigit():props.append(int(p.strip()))
                 return props,money
-            left_props,left_money=parse_side(left_tokens)
-            right_props,right_money=parse_side(right_tokens)
+            left_props,left_money=parse_side(left_tokens);right_props,right_money=parse_side(right_tokens)
             def validate_houses(prop_list):
                 for pos in prop_list:
                     if self.houses.get(pos,0)>0:
@@ -656,9 +652,6 @@ class MonopolyBot(SingleServerIRCBot):
         if body.lower()=="!accept":
             if not self.current_trade:return False,"No active trade."
             t=self.current_trade
-            caller_player=next((k for k,s in self.aliases.items() if caller in s or caller==k),None)
-            if caller in self.admin_users:caller_player=t["other"]
-            if caller_player!=t["other"]:return False,f"Only {self.pname(t['other'])} may !accept this trade."
             if self.players[t["offerer"]]["money"]<t["left_money"]:return False,f"{self.pname(t['offerer'])} does not have enough money."
             if self.players[t["other"]]["money"]<t["right_money"]:return False,f"{self.pname(t['other'])} does not have enough money."
             self.players[t["offerer"]]["money"]-=t["left_money"];self.players[t["other"]]["money"]+=t["left_money"]
@@ -669,25 +662,22 @@ class MonopolyBot(SingleServerIRCBot):
                     raw=self.active_board.get(pos,f"Position {pos}")
                     nm=raw.split("-",1)[-1] if "-" in raw else raw
                     self.active_board[pos]=f"{new}-{nm}"
-            transfer(t["left_props"],t["offerer"],t["other"])
-            transfer(t["right_props"],t["other"],t["offerer"])
+            transfer(t["left_props"],t["offerer"],t["other"]);transfer(t["right_props"],t["other"],t["offerer"])
             self.current_trade=None
-            try:self.handle_command(caller,"!propertylist");self.handle_command(caller,"!housestatus")
+            try:self.handle_command("tradebot","!propertylist");self.handle_command("tradebot","!housestatus")
             except Exception:pass
             return True,"Trade accepted and completed."
 
+            
         if body.lower()=="!reject":
             if not self.current_trade:return False,"No active trade."
-            t=self.current_trade
-            caller_player=next((k for k,s in self.aliases.items() if caller in s or caller==k),None)
-            if caller in self.admin_users:caller_player=t["offerer"]
-            if caller_player not in (t["offerer"],t["other"]):return False,"Only involved players may reject the trade."
             self.current_trade=None
-            return True,self.pname(f"{caller_player} rejected the trade.")
+            return True,"Trade rejected."
         return True,None
-
-
         
+
+
+
     def move_player(self,p,sp):
         display=self.pname(p)
         def play_rent_sound():self.connection.privmsg("player2bot","!sound rent.mp3")
@@ -774,7 +764,8 @@ class MonopolyBot(SingleServerIRCBot):
             return "Jail",msg
         if new==54:
             self.switch_required=True
-            msg+="Must use !switch before next dice roll"
+            msg+=f"{display} must use switch"
+        
         if owner and owner!=p:
             if new in self.mortgaged:msg+="Property is mortgaged, no rent"
             elif self.jailed.get(owner,False):msg+="Owner in jail, no rent"
@@ -803,9 +794,10 @@ class MonopolyBot(SingleServerIRCBot):
             return name,""
         if msg:
             self.connection.privmsg(self.channel,msg+bonus_msg+loan_msg)
-            self.connection.privmsg("player1bot",f"!d2 {msg}{bonus_msg}{loan_msg}")
+            self.connection.privmsg("player1bot",f"!d2 {self.pname(msg)}{bonus_msg}{loan_msg}")
         return name,self.pname(msg)
         
+
     # -------- Dice0-4 --------
     def _handle_dice_pub(self,c,nick,msg):
         m=msg.strip().lower()
@@ -882,8 +874,9 @@ class MonopolyBot(SingleServerIRCBot):
         c.privmsg(self.channel,f"Player {display} added. Order: {', '.join(self.pname(f'p{x}') for x in self.dice_order)}")
 
     def _next_turn_label(self):
-        if not self.dice_order:return "Player - ? - Turn"
-        return f"Player - {self.pname(f'p{self.dice_order[self.expected_player_index%len(self.dice_order)]}')} - Turn"
+        if not self.dice_order:return "?'s Turn to Roll"
+        player_id=self.dice_order[self.expected_player_index%len(self.dice_order)]
+        return f"{self.pname(f'p{player_id}')}'s Turn to Roll"
         
     def _handle_dice_command(self,c,d,p,nick):
         pl_key=f"p{p}";display=self.pname(pl_key)

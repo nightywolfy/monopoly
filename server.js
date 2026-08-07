@@ -22,6 +22,7 @@ const piecesFile=path.join(__dirname,'pieces.json');
 const display1File=path.join(__dirname,'display1.json');
 const display2File=path.join(__dirname,'display2.json');
 const dotsFile=path.join(__dirname,'dots.json');
+const labelsFile=path.join(__dirname,'labels.json');
 
 function safeReadJSON(file,fallback={}){
   try{if(!existsSync(file))return fallback;return JSON.parse(readFileSync(file,'utf-8'))}
@@ -40,6 +41,7 @@ let display1=safeReadJSON(display1File,{text:""});
 let display2=safeReadJSON(display2File,{text:""});
 let activeDots=safeReadJSON(dotsFile,{});
 let buildings=safeReadJSON(buildingsFile,{});
+let labels=safeReadJSON(labelsFile,{p1:'player1',p2:'player2',p3:'player3',p4:'player4',p5:'player5',p6:'player6'});
 
 const saveMoney=()=>safeWriteJSON(moneyFile,money);
 const saveBuildings=()=>safeWriteJSON(buildingsFile,buildings);
@@ -47,6 +49,7 @@ const savePieces=()=>safeWriteJSON(piecesFile,pieces);
 const saveDisplay1=()=>safeWriteJSON(display1File,display1);
 const saveDisplay2=()=>safeWriteJSON(display2File,display2);
 const saveDots=()=>safeWriteJSON(dotsFile,activeDots);
+const saveLabels=()=>safeWriteJSON(labelsFile,labels);
 
 const boardSpaces=[
   {number:0,x:825,y:825},{number:1,x:722,y:825},{number:2,x:650,y:825},{number:3,x:577,y:825},
@@ -75,15 +78,19 @@ function initializeDefaults(){
   for(const color of Object.values(colorMap)){if(!pieces[color])pieces[color]={x:825,y:755}}
   if(!display1.text)display1.text="";
   if(!display2.text)display2.text="";
-  saveMoney();saveBuildings();savePieces();saveDisplay1();saveDisplay2();saveDots();
+  if(!labels||typeof labels!=='object')labels={};
+  Object.keys(colorMap).forEach(p=>{if(!labels[p])labels[p]=p});
+  saveMoney();saveBuildings();savePieces();saveDisplay1();saveDisplay2();saveDots();saveLabels();
 }
 initializeDefaults();
 
 function safeEmit(event,data){try{io.emit(event,data)}catch(err){console.error(`[Socket] Emit failed (${event}):`,err)}}
+function safeEmitTo(room,event,data){try{io.to(room).emit(event,data)}catch(err){console.error(`[Socket] Emit failed (${event} -> ${room}):`,err)}}
 function updatePiece(player,x,y){const color=colorMap[player];if(!color)return;const current=pieces[color];if(current&&current.x===x&&current.y===y)return;pieces[color]={x,y};savePieces();safeEmit('piecesUpdate',pieces)}
 function updateDisplay1(newText){if(display1.text===newText)return;display1.text=newText;saveDisplay1();safeEmit('displayUpdate1',{text:display1.text})}
 function updateDisplay2(newText){if(display2.text===newText)return;display2.text=newText;saveDisplay2();safeEmit('displayUpdate2',{text:display2.text})}
 function updateMoney(player,amount){if(!colorMap[player]||money[player]===amount)return;money[player]=amount;saveMoney();safeEmit('moneyUpdate',money)}
+function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||labels[player]===text)return;labels[player]=text;saveLabels();safeEmitTo('computer','labelsUpdate',labels)}
 function getBuilding(space){return buildings[String(space)]||null}
 
 function setBuilding(space,type,unset=false){
@@ -257,6 +264,13 @@ function createBot(nick,defaultTarget,options={}){
             Object.keys(colorMap).forEach((p,i)=>updateMoney(p,Math.max(-999,Math.min(9999,amounts[i]))));
             break;
           }
+          case '!label': {
+            if (args[0]?.toLowerCase() !== 'all' || args.length !== Object.keys(colorMap).length + 1) { safeSay(defaultTarget, `Usage: !label all <names for ${Object.keys(colorMap).length} players>`); break; }
+            const names = args.slice(1);
+            if (names.some(n=>!/^[A-Za-z0-9_-]{1,12}$/.test(n))) { safeSay(defaultTarget,'Labels must be 1-12 letters/numbers/-/_ each.'); break; }
+            Object.keys(colorMap).forEach((p,i)=>updateLabel(p,names[i]));
+            break;
+          }
           case '!mv': {
             const [target,...spacesStr] = args;
             if (target?.toLowerCase()!=='all') { safeSay(defaultTarget,'Only !mv all ... allowed'); break; }
@@ -393,6 +407,10 @@ io.on('connection',(socket)=>{
   try{
     const ip=socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`[Socket] Frontend connected: ${ip}`);
+    socket.on('identify',payload=>{
+      const page=String(payload?.page||'').toLowerCase();
+      if(page==='computer'||page==='mobile'){socket.join(page);socket.data.page=page}
+    });
     socket.on('sendMessage',payload=>{
       if(!payload||typeof payload!=='object')return;
       const {bot,msg}=payload;
@@ -406,12 +424,18 @@ io.on('connection',(socket)=>{
     socket.on('getBuildings',()=>socket.emit('buildingsUpdate',buildings));
     socket.on('getDisplay1',()=>socket.emit('displayUpdate1',{text:display1.text}));
     socket.on('getDisplay2',()=>socket.emit('displayUpdate2',{text:display2.text}));
+    socket.on('getLabels',()=>socket.emit('labelsUpdate',labels));
     socket.on('updateMoney',payload=>{
       const player=payload.player,amount=parseInt(payload.amount,10);
       if(colorMap[player]&&!Number.isNaN(amount)&&amount>=-999&&amount<=9999)updateMoney(player,amount);
     });
     socket.on('updateDisplay1',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay1(t)});
     socket.on('updateDisplay2',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay2(t)});
+    socket.on('updateLabel',payload=>{
+      if(socket.data.page!=='computer')return;
+      const player=payload?.player,text=String(payload?.text||'').trim().slice(0,12);
+      if(colorMap[player]&&text)updateLabel(player,text);
+    });
     socket.emit('map-change',currentMap);
     socket.emit('reload-dots',activeDots);
     socket.on('cmd-dot',({num,color})=>updateDot(num,color));
@@ -455,6 +479,7 @@ app.get('/building.json',(_,res)=>res.json(buildings));
 app.get('/display1.json',(_,res)=>res.json(display1));
 app.get('/display2.json',(_,res)=>res.json(display2));
 app.get('/dots.json',(_,res)=>res.json(activeDots));
+app.get('/labels.json',(_,res)=>res.json(labels));
 
 let shuttingDown=false;
 
@@ -463,7 +488,7 @@ async function gracefulShutdown(signal){
   shuttingDown=true;
   console.log(`[Server] Received ${signal}, shutting down gracefully...`);
   try{
-    saveMoney();saveBuildings();savePieces();saveDisplay1();saveDisplay2();saveDots();
+    saveMoney();saveBuildings();savePieces();saveDisplay1();saveDisplay2();saveDots();saveLabels();
     for(const bot of Object.values(bots)){
       try{bot.destroy()}catch(err){console.error('[Server] Error destroying bot:',err)}
     }

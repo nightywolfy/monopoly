@@ -28,10 +28,13 @@ then you add them up as normal, and you would move 8 squares.
 
 !start <number of players> <deep/regular> <amount>   example:  !start 3 deep 1500
 !diceoverride (use this command to override someone's turn)
-!gostart (initiate go-dice for head to head game)
+
 !map 1 (choose smaller map)
 !map 2 (choose bigger map)
-!alias p1 username
+
+!name p1 AC  (2 characters only to show up instead of p1/p2/p3/p4/p5/p6)
+!nameswitch  (switch from p1 to AC or AC to P1)
+
 !auction 39 (manually start auction on china)
 !resetauction
 !switch p1 p2 (used for deepboard space 54)
@@ -46,5 +49,4 @@ then you add them up as normal, and you would move 8 squares.
 !save (save game)
 
 !propertylist (use this command to put all the colored dot in the right place)
-!housestatus (use this command to put all the houses/hotel in the right place)
-!status
+!status (example:  !status p1)  
