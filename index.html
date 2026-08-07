@@ -86,8 +86,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 
 <!-- Right: Player Selection -->
 <div id="playerContainer">
-
-
 <div style="position:relative;width:100%;margin-bottom:20px;display:flex;justify-content:center;align-items:flex-start;">
 <div style="position:absolute;left:30px;top:240px;display:flex;flex-direction:column;gap:10px;">
 <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
@@ -282,9 +280,8 @@ board.appendChild(el);
 }
 }
 
-
 function scaleBoard(){
-const container=document.getElementById('boardContainer');
+const container=document.getElementById('board');
 const wrapper=document.getElementById('boardWrapper');
 const scaleX=wrapper.clientWidth/930;
 const scaleY=wrapper.clientHeight/930;
