@@ -292,6 +292,7 @@ board.appendChild(el);
 }
 }
 
+
 const boardSpaces=[
 {number:1,x:717,y:779},
 {number:3,x:572,y:779},
@@ -300,22 +301,22 @@ const boardSpaces=[
 {number:6,x:355,y:779},
 {number:8,x:210,y:779},
 {number:9,x:138,y:779},
-{number:11,x:75,y:715},
-{number:12,x:75,y:643},
-{number:13,x:75,y:570},
-{number:14,x:75,y:498},
-{number:15,x:75,y:425},
-{number:16,x:75,y:355},
-{number:17,x:75,y:283},
-{number:19,x:75,y:138},
-{number:21,x:134,y:74},
-{number:22,x:204,y:74},
-{number:24,x:352,y:74},
-{number:25,x:424,y:74},
-{number:26,x:497,y:74},
-{number:27,x:569,y:74},
-{number:28,x:644,y:74},
-{number:29,x:714,y:74},
+{number:11,x:15,y:715},
+{number:12,x:15,y:643},
+{number:13,x:15,y:570},
+{number:14,x:15,y:498},
+{number:15,x:15,y:425},
+{number:16,x:15,y:355},
+{number:17,x:15,y:283},
+{number:19,x:15,y:138},
+{number:21,x:134,y:16},
+{number:22,x:207,y:16},
+{number:24,x:352,y:16},
+{number:25,x:424,y:16},
+{number:26,x:497,y:16},
+{number:27,x:569,y:16},
+{number:28,x:644,y:16},
+{number:29,x:714,y:16},
 {number:31,x:774,y:135},
 {number:33,x:774,y:280},
 {number:34,x:774,y:350},
@@ -329,13 +330,13 @@ const boardSpaces=[
 {number:44,x:355,y:660},
 {number:45,x:280,y:660},
 {number:46,x:140,y:650},
-{number:47,x:190,y:570},
-{number:50,x:190,y:350},
-{number:51,x:190,y:280},
+{number:47,x:130,y:570},
+{number:50,x:130,y:350},
+{number:51,x:130,y:280},
 {number:52,x:140,y:150},
-{number:53,x:280,y:187},
-{number:56,x:495,y:187},
-{number:57,x:568,y:187},
+{number:53,x:280,y:129},
+{number:56,x:495,y:129},
+{number:57,x:568,y:129},
 {number:58,x:650,y:145},
 {number:59,x:660,y:275},
 {number:63,x:660,y:568}
@@ -371,8 +372,8 @@ btn.textContent=spaceNum;
 btn.style.position='absolute';
 btn.style.left=`${coords.x}px`;
 btn.style.top=`${coords.y}px`;
-if(group1.includes(spaceNum)){btn.style.width='50px';btn.style.height='50px';btn.style.fontSize='0.85em';}
-else if(group2.includes(spaceNum)){btn.style.width='50px';btn.style.height='50px';btn.style.fontSize='0.75em';}
+if(group1.includes(spaceNum)){btn.style.width='50px';btn.style.height='105px';btn.style.fontSize='0.85em';}
+else if(group2.includes(spaceNum)){btn.style.width='105px';btn.style.height='50px';btn.style.fontSize='0.75em';}
 else{btn.style.width='110px';btn.style.height='110px';btn.style.fontSize='0.8em';}
 btn.style.backgroundColor='rgba(128,128,gray,0.4)';
 btn.style.border='1px solid rgba(255,255,255,0.6)';

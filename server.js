@@ -384,7 +384,7 @@ const bots={
   player4bot:createBot('player4bot','##rento',{delay:21000}),
   player5bot:createBot('player5bot','##rento',{delay:28000}),
   player6bot:createBot('player6bot','##rento',{delay:35000})
-}
+};
 
 
 app.post('/send-irc',(req,res)=>{
@@ -511,3 +511,4 @@ async function gracefulShutdown(signal){
 // --- Start server ---
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
+//server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));

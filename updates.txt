@@ -28,7 +28,7 @@ Update Changelog:
 24. Updated turn-ending messages to correctly display the next player's turn (example: "Player 3 turn" instead of "Player 2 turn ended").
 25. Added smoother button transitions when switching between mortgage and redeem modes.
 26. Added button press visual effects for improved user interaction.
-27. Added !housestatus access to the all players page for easier monitoring.
-28. Added the !rename allowing players to use custom names instead of default names (p1/p2/p3/p4/p5/p6).
-29. Updated !status with a cleaner output format, including property names and support for individual player checks (example: !status p1).
-30. Added the !display all p1-name p2-name p3-name p4-name p5-name p6-name command for customizing the MoneyBox player labels.
+27. Added !housestatus to the all players page, making house/property monitoring easier.
+28. Added !rename support, allowing players to replace default player names (p1-p6) with custom names.
+29. Improved !status with a cleaner layout, property name display, and individual player lookup support (example: !status p1).
+30. Added !display p1-name p2-name p3-name p4-name p5-name p6-name for customizing player names shown on the MoneyBox display.
