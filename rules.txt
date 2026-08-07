@@ -1,12 +1,8 @@
-new adjusted rules:
-
 for 2 player game:
-
 this game has a new rule such that instead of letting the dice throws be determined by chance,
 one person choooses one die and another person chooses the other die..
 so you can choose 6 and your opponent choose 2, you both choose at the same time so no one has information until the result is determined.
 then you add them up as normal, and you would move 8 squares.
-
 
 1. Log into chat with username of your choice. leave "password" part empty
 2. Push "DICE" button when it is your turn then press 1 or 2 or 3 or 4 or 5 or 6 then wait until opponent does the same.
@@ -26,27 +22,30 @@ then you add them up as normal, and you would move 8 squares.
 16. Landing on "parking" gives you option to get free loan of $100 which you need to payback slowly over time
 17. Landing on 62 (inner) give you option to run auction on any unowned property of your choice.
 
-!start <number of players> <deep/regular> <amount>   example:  !start 3 deep 1500
-!diceoverride (use this command to override someone's turn)
+Start Game:
+!start <number of players> <deep/regular> <amount>
+Examples:  !start 6 deep 1400 | !start 4 regular 1200
 
-!map 1 (choose smaller map)
-!map 2 (choose bigger map)
-
-!name p1 AC  (2 characters only to show up instead of p1/p2/p3/p4/p5/p6)
-!nameswitch  (switch from p1 to AC or AC to P1)
-!label all MC1 AMAHRIA2 AB3 SARAF4 TODO5 CRINJAL6 (lable names for moneybox)
+Commands that needs to run during a game:
 !auction 39 (manually start auction on china)
-!resetauction
-!switch p1 p2 (used for deepboard space 54)
+!switch p1 p2 (used for space-54)
+!remove p1 (remove player1 from the game if they bankrupt or AFK)
+!insert p4 700  (insert player4 in the middle of game with total amount of $700)
 
-!offer-p1 5,15,25 p2 money:900  (p1 offers 5,15,25 for p2's $900)
+Trading:
+!offer-p1 5,15,25,35 money:25 p2 39 money:1000  -->  p1 offers 5,15,25,35 (4 railroads) + $25  for p2's $1000 and china
 !accept
 !reject
 
-!remove p1 (remove player1 from the game if they bankrupt or AFK)
-!insert p4 500  (insert player4 in the middle of game with total amount of $500)
+set Display-name for All 6 Players
+Example:  !display MC1 AMAHRIA2 AB3 SARAF4 TODO5 CRINJAL6 
+Example:  !display Mary1 John2 Barb3 Will4 0 0
+
+rename to custom name (2 letters + 1 number only)
+Example: !rename p1 AL1 | !rename p2 ED2
+
+Rarely used commands:
+!diceoverride (use this command to override someone's turn)
 !gobonus p2 50 250 (bank owes you total of $250 which will be paid everytime you pass go of 50 x 5)
 !save (save game)
-
-!propertylist (use this command to put all the colored dot in the right place)
 !status (example:  !status p1)  

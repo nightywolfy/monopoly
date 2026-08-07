@@ -264,11 +264,11 @@ function createBot(nick,defaultTarget,options={}){
             Object.keys(colorMap).forEach((p,i)=>updateMoney(p,Math.max(-999,Math.min(9999,amounts[i]))));
             break;
           }
-          case '!label': {
-            if (args[0]?.toLowerCase() !== 'all' || args.length !== Object.keys(colorMap).length + 1) { safeSay(defaultTarget, `Usage: !label all <names for ${Object.keys(colorMap).length} players>`); break; }
-            const names = args.slice(1);
-            if (names.some(n=>!/^[A-Za-z0-9_-]{1,12}$/.test(n))) { safeSay(defaultTarget,'Labels must be 1-12 letters/numbers/-/_ each.'); break; }
-            Object.keys(colorMap).forEach((p,i)=>updateLabel(p,names[i]));
+
+          case '!display': {
+            if (args.length !== Object.keys(colorMap).length) { safeSay(defaultTarget, `Usage: !display <names for ${Object.keys(colorMap).length} players>`); break; }
+            if (args.some(n=>!/^[A-Za-z0-9_-]{1,10}$/.test(n))) { safeSay(defaultTarget,'Labels must be 1-10 letters/numbers/-/_ each.'); break; }
+            Object.keys(colorMap).forEach((p,i)=>updateLabel(p,args[i]));
             break;
           }
           case '!mv': {

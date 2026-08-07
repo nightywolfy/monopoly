@@ -29,6 +29,6 @@ Update Changelog:
 25. Added smoother button transitions when switching between mortgage and redeem modes.
 26. Added button press visual effects for improved user interaction.
 27. Added !housestatus access to the all players page for easier monitoring.
-28. Added the !name and !nameswitch commands, allowing players to use custom names instead of default names (p1/p2/p3/p4/p5/p6).
+28. Added the !rename allowing players to use custom names instead of default names (p1/p2/p3/p4/p5/p6).
 29. Updated !status with a cleaner output format, including property names and support for individual player checks (example: !status p1).
-30. Added the !label all p1-name p2-name p3-name p4-name p5-name p6-name command for customizing the MoneyBox player labels.
+30. Added the !display all p1-name p2-name p3-name p4-name p5-name p6-name command for customizing the MoneyBox player labels.

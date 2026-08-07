@@ -99,10 +99,9 @@ class MonopolyBot(SingleServerIRCBot):
         self.free_loans={}
         self.go_jail_attempts={'p1':0,'p2':0}
         self.custom_names={}
-        self.use_custom_names=True
 
     def pname(self,msg):
-        if not msg or not self.use_custom_names:return msg
+        if not msg:return msg
         for p,name in self.custom_names.items():msg=re.sub(rf"\b{p}\b",name,msg)
         return msg
 
@@ -157,127 +156,125 @@ class MonopolyBot(SingleServerIRCBot):
             pass
     def handle_command(self,who,body):
         body=body.strip();caller=who.lower()
-        if body=="!up":
+
+        if m:=re.match(r"!up$",body):
             if not self.players:return False,"No game in progress."
             self.auto_up();return True,None
 
+        if m:=re.match(r"!alias\s+(p[1-6])\s+(\w+)",body):
+            pl,a=m.groups();pl=pl.lower();a=a.lower()
+            if not isinstance(self.aliases,dict):self.aliases={"p1":set(),"p2":set(),"p3":set(),"p4":set(),"p5":set(),"p6":set()}
+            if pl not in self.aliases or pl not in self.players:return False,f"{pl} does not exist or game not started."
+            if any(a in s for s in self.aliases.values()):return False,"Alias already used"
+            self.aliases[pl].add(a)
+            return True,self.pname(f"Alias '{a}' added for {pl}")
+            
         if m:=re.match(r"!start\s+(\d+)\s*(deep|regular)?\s*(\d+)?",body):
-            n,mode,money=int(m.group(1)),m.group(2) or "regular",int(m.group(3) or 1000)
+            n,mode,money=int(m.group(1)),m.group(2)or"regular",int(m.group(3)or 1000)
             if not 2<=n<=6:return False,"Number of players must be 2-6"
             self.reset_state();self.num_players=n
-            self.players={f"p{i+1}":{"money":money,"pos":0} for i in range(n)}
-            self.active_board=self.board_regular.copy() if mode=="regular" else {**self.board_regular,**self.board_deep}
-            self.non_property=set(self.non_property_regular) if mode=="regular" else set(self.non_property_regular)|set(self.non_property_deep)
+            self.players={f"p{i+1}":{"money":money,"pos":0}for i in range(n)}
+            self.active_board=self.board_regular.copy()if mode=="regular" else{**self.board_regular,**self.board_deep}
+            self.non_property=set(self.non_property_regular)if mode=="regular" else set(self.non_property_regular)|set(self.non_property_deep)
             self.max_pos=39 if mode=="regular" else 63
             for i in range(n):self.aliases.setdefault(f"p{i+1}",set()).add(f"player{i+1}bot")
             try:
-                for cmd in ["!cleardot","!clearall",f"!dotlocation {'1' if mode=='regular' else '2'}"]:
+                for cmd in["!cleardot","!clearall",f"!dotlocation {'1' if mode=='regular' else '2'}",f"!map {'1' if mode=='regular' else '3'}"]:
                     self.connection.privmsg("player1bot",cmd)
                 self._handle_dicestart(self.connection,n)
             except Exception as e:
                 return False,f"Game started but failed to send initial commands: {e}"
             self.connection.privmsg("player1bot","!d1 Game has started")
-            self.connection.privmsg("player1bot","!d2 Player - 1 - Turn")
+            self.connection.privmsg("player1bot","!d2 P1's Turn to Roll")
             return True,f"Game started with {n} players ({mode}) ${money} each"
-            
-        if m:=re.match(r"!alias\s+(\w+)\s+(\w+)",body):
-            pl,a=m.groups();pl=pl.lower();a=a.lower()
-            if not isinstance(self.aliases,dict):self.aliases={"p1":set(),"p2":set(),"p3":set(),"p4":set(),"p5":set(),"p6":set()}
-            if pl not in self.aliases or pl not in self.players:return False, f"{pl} does not exist or game not started."
-            if any(a in s for s in self.aliases.values()):return False, "Alias already used"
-            self.aliases[pl].add(a)
-            return True,self.pname(f"Alias '{a}' added for {pl}")
-
-        if m:=re.match(r"!name\s+(p[1-6])\s+([a-z]{2})$",body.lower()):
-            pl,nm=m.groups();nm=f"{nm.upper()}{pl[1]}"
-            if pl not in self.players:return False,f"{pl} is not in the game"
-            if nm in self.custom_names.values() and self.custom_names.get(pl)!=nm:return False,"Name already taken"
-            self.custom_names[pl]=nm
-            return True,f"{pl} is now known as {nm}"
-            
-        if body=="!nameswitch":
-            self.use_custom_names=not self.use_custom_names
-            state="ON" if self.use_custom_names else "OFF"
-            return True,f"Custom names {state}"
-
-            
-        if m := re.match(r"!move\s+(\w+)\s+(-?\d+)", body):
-            pl_token, sp = m.groups(); sp = int(sp)
-            pl_key = self.resolve_player(pl_token)
-            if not pl_key or pl_key not in self.players: return False, f"Player {pl_token} does not exist"
-            name, msg = self.move_player(pl_key, sp)
-            
+      
+        if m:=re.match(r"!rename\s+(\S+)\s+(\S+)",body):
+            old,new=m.groups()
+            target=old.lower()
+            if target not in self.players:
+                for p,n in self.custom_names.items():
+                    if n.lower()==old.lower():target=p;break
+                else:return False,"Player name not found"
+            if not re.match(r"^[a-zA-Z]{1,2}[1-6]$|^p[1-6]$",new):return False,"Invalid format. Use p1-p6 or 1-2 letters + 1 number"
+            if new.lower().startswith("p") and new.lower() in self.players:
+                self.custom_names.pop(target,None)
+                return True,f"{target} renamed back to {new.lower()}"
+            if any(n.lower()==new.lower() and p!=target for p,n in self.custom_names.items()):
+                return False,f"Name {new} is already taken"
+            self.custom_names[target]=new
+            return True,f"{target} is now known as {new}"
+       
+        if m:=re.match(r"!move\s+([a-zA-Z0-9]+)\s+(-?\d+)",body):
+            pl_token,sp=m.groups();sp=int(sp)
+            pl_key=self.resolve_player(pl_token)
+            if not pl_key or pl_key not in self.players:return False,f"Player {pl_token} does not exist"
+            name,msg=self.move_player(pl_key,sp)
             return True,self.pname(f"{pl_key} moved to {self.players[pl_key]['pos']} ({name}). Money: {self.players[pl_key]['money']} |{msg}")
-            
-            
-        if m := re.match(r"!teleport\s+(\w+)\s+(-?\d+)", body):
-            pl_token, pos = m.groups(); pos = int(pos)
-            pl_key = self.resolve_player(pl_token)
-            if not pl_key or pl_key not in self.players: return False, f"Player {pl_token} does not exist"
-            self.players[pl_key]["pos"] = pos
-            return True, self.pname(f"{pl_key} teleported to {pos}")
-            
-        if m := re.match(r"!add\s+(\w+)\s+(-?\d+)", body):
-            pl_token, amount = m.groups(); amount = int(amount)
-            pl_key = self.resolve_player(pl_token)
-            if not pl_key or pl_key not in self.players: return False, f"Player {pl_token} does not exist"
-            self.players[pl_key]["money"] += amount
-            return True, self.pname(f"{pl_key} balance: {self.players[pl_key]['money']}")       
 
-        if m:=re.match(r"!switch\s+(\w+)\s+(\w+)",body):
-            p1,p2=m.groups()
-            k1=self.resolve_player(p1)
-            k2=self.resolve_player(p2)
+        if m:=re.match(r"!teleport\s+([a-zA-Z0-9]+)\s+(-?\d+)",body):
+            pl_token,pos=m.groups();pos=int(pos)
+            pl_key=self.resolve_player(pl_token)
+            if not pl_key or pl_key not in self.players:return False,f"Player {pl_token} does not exist"
+            if pos<0 or pos>self.max_pos:return False,f"Invalid position {pos}. Board range is 0-{self.max_pos}"
+            self.players[pl_key]["pos"]=pos
+            return True,self.pname(f"{pl_key} teleported to {pos}")
+
+        if m:=re.match(r"!add\s+([a-zA-Z0-9]+)\s+(-?\d+)",body):
+            pl_token,amount=m.groups();amount=int(amount)
+            pl_key=self.resolve_player(pl_token)
+            if not pl_key or pl_key not in self.players:return False,f"Player {pl_token} does not exist"
+            if caller not in self.admin_users:return False,"Only admins can use !add"
+            if abs(amount)>5000:return False,"Amount too large"
+            self.players[pl_key]["money"]+=amount
+            return True,self.pname(f"{pl_key} balance: {self.players[pl_key]['money']}")
+
+        if m:=re.match(r"!switch\s+(\w+)\s+(\w+)$",body):
+            p1,p2=m.groups();k1=self.resolve_player(p1);k2=self.resolve_player(p2)
             if not k1 or not k2:return False,"Player does not exist"
             if k1 not in self.players or k2 not in self.players:return False,"One or both players are not in the game"
-            if self.jailed.get(k1,False) or self.jailed.get(k2,False):return True,"Cannot switch with a player in jail"
+            if k1==k2:return False,"Cannot switch a player with themselves"
+            if bool(self.jailed.get(k1)) or bool(self.jailed.get(k2)):return True,"Cannot switch with a player in jail"
             self.players[k1]["pos"],self.players[k2]["pos"]=self.players[k2]["pos"],self.players[k1]["pos"]
             if self.switch_required:self.switch_required=False
             return True,self.pname(f"{k1} and {k2} switched")
-
-        m=re.match(r"!remove\s+(\w+)",body)
-        if m:
-            rm_token=m.group(1)
-            rm=self.resolve_player(rm_token)
-            if not rm or rm not in self.players:return False, f"Player {rm_token} is not in the game"
-            self._handle_diceremove(self.connection,int(rm[1:]))
+         
+        if m:=re.match(r"!remove\s+(\w+)$",body):
+            rm_token=m.group(1);rm=self.resolve_player(rm_token)
+            if not rm or rm not in self.players:return False,f"Player {rm_token} is not in the game"
+            if rm[1:].isdigit():self._handle_diceremove(self.connection,int(rm[1:]))
             del self.players[rm]
             if rm in self.aliases:self.aliases[rm].clear()
-            if rm in self.custom_names:del self.custom_names[rm]
-            to_del=[pos for pos,owner in self.properties.items() if owner==rm]
-            for pos in to_del:
-                del self.properties[pos]
-                if pos in self.houses:del self.houses[pos]
-                if pos in self.mortgaged:self.mortgaged.remove(pos)
-                old=self.active_board.get(pos,f"Position {pos}");nm=old.split("-",1)[-1]
-                self.active_board[pos]=f"x-{nm}"
+            self.custom_names.pop(rm,None)
+            if self.turn==rm:self.turn=next(iter(self.players),None)
+            for pos in [p for p,o in self.properties.items() if o==rm]:
+                del self.properties[pos];self.houses.pop(pos,None);self.mortgaged.discard(pos)
+                self.active_board[pos]=f"x-{self.active_board.get(pos,f'Position {pos}').split('-',1)[-1]}"
             try:self.handle_command(caller,"!propertylist");self.handle_command(caller,"!housestatus")
             except Exception:pass
             return True,self.pname(f"{rm} has been removed")
 
-        if m:=re.match(r"!insert\s+(p[1-6])\s+(-?\d+)",body):
+        if m:=re.match(r"!insert\s+(p[1-6])\s+(-?\d+)$",body):
             pl,amt=m.groups();amt=int(amt);pl=pl.lower()
             if pl in self.players:return False,f"{pl} already exists"
-            self.players[pl]={"money":amt,"pos":0};self.aliases.setdefault(pl,set()).add(f"player{pl[1:]}bot")
-            try:self.num_players=max(self.num_players,int(pl[1:]))
-            except:pass
+            if amt<0:return False,"Starting money cannot be negative"
+            self.players[pl]={"money":amt,"pos":0}
+            self.aliases.setdefault(pl,set()).add(f"player{pl[1:]}bot")
+            self.num_players=len(self.players)
             self.jailed[pl]=False
             try:self._handle_diceadd(self.connection,int(pl[1:]))
             except Exception:pass
             return True,f"{pl} inserted with ${amt}"
-        elif re.match(r"!insert\s+\S+",body):
-            return False,"Player must be p1-p6"
-               
-        if body.lower()=="!propertylist":
+
+        if m:=re.match(r"!propertylist$",body.lower()):
             try:
                 self.connection.privmsg("player1bot","!cleardot")
-                non_props=self.non_property_regular|self.non_property_deep;groups={}
+                non_props=self.non_property;groups={}
                 for pos in sorted(self.active_board):
                     if pos in non_props:continue
                     owner=self.properties.get(pos)
                     if not owner:continue
-                    if pos in self.mortgaged:owner=f"m{owner[1]}"
-                    color=self.unmortgaged_colors.get(owner) if owner[0]=="p" else self.mortgaged2_colors.get(owner)
+                    if pos in self.mortgaged and owner.startswith("p"):owner=f"m{owner[1:]}"
+                    color=self.unmortgaged_colors.get(owner) if owner and owner[0]=="p" else self.mortgaged2_colors.get(owner)
                     if not color:continue
                     groups.setdefault((owner,color),[]).append(pos)
                 delay=0
@@ -289,28 +286,36 @@ class MonopolyBot(SingleServerIRCBot):
             except Exception as e:
                 return False,f"Could not process property list: {e}"
 
-        if body.lower()=="!housestatus":
-            import time
+        if m:=re.match(r"!housestatus$",body.lower()):
             try:self.connection.privmsg("player1bot","!clearall")
             except Exception:pass
-            time.sleep(1)
             groups={1:[],2:[],3:[],4:[],"hotel":[]}
             for color,positions in self.color_sets.items():
                 for p in positions:
+                    if p not in self.active_board:continue
                     h=self.houses.get(p,0)
                     if h==5:groups["hotel"].append(p)
                     elif 1<=h<=4:groups[h].append(p)
             try:
+                delay=1
                 for n in (1,2,3,4):
-                    if groups[n]:self.connection.privmsg("player1bot",f"!house{n} {' '.join(map(str,groups[n]))}");time.sleep(2)
-                if groups["hotel"]:self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,groups['hotel']))}");time.sleep(2)
+                    if groups[n]:
+                        threading.Timer(delay,lambda x=n:self.connection.privmsg("player1bot",f"!house{x} {' '.join(map(str,groups[x]))}")).start()
+                        delay+=2
+                if groups["hotel"]:
+                    threading.Timer(delay,lambda:self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,groups['hotel']))}")).start()
             except Exception:pass
             return True,None
 
-        if m:=re.match(r"!status(?:\s+(p[1-6]))?$",body.lower()):
+        if m:=re.match(r"!status(?:\s+(\w+))?$",body.lower()):
             if not self.players:return False,"No game in progress."
             target=m.group(1)
-            players=[target] if target else list(self.players.keys())
+            if target:
+                target=self.resolve_player(target)
+                if not target:return False,"Player not found"
+                players=[target]
+            else:
+                players=list(self.players.keys())
             lines=[]
             for p in players:
                 if p not in self.players:continue
@@ -322,19 +327,21 @@ class MonopolyBot(SingleServerIRCBot):
                     if self.houses.get(x,0):pn+=f"[{self.houses.get(x,0)}]"
                     prop_list.append(f"{x}-{pn}")
                 props="|".join(prop_list)or"None"
-                pg=self.passgo_bonus.get(p);go=f"|GO:{pg['cap']-pg['used']}/{pg['cap']}"if pg else""
-                loan=self.free_loans.get(p);loan_txt=f"|Loan:{loan['owed']}"if loan and loan["owed"]>0 else""
+                pg=self.passgo_bonus.get(p)
+                go=f"|GO:{pg.get('cap',0)-pg.get('used',0)}/{pg.get('cap',0)}" if pg else ""
+                loan=self.free_loans.get(p)
+                loan_txt=f"|Loan:{loan.get('owed',0)}" if loan and loan.get("owed",0)>0 else ""
                 lines.append(self.pname(f"{p}|Properties:{props}{go}{loan_txt}"))
             for i,line in enumerate(lines):
                 threading.Timer(i*2,lambda l=line:self.connection.privmsg(self.channel,l)).start()
             return True,""
-
+        
         if m:=re.match(r"!jailpay\s+(\w+)",body):
-            pl_token=m.group(1)
-            pl=self.resolve_player(pl_token)
+            pl_token=m.group(1);pl=self.resolve_player(pl_token)
             if not pl or pl not in self.players:return False,f"Player {pl_token} is not in the game"
-            if not self.jailed.get(pl,False):return False,f"{pl_token} is not in jail"
+            if not self.jailed.get(pl,False):return False,f"{self.pname(pl)} is not in jail"
             if self.dice_mode and self.dice_order:
+                if self.expected_player_index>=len(self.dice_order):return False,"Invalid dice turn order"
                 pn=int(pl[1:]);exp=self.dice_order[self.expected_player_index]
                 if pn!=exp:return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(f'p{exp}')}"
             turn=max(self.go_jail_attempts.get(pl,0),self.dice4_streak.get(pl,0))
@@ -343,10 +350,10 @@ class MonopolyBot(SingleServerIRCBot):
             self.players[pl]["money"]-=cost;self.jailed[pl]=False
             self.go_jail_attempts[pl]=0;self.dice4_streak[pl]=0
             try:self.connection.privmsg("player2bot","!sound key.mp3")
-            except:pass
+            except Exception:pass
             return True,self.pname(f"{pl} paid ${cost} bail (turn {turn+1}) and is now out of jail. Balance: {self.players[pl]['money']}")
-
-        if m:=re.match(r"!gobonus\s+(\w+)\s+(\d+)\s+(\d+)",body):
+            
+        if m:=re.match(r"!gobonus\s+(\w+)\s+(\d+)\s+(\d+)$",body):
             pl_token,bonus,cap=m.groups();bonus=int(bonus);cap=int(cap)
             pl=self.resolve_player(pl_token)
             if not pl or pl not in self.players:return False,f"{pl_token} not in game"
@@ -355,7 +362,7 @@ class MonopolyBot(SingleServerIRCBot):
             self.passgo_bonus[pl]={"outer":bonus,"inner":bonus,"cap":cap,"used":0}
             return True,self.pname(f"{pl} gets +{bonus} GO bonus (cap {cap})")
 
-        if m:=re.match(r"!freeloan\s+(\w+)\s+(\d+)\s+(\d+)",body):
+        if m:=re.match(r"!freeloan\s+(\w+)\s+(\d+)\s+(\d+)$",body):
             pl_token,amount,cut=m.groups();amount=int(amount);cut=int(cut)
             pl=self.resolve_player(pl_token)
             if not pl or pl not in self.players:return False,f"{pl_token} is not in the game"
@@ -365,38 +372,43 @@ class MonopolyBot(SingleServerIRCBot):
             self.free_loans[pl]["owed"]+=amount;self.free_loans[pl]["outer"]+=cut;self.free_loans[pl]["inner"]+=cut
             self.players[pl]["money"]+=amount
             return True,self.pname(f"{pl} received ${amount} free loan. Owes ${self.free_loans[pl]['owed']} (-${self.free_loans[pl]['outer']} outer GO / -${self.free_loans[pl]['inner']} inner GO each pass)")
-
             
-        m=re.match(r"!auction\s+(\d+)",body)
-        if m:
+        if m:=re.match(r"!auction\s+(\d+)$",body):
             pos=int(m.group(1))
+            if not self.players:return False,"No game in progress."
             if not 0<=pos<=63:return False,"Position must be between 0 and 63"
-            if pos in self.non_property_regular or pos in self.non_property_deep:return False,f"Position {pos} is not a property"
+            if pos in self.non_property:return False,f"Position {pos} is not a property"
             prop=self.active_board.get(pos,f"Position {pos}")
             if self.current_auction:return False,"Auction already in progress."
-            if pos in self.properties or (hasattr(self,"mortgaged") and pos in self.mortgaged):return False,f"Cannot auction {prop}."
-            self.active_board[pos]=f"x-{prop}"
+            if pos in self.properties or pos in self.mortgaged:return False,f"Cannot auction {prop}."
+            self.active_board[pos]=prop if prop.startswith("x-") else f"x-{prop}"
             self.current_auction={"pos":pos,"bids":{},"last_bidder":None,"bid_timer":None,"active":set(self.players.keys())}
             if self.auction_required:self.auction_required=False
             try:self.connection.privmsg("player1bot",f"!d2 Auction started for {prop}")
-            except:pass
+            except Exception:pass
             return True,self.pname(f"Auction started for {prop}. Use !bidadd <amount> or !fold.")
             
-        m=re.match(r"!bidadd\s+(\d+)",body)
-        if m and self.current_auction:
-            inc=int(m.group(1));auc=self.current_auction
+        if m:=re.match(r"!bidadd\s+(\d+)$",body):
+            if not self.current_auction:return False,None
+            inc=int(m.group(1))
+            if inc<=0:return False,"Bid must be greater than 0"
+            auc=self.current_auction
             active=auc.setdefault("active",set(self.players.keys()))
-            player_key=next((k for k,s in self.aliases.items() if caller in s or caller==k),None)
-            if not player_key:return False,f"{caller} is not valid player."
+            player_key=self.resolve_player(caller)
+            m_bot=re.match(r"player([1-6])bot$",caller.lower())
+            if m_bot and player_key is None:
+                player_key=f"p{m_bot.group(1)}"
+            if not player_key:return False,f"{caller} is not a valid player."
             if player_key not in active:return False,None
             if auc["bids"] and player_key==max(auc["bids"],key=auc["bids"].get):return False,None
             new_bid=max(auc["bids"].values(),default=0)+inc
+            if player_key not in self.players:return False,"Player is no longer in the game"
             if self.players[player_key]["money"]<new_bid:return False,f"Not enough money ({new_bid})"
             auc["bids"][player_key]=new_bid;auc["last_bidder"]=player_key
             if auc.get("bid_timer"):auc["bid_timer"].cancel()
-
             def auto_win():
                 if self.current_auction!=auc:return
+                if player_key not in self.players:return
                 if auc["last_bidder"]==player_key and auc["bids"].get(player_key)==new_bid:
                     winner=player_key;amt=new_bid;pos=auc["pos"]
                     self.players[winner]["money"]-=amt
@@ -423,42 +435,62 @@ class MonopolyBot(SingleServerIRCBot):
             self.msg_queue.put(("player1bot",f"!d2 {msg}"))
             return True,None
 
-        if body.lower()=="!fold" and self.current_auction:
-            auc=self.current_auction;auc.setdefault("active",set(self.players.keys()))
-            player_key=next((k for k,s in self.aliases.items() if caller in s or caller==k),None)
-            if not player_key:return False,f"{caller} is not valid player."
+        if m:=re.match(r"!fold$",body.lower()):
+            if not self.current_auction:return False,None
+            auc=self.current_auction
+            auc.setdefault("active",set(self.players.keys()))
+            player_key=self.resolve_player(caller)
+            m_bot=re.match(r"player([1-6])bot$",caller.lower())
+            if m_bot and player_key is None:
+                player_key=f"p{m_bot.group(1)}"
+            if not player_key:return False,f"{caller} is not a valid player."
             if player_key not in auc["active"]:return False,None
             if player_key==auc.get("last_bidder"):return False,None
             auc["active"].discard(player_key);auc["bids"].pop(player_key,None)
             if not auc["active"]:
-                pos=auc["pos"];prop=self.active_board.get(pos,f"Position {pos}");prop=prop[2:] if prop.startswith("x-") else prop
+                pos=auc["pos"];prop=self.active_board.get(pos,f"Position {pos}")
+                prop=prop[2:] if prop.startswith("x-") else prop
                 if auc.get("bid_timer"):auc["bid_timer"].cancel()
-                self.current_auction=None;return True,f"Auction ended. No bids for {prop}"
+                self.current_auction=None
+                return True,f"Auction ended. No bids for {prop}"
             if len(auc["active"])==1:
-                winner=next(iter(auc["active"]));pos=auc["pos"]
+                winner=next(iter(auc["active"]))
+                if winner not in self.players:
+                    self.current_auction=None
+                    return True,"Auction ended. Winner no longer exists."
+                pos=auc["pos"]
                 if auc.get("bid_timer"):auc["bid_timer"].cancel()
                 if winner in auc["bids"]:
-                    amt=auc["bids"][winner];self.players[winner]["money"]-=amt;self.properties[pos]=winner
-                    raw=self.active_board.get(pos,f"Position {pos}");name=raw[2:] if raw.startswith("x-") else raw
+                    amt=auc["bids"][winner]
+                    self.players[winner]["money"]-=amt
+                    self.properties[pos]=winner
+                    raw=self.active_board.get(pos,f"Position {pos}")
+                    name=raw[2:] if raw.startswith("x-") else raw
                     self.active_board[pos]=f"{winner}-{name}"
-                    color=self.unmortgaged_colors.get(winner,"red");wname=self.pname(winner)
+                    color=self.unmortgaged_colors.get(winner,"red")
+                    wname=self.pname(winner)
                     self.msg_queue.put((self.channel,f"{wname} wins {name} for {amt}"))
                     self.msg_queue.put(("player2bot","!sound sold.mp3"))
                     self.msg_queue.put(("player1bot",f"!d2 {wname} wins {name} for {amt}"))
                     self.msg_queue.put(("player1bot",f"!dot {pos} {color}"))
                     self.msg_queue.put(("rentobot","!up"))
-                    self.current_auction=None;return True,None
-                else:
-                    self.current_auction=None;return True,"Auction ended. No bids."
+                    self.current_auction=None
+                    return True,None
+                self.current_auction=None
+                return True,"Auction ended. No bids."
             return True,f"{self.pname(player_key)} folds"
     
-        if body.lower()=="!resetauction":
+        if m:=re.match(r"!resetauction$",body.lower()):
             if not self.current_auction:return False,"No auction in progress to reset."
             auc=self.current_auction
-            if auc.get("bid_timer"):auc["bid_timer"].cancel()
+            if auc.get("bid_timer"):
+                auc["bid_timer"].cancel()
+                auc["bid_timer"]=None
             pos=auc["pos"];raw=self.active_board.get(pos,"")
-            if raw.startswith("x-"):self.active_board[pos]=raw[2:]
-            auc["bids"]={};auc["last_bidder"]=None;auc["active"]=set(self.players.keys())
+            if raw and not raw.startswith("x-"):self.active_board[pos]=f"x-{raw}"
+            auc["bids"]={}
+            auc["last_bidder"]=None
+            auc["active"]=set(self.players.keys())
             return True,self.pname(f"Auction for property {pos} has been RESET. Bidding restarted.")
 
         if re.match(r"!mortgage\s+(\d+)",body) or re.match(r"!redeem\s+(\d+)",body):
@@ -480,8 +512,8 @@ class MonopolyBot(SingleServerIRCBot):
                                 msg=f"Only the owner ({owner_display}) can mortgage this property"
                             elif pos in self.mortgaged:
                                 msg=f"Property {pos} is already mortgaged"
-                            elif self.houses.get(pos,0)>0:
-                                msg=f"Cannot mortgage property {pos} because it has houses"
+                            elif any(self.houses.get(x,0)>0 for group in self.color_sets.values() if pos in group for x in group):
+                                msg=f"Cannot mortgage property {pos} because the color set has houses"
                             else:
                                 val=self.mortgage_table.get(pos,0)
                                 if val<=0:
@@ -499,8 +531,7 @@ class MonopolyBot(SingleServerIRCBot):
                                     self.msg_queue.put(("player1bot",f"!d2 {msg}"))
                                     self.msg_queue.put(("player2bot","!sound mortgage.mp3"))
                                     self.msg_queue.put(("player1bot",f"!dot {pos} {self.mortgaged_colors.get(owner,'black')}"))
-                                    
-                                    
+                                   
                     m=re.match(r"!redeem\s+(\d+)",body)
                     if m:
                         pos=int(m.group(1))
@@ -555,7 +586,8 @@ class MonopolyBot(SingleServerIRCBot):
             candidates.sort(key=lambda x:(self.houses.get(x,0),x))
             target=candidates[0];cost=self.house_costs.get(color,0)
             if self.players[owner]['money']<cost:return False,f"{self.pname(owner)} does not have enough money to buy a house ({cost} required)"
-            self.houses[target]=self.houses.get(target,0)+1;self.players[owner]['money']-=cost
+            self.players[owner]['money']-=cost
+            self.houses[target]=self.houses.get(target,0)+1
             self.connection.privmsg("player2bot","!sound build1.mp3")
             return True,self.pname(f"Added 1 house to property {target} in {color} set. {owner} charged {cost}")
 
@@ -576,36 +608,78 @@ class MonopolyBot(SingleServerIRCBot):
             if not candidates:return False,f"Cannot remove house: {color} set already has 0 houses"
             candidates.sort(key=lambda x:(-self.houses.get(x,0),-x))
             target=candidates[0];refund=self.house_costs.get(color,0)//2
-            self.houses[target]=self.houses.get(target,0)-1;self.players[owner]['money']+=refund
+            self.players[owner]['money']+=refund
+            self.houses[target]=max(0,self.houses.get(target,0)-1)
             self.connection.privmsg("player2bot","!sound destroy1.mp3")
             return True,self.pname(f"Removed 1 house from property {target} in {color} set. {owner} refunded {refund}")
 
-            
         m=re.match(r"!save\s*(\S+)?",body)
         if m:
             fn=m.group(1)or"1.pkl"
-            state={"players":self.players,"properties":self.properties,"houses":self.houses,"mortgaged":self.mortgaged,"aliases":self.aliases,"custom_names":self.custom_names,"use_custom_names":self.use_custom_names,"current_auction":self.current_auction,"current_trade":self.current_trade,"active_board":self.active_board,"non_property":self.non_property,"num_players":self.num_players,"max_pos":self.max_pos}
+            state={
+                "players":self.players,
+                "properties":self.properties,
+                "houses":self.houses,
+                "mortgaged":self.mortgaged,
+                "aliases":self.aliases,
+                "custom_names":self.custom_names,
+                "current_auction":self.current_auction,
+                "current_trade":self.current_trade,
+                "active_board":self.active_board,
+                "non_property":self.non_property,
+                "num_players":self.num_players,
+                "max_pos":self.max_pos,
+                "jailed":self.jailed,
+                "consecutive_doubles":self.consecutive_doubles,
+                "dice4_streak":self.dice4_streak,
+                "switch_required":self.switch_required,
+                "auction_required":self.auction_required,
+                "dice_rolls":self.dice_rolls,
+                "passgo_bonus":self.passgo_bonus,
+                "free_loans":self.free_loans,
+                "go_jail_attempts":self.go_jail_attempts
+            }
             try:
                 with open(fn,"wb")as f:pickle.dump(state,f)
                 return True,self.pname(f"Game state saved to '{fn}'")
             except Exception as e:return False,f"Failed to save game: {e}"
-            
+
         m=re.match(r"!restore\s*(\S+)?",body)
         if m:
             fn=m.group(1)or"1.pkl"
             if not os.path.exists(fn):return False,f"File '{fn}' not found"
             try:
                 with open(fn,"rb")as f:state=pickle.load(f)
-                self.players=state["players"];self.properties=state["properties"];self.houses=state["houses"]
-                self.mortgaged=state["mortgaged"];self.aliases={k:set(v)for k,v in state["aliases"].items()}
+
+                self.players=state.get("players",{})
+                self.properties=state.get("properties",{})
+                self.houses=state.get("houses",{})
+                self.mortgaged=state.get("mortgaged",set())
+                self.aliases={k:set(v)for k,v in state.get("aliases",{}).items()}
                 self.custom_names=state.get("custom_names",{})
-                self.use_custom_names=state.get("use_custom_names",True)
-                self.current_auction=state["current_auction"];self.current_trade=state["current_trade"]
-                self.active_board=state["active_board"];self.non_property=state["non_property"]
-                self.num_players=state["num_players"];self.max_pos=state["max_pos"]
-                self.consecutive_doubles={f"p{i}":0 for i in range(1,self.num_players+1)}
-                try:self.handle_command("restorebot","!propertylist");self.handle_command("restorebot","!housestatus")
-                except Exception:pass
+                self.current_auction=state.get("current_auction")
+                self.current_trade=state.get("current_trade")
+                self.active_board=self.board_regular.copy()
+                if state.get("max_pos",39)>39:
+                    self.active_board.update(self.board_deep)
+                self.non_property=state.get("non_property",set())
+                self.num_players=state.get("num_players",len(self.players))
+                self.max_pos=state.get("max_pos",39)
+                self.jailed=state.get("jailed",{})
+                self.consecutive_doubles=state.get("consecutive_doubles",{})
+                self.dice4_streak=state.get("dice4_streak",{})
+                self.switch_required=state.get("switch_required",False)
+                self.auction_required=state.get("auction_required",False)
+                self.dice_rolls=state.get("dice_rolls",{})
+                self.passgo_bonus=state.get("passgo_bonus",{})
+                self.free_loans=state.get("free_loans",{})
+                self.go_jail_attempts=state.get("go_jail_attempts",{})
+                try:
+                    self.handle_command("restorebot","!propertylist")
+                    self.handle_command("restorebot","!housestatus")
+                    self.auto_up()
+                except Exception:
+                    pass
                 return True,f"Game state restored from '{fn}'"
             except Exception as e:return False,f"Failed to restore game: {e}"
 
@@ -613,16 +687,23 @@ class MonopolyBot(SingleServerIRCBot):
         if m:
             offerer_token=m.group(1).lower();text=m.group(2).strip();offerer=self.resolve_player(offerer_token)
             if not offerer:return False,f"{offerer_token} is not a valid player."
+            if offerer not in self.players:return False,f"{offerer_token} is not in the game."
             if self.current_trade:return False,"A trade is already active. !accept or !reject it first."
             parts=text.split()
-            other=next((self.resolve_player(p) for p in parts if self.resolve_player(p) and self.resolve_player(p)!=offerer),None)
+            other_index=None
+            other=None
+            for i,p in enumerate(parts):
+                temp=self.resolve_player(p)
+                if temp and temp!=offerer:
+                    other_index=i
+                    other=temp
+                    break
             if not other:return False,"Other player not in game."
-            idx=next(i for i,p in enumerate(parts) if self.resolve_player(p)==other)
-            left_tokens=parts[:idx];right_tokens=parts[idx+1:]
+            left_tokens=parts[:other_index]
+            right_tokens=parts[other_index+1:]
             def parse_side(tokens):
                 props=[];money=0
                 for t in tokens:
-                    if not t:continue
                     if t.startswith("money:"):
                         try:money+=int(t.split(":",1)[1])
                         except:pass
@@ -630,7 +711,11 @@ class MonopolyBot(SingleServerIRCBot):
                         for p in t.split(","):
                             if p.strip().isdigit():props.append(int(p.strip()))
                 return props,money
-            left_props,left_money=parse_side(left_tokens);right_props,right_money=parse_side(right_tokens)
+            left_props,left_money=parse_side(left_tokens)
+            right_props,right_money=parse_side(right_tokens)
+            for pos in left_props+right_props:
+                if pos not in self.active_board or pos in self.non_property:
+                    return False,f"Property {pos} is not a valid property."
             def validate_houses(prop_list):
                 for pos in prop_list:
                     if self.houses.get(pos,0)>0:
@@ -647,59 +732,67 @@ class MonopolyBot(SingleServerIRCBot):
             for pos in right_props:
                 if self.properties.get(pos)!=other:return False,f"{self.pname(other)} does not own property {pos}"
             self.current_trade={"offerer":offerer,"other":other,"left_props":left_props,"left_money":left_money,"right_props":right_props,"right_money":right_money}
-            return True,self.pname(f"Trade offer created: {offerer} offers {left_props} + ${left_money} for {other}'s {right_props} + ${right_money}. {other} must !accept or !reject.")
+            return True,self.pname(f"Trade offer created: {offerer} gives {left_props} + ${left_money} for {other}'s {right_props} + ${right_money}. {other} must !accept or !reject.")
 
         if body.lower()=="!accept":
             if not self.current_trade:return False,"No active trade."
             t=self.current_trade
             if self.players[t["offerer"]]["money"]<t["left_money"]:return False,f"{self.pname(t['offerer'])} does not have enough money."
             if self.players[t["other"]]["money"]<t["right_money"]:return False,f"{self.pname(t['other'])} does not have enough money."
-            self.players[t["offerer"]]["money"]-=t["left_money"];self.players[t["other"]]["money"]+=t["left_money"]
-            self.players[t["other"]]["money"]-=t["right_money"];self.players[t["offerer"]]["money"]+=t["right_money"]
+            self.players[t["offerer"]]["money"]-=t["left_money"]
+            self.players[t["other"]]["money"]+=t["left_money"]
+            self.players[t["other"]]["money"]-=t["right_money"]
+            self.players[t["offerer"]]["money"]+=t["right_money"]
             def transfer(props,old,new):
                 for pos in props:
                     self.properties[pos]=new
                     raw=self.active_board.get(pos,f"Position {pos}")
                     nm=raw.split("-",1)[-1] if "-" in raw else raw
                     self.active_board[pos]=f"{new}-{nm}"
-            transfer(t["left_props"],t["offerer"],t["other"]);transfer(t["right_props"],t["other"],t["offerer"])
+            transfer(t["left_props"],t["offerer"],t["other"])
+            transfer(t["right_props"],t["other"],t["offerer"])
             self.current_trade=None
-            try:self.handle_command("tradebot","!propertylist");self.handle_command("tradebot","!housestatus")
-            except Exception:pass
+            try:
+                self.handle_command("tradebot","!propertylist")
+                self.handle_command("tradebot","!housestatus")
+            except Exception:
+                pass
             return True,"Trade accepted and completed."
 
-            
         if body.lower()=="!reject":
             if not self.current_trade:return False,"No active trade."
             self.current_trade=None
             return True,"Trade rejected."
-        return True,None
-        
 
+        return True,None
 
 
     def move_player(self,p,sp):
+        if p not in self.players:return "","Player not found"
         display=self.pname(p)
         def play_rent_sound():self.connection.privmsg("player2bot","!sound rent.mp3")
         old=self.players[p]["pos"];in_reg=old<=39
         new=(old+sp)%40 if in_reg else ((old-40+sp)%24)+40
-        if self.jailed.get(p,False) and old==10 and new!=10:
+
+        if self.jailed.get(p,False) and old==10 and sp>0:
             self.jailed[p]=False;self.connection.privmsg(self.channel,f"{display} is now out of jail")
         bonus_data=self.passgo_bonus.get(p);loan=self.free_loans.get(p);loan_msg="";bonus_msg=""
 
         if in_reg and old+sp>39:
             base=200;extra=0
             if bonus_data:
-                rem=bonus_data["cap"]-bonus_data["used"];extra=min(bonus_data["outer"],rem);bonus_data["used"]+=extra
+                
+                rem=max(0,bonus_data["cap"]-bonus_data["used"]);extra=min(bonus_data["outer"],rem);bonus_data["used"]+=extra
                 if extra:bonus_msg=f" GO bonus +{extra}"
             self.players[p]["money"]+=base+extra
             if loan and loan["owed"]>0:
                 pay=min(loan["outer"],loan["owed"]);self.players[p]["money"]-=pay;loan["owed"]-=pay;loan_msg=f" Loan payment -{pay}"
                 if loan["owed"]<=0:self.free_loans.pop(p,None)
-        elif not in_reg and old+sp>63:
+        elif not in_reg and old-40+sp>=24:
             base=100;extra=0
             if bonus_data:
-                rem=bonus_data["cap"]-bonus_data["used"];extra=min(bonus_data["inner"],rem);bonus_data["used"]+=extra
+                
+                rem=max(0,bonus_data["cap"]-bonus_data["used"]);extra=min(bonus_data["inner"],rem);bonus_data["used"]+=extra
                 if extra:bonus_msg=f" GO bonus +{extra}"
             self.players[p]["money"]+=base+extra
             if loan and loan["owed"]>0:
@@ -708,9 +801,11 @@ class MonopolyBot(SingleServerIRCBot):
         self.players[p]["pos"]=new;name=self.active_board.get(new,f"Position {new}")
         owner=self.properties.get(new);msg="";fee=0
         def send_msg(m):
-            if m:self.connection.privmsg(self.channel,self.pname(m)+bonus_msg+loan_msg);self.connection.privmsg("player1bot",f"!d2 {self.pname(m)}{bonus_msg}{loan_msg}")
-              
-                        
+            if m:
+                self.connection.privmsg(self.channel,msg+bonus_msg+loan_msg)
+                self.connection.privmsg("player1bot",f"!d2 {msg}{bonus_msg}{loan_msg}")
+                
+               
         rails={5:43,15:49,25:55,35:61,43:5,49:15,55:25,61:35}
         if new in rails:
             if new in (5,15,25,35):
@@ -736,8 +831,7 @@ class MonopolyBot(SingleServerIRCBot):
                         rc=[x for x in (5,15,25,35) if self.properties.get(x)==owner and x not in self.mortgaged]
                         rent={1:25,2:50,3:100,4:200}.get(len(rc),25)
                         self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{display} pays {rent} to {self.pname(owner)}"
-        
-        
+
         total_houses=sum(h for pos,h in self.houses.items() if self.properties.get(pos)==p)
         total_props=sum(1 for o in self.properties.values() if o==p)
         if new in (2,18,36,48):
@@ -765,7 +859,6 @@ class MonopolyBot(SingleServerIRCBot):
         if new==54:
             self.switch_required=True
             msg+=f"{display} must use switch"
-        
         if owner and owner!=p:
             if new in self.mortgaged:msg+="Property is mortgaged, no rent"
             elif self.jailed.get(owner,False):msg+="Owner in jail, no rent"
@@ -796,8 +889,6 @@ class MonopolyBot(SingleServerIRCBot):
             self.connection.privmsg(self.channel,msg+bonus_msg+loan_msg)
             self.connection.privmsg("player1bot",f"!d2 {self.pname(msg)}{bonus_msg}{loan_msg}")
         return name,self.pname(msg)
-        
-
     # -------- Dice0-4 --------
     def _handle_dice_pub(self,c,nick,msg):
         m=msg.strip().lower()
@@ -857,9 +948,13 @@ class MonopolyBot(SingleServerIRCBot):
             if not self.dice_mode:c.privmsg(self.channel,"Dice mode not active.");return
             pl_key=f"p{pn}";display=self.pname(pl_key)
             if pn not in self.dice_order:c.privmsg(self.channel,f"Player {display} not in order");return
+
             i=self.dice_order.index(pn);self.dice_order.pop(i)
             if i<=self.expected_player_index and self.expected_player_index>0:self.expected_player_index-=1
-            if not self.dice_order:self.dice_mode=False;c.privmsg(self.channel,"All players removed. Dice mode stopped.");return
+            if not self.dice_order:
+                self.dice_mode=False;c.privmsg(self.channel,"All players removed. Dice mode stopped.");return
+            self.expected_player_index%=len(self.dice_order)
+
         c.privmsg(self.channel,f"Player {display} removed. Order: {', '.join(self.pname(f'p{x}') for x in self.dice_order)}")
         
     def _handle_diceadd(self,c,pn):
@@ -868,9 +963,11 @@ class MonopolyBot(SingleServerIRCBot):
             pl_key=f"p{pn}";display=self.pname(pl_key)
             if pl_key not in self.players:c.privmsg(self.channel,f"Player {display} is not in the game.");return
             if pn in self.dice_order:c.privmsg(self.channel,f"Player {display} already in dice order.");return
-            cur=self.dice_order[self.expected_player_index] if self.dice_order else None
+            cur=self.dice_order[self.expected_player_index] if self.dice_order and self.expected_player_index<len(self.dice_order) else None
             self.dice_order.append(pn);self.dice_order.sort()
-            if cur is not None:self.expected_player_index=self.dice_order.index(cur)
+            if cur is not None and cur in self.dice_order:self.expected_player_index=self.dice_order.index(cur)
+            elif self.dice_order:self.expected_player_index%=len(self.dice_order)
+
         c.privmsg(self.channel,f"Player {display} added. Order: {', '.join(self.pname(f'p{x}') for x in self.dice_order)}")
 
     def _next_turn_label(self):
@@ -893,8 +990,10 @@ class MonopolyBot(SingleServerIRCBot):
             elif self.jailed.get(pl_key,False):c.privmsg(self.channel,f"{display} is in jail! Only !dice4 can be used.");return
             self.dice4_streak[pl_key]=self.dice4_streak.get(pl_key,0)+1 if d=="dice4" else 0
         getattr(self,f"_handle_{d}",lambda*a:None)(c,p)
-        if d=="dice4" and self.dice4_streak.get(pl_key,0)>=3:
+   
+        if d=="dice4" and self.dice4_streak.get(pl_key,0)>=3 and self.jailed.get(pl_key,False):
             self.dice4_streak[pl_key]=0;self.jailed[pl_key]=False
+            
             c.privmsg(self.channel,f"{display} rolled dice4 three times in a row! Released from jail for free.")
             try:c.privmsg("player2bot","!sound key.mp3")
             except:pass
@@ -906,10 +1005,12 @@ class MonopolyBot(SingleServerIRCBot):
     def _handle_dice2(self,c,p):self._roll_and_handle(c,p,[1,1,2,2,3,3],[4,4,5,5,6,6],"dice2",True)
     def _handle_dice3(self,c,p):self._roll_and_handle(c,p,[4,4,5,5,6,6],[4,4,5,5,6,6],"dice3",True)
     def _handle_dice4(self,c,p):self._roll_and_handle(c,p,[1,2,3,4,5,6],[1,2,3,4,5,6],"dice4",False)
-
     def _roll_and_handle(self,c,p,p1,p2,d,nl=True):
         f,s=random.choice(p1),random.choice(p2);t=f+s;pl=f"p{p}";display=self.pname(pl);dbl=f==s
+
+        if pl not in self.players:return
         self.dice_rolls[p]=(f,s);self.consecutive_doubles[pl]=self.consecutive_doubles.get(pl,0)+1 if dbl else 0
+        
         c.privmsg(self.channel,f"{d} rolled by {display} {f}+{s}")
         if self.consecutive_doubles[pl]>=CONSECUTIVE_DOUBLES_FOR_TELEPORT:
             self.consecutive_doubles[pl]=0;c.privmsg(self.channel,f"{display} rolled doubles twice. Turn lost")
@@ -1026,16 +1127,16 @@ class MonopolyBot(SingleServerIRCBot):
                 c.privmsg(self.channel,f"Dice results: {nums[0]} and {nums[1]}")
                 pm={
                     True:{
-                        '1': '!d1 "Double for (P1): press go again"',
-                        '2': '!d1 "Double for (P2): press go again"',
-                        '3': '!d1 "Double for (P1): press go again"',
-                        '4': '!d1 "Double for (P2): press go again"',
+                        '1': '!d1 "Double for (P1): go again"',
+                        '2': '!d1 "Double for (P2): go again"',
+                        '3': '!d1 "Double for (P1): go again"',
+                        '4': '!d1 "Double for (P2): go again"',
                     },
                     False:{
-                        '1': '!d1 "Now Player - 2 - Turn"',
-                        '2': '!d1 "Now Player - 1 - Turn"',
-                        '3': '!d1 "Now Player - 2 - Turn"',
-                        '4': '!d1 "Now Player - 1 - Turn"',
+                        '1': '!d1 "Player - 2 - Turn"',
+                        '2': '!d1 "Player - 1 - Turn"',
+                        '3': '!d1 "Player - 2 - Turn"',
+                        '4': '!d1 "Player - 1 - Turn"',
                     },
                 }[double][self.go_active]
                 c.privmsg("player1bot",pm)
