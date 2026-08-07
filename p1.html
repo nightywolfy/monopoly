@@ -436,7 +436,6 @@ fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.tex
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});
 fetch('/building.json').then(r=>r.json()).then(renderBuildings);
-
 </script>
 </body>
 </html>

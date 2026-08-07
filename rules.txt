@@ -34,7 +34,7 @@ then you add them up as normal, and you would move 8 squares.
 
 !name p1 AC  (2 characters only to show up instead of p1/p2/p3/p4/p5/p6)
 !nameswitch  (switch from p1 to AC or AC to P1)
-
+!label all MC1 AMAHRIA2 AB3 SARAF4 TODO5 CRINJAL6 (lable names for moneybox)
 !auction 39 (manually start auction on china)
 !resetauction
 !switch p1 p2 (used for deepboard space 54)

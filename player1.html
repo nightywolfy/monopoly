@@ -124,12 +124,18 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 </div>
 </div>
 
+
+
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
+socket.emit('identify', {page: 'computer'});
 let currentMap = 1;
 let activeDots = {};
-const colorMap = {red:"p1", blue:"p2", yellow:"p3", green:"p4"};
+let labels={p1:'Player1',p2:'Player2'};
+let lastMoney={p1:0,p2:0};
+const colorMap={red:"p1",blue:"p2"};
 const buildingPositions={
 1:{x:740,y:795},
 3:{x:595,y:795},
@@ -167,86 +173,74 @@ const buildingPositions={
 59:{x:523,y:220}
 };
 
+function renderDotsFromServer(data){
+const board=document.getElementById('board');
+if(!data)return;
+for(const [num,info] of Object.entries(data)){
+if(!info)continue;
+if(activeDots[num]){
+const el=activeDots[num];
+el.style.left=info.x+'px';
+el.style.top=info.y+'px';
+el.style.background=info.color||'#fff';
+}else{
+const el=document.createElement('div');
+el.className='dot';
+el.style.left=info.x+'px';
+el.style.top=info.y+'px';
+el.style.background=info.color||'#fff';
+el.style.zIndex=30;
+board.appendChild(el);
+activeDots[num]=el;
+}
+}
+}
 
 function updatePieces(data){
-    if(!data || typeof data !== 'object'){
-        console.warn("Pieces data invalid:", data);
-        return;
-    }
-
-    // Map positions to arrays of colors (to detect overlaps)
-    const posMap = {};
-
-    for(const [color, pos] of Object.entries(data)){
-        if(!pos || typeof pos.x !== "number" || typeof pos.y !== "number"){
-            console.warn("Invalid position for", color, pos);
-            continue;
-        }
-
-        const key = `${pos.x},${pos.y}`;
-        if(!posMap[key]) posMap[key] = [];
-        posMap[key].push(color);
-    }
-
-    for(const [key, colors] of Object.entries(posMap)){
-        const [baseX, baseY] = key.split(',').map(Number);
-
-        colors.forEach((color, idx) => {
-            const id = colorMap[color];
-            if(!id) return;
-            const el = document.getElementById(id);
-            if(!el) return;
-
-            // Slight offsets for overlapping pieces
-            let offsetX = 0, offsetY = 0;
-            if(idx === 1){ offsetX = 10; offsetY = 0; }  // second player
-            if(idx === 2){ offsetX = 0; offsetY = 10; }  // third player
-            if(idx === 3){ offsetX = 10; offsetY = 10; } // fourth player
-
-            el.style.left = (baseX + offsetX) + 'px';
-            el.style.top  = (baseY + offsetY) + 'px';
-            el.style.zIndex = 20;
-        });
-    }
+if(!data||typeof data!=='object'){console.warn("Pieces data invalid:",data);return;}
+const posMap={};
+for(const[color,pos]of Object.entries(data)){
+if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number"){console.warn("Invalid position for",color,pos);continue;}
+const key=`${pos.x},${pos.y}`;
+if(!posMap[key])posMap[key]=[];
+posMap[key].push(color);
 }
-
-function renderDotsFromServer(data){
-  const board = document.getElementById('board');
-  if(!data) return;
-  for(const [num, info] of Object.entries(data)){
-    if(!info) continue;
-    if(activeDots[num]){
-      // Update existing dot
-      const el = activeDots[num];
-      el.style.left = info.x+'px';
-      el.style.top = info.y+'px';
-      el.style.background = info.color || '#fff';
-    } else {
-      // Create new dot
-      const el = document.createElement('div');
-      el.className = 'dot';
-      el.style.left = info.x+'px';
-      el.style.top = info.y+'px';
-      el.style.background = info.color || '#fff';
-      el.style.zIndex = 30;
-      board.appendChild(el);
-      activeDots[num] = el;
-    }
-  }
+for(const[key,colors]of Object.entries(posMap)){
+const[baseX,baseY]=key.split(',').map(Number);
+colors.forEach((color,idx)=>{
+const id=colorMap[color];
+if(!id)return;
+const el=document.getElementById(id);
+if(!el)return;
+let offsetX=0,offsetY=0;
+if(idx===1){offsetX=10;offsetY=0;}
+if(idx===2){offsetX=0;offsetY=10;}
+if(idx===3){offsetX=10;offsetY=10;}
+el.style.left=(baseX+offsetX)+'px';
+el.style.top=(baseY+offsetY)+'px';
+el.style.zIndex=20;
+});
 }
-
+}
 
 // Displays
 function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }
 function updateDisplay2(text){ document.getElementById('display2').innerText = text || ''; }
 
-// Money
-function updateMoney(data){
-document.getElementById('money-p1-overlay').textContent = 'Player1: $' + data.p1;
-document.getElementById('money-p2-overlay').textContent = 'Player2: $' + data.p2;
-
+function renderMoneyBoxes(){
+document.getElementById('money-p1-overlay').textContent=labels.p1+': $'+lastMoney.p1;
+document.getElementById('money-p2-overlay').textContent=labels.p2+': $'+lastMoney.p2;
 }
 
+function updateMoney(data){
+lastMoney = {...lastMoney, ...data};
+renderMoneyBoxes();
+}
+
+function updateLabels(data){
+labels = {...labels, ...data};
+renderMoneyBoxes();
+}
 
 function renderBuildings(data){
 const board=document.getElementById('board');
@@ -269,58 +263,54 @@ board.appendChild(el);
 }
 }
 
-
-const boardSpaces = [
-  { number: 1, x: 717, y: 775 }, 
-  { number: 3, x: 572, y: 775 },
-  { number: 4, x: 500, y: 775 }, 
-  { number: 5, x: 425, y: 775 }, 
-  { number: 6, x: 355, y: 775 }, 
-  { number: 8, x: 210, y: 775 }, 
-  { number: 9, x: 138, y: 775 }, 
-  { number: 11, x: 75, y: 715 },
-  { number: 12, x: 75, y: 643 }, 
-  { number: 13, x: 75, y: 570 }, 
-  { number: 14, x: 75, y: 498 }, 
-  { number: 15, x: 75, y: 425 },
-  { number: 16, x: 75, y: 355 }, 
-  { number: 17, x: 75, y: 283 }, 
-  { number: 19, x: 75, y: 138 },
-  { number: 21, x: 134, y: 74 }, 
-  { number: 22, x: 204, y: 74 }, 
-  { number: 24, x: 352, y: 74 }, 
-  { number: 25, x: 424, y: 74 }, 
-  { number: 26, x: 497, y: 74 }, 
-  { number: 27, x: 569, y: 74 },
-  { number: 28, x: 644, y: 74 }, 
-  { number: 29, x: 714, y: 74 }, 
-  { number: 31, x: 774, y: 135 },
-  { number: 33, x: 774, y: 280 },
-  { number: 34, x: 774, y: 350 },
-  { number: 35, x: 774, y: 420 },
-  { number: 37, x: 774, y: 570 },
-  { number: 38, x: 774, y: 640 },
-  { number: 39, x: 774, y: 712 },
-  { number: 40, x: 650, y: 650 },
-  { number: 41, x: 570, y: 658 },
-  { number: 42, x: 495, y: 658 },
-  { number: 44, x: 355, y: 658 },
-  { number: 45, x: 280, y: 658 },
-  { number: 46, x: 140, y: 650 },
-  { number: 47, x: 190, y: 570 },
-  { number: 50, x: 190, y: 350 },
-  { number: 51, x: 190, y: 280 },
-  { number: 52, x: 140, y: 150 },
-  { number: 53, x: 280, y: 187 },
-  { number: 56, x: 495, y: 187 },
-  { number: 57, x: 568, y: 187 },
-  { number: 58, x: 650, y: 145 },
-  { number: 59, x: 660, y: 275 },
-  { number: 63, x: 660, y: 568 }
- 
+const boardSpaces=[
+{number:1,x:717,y:779},
+{number:3,x:572,y:779},
+{number:4,x:500,y:779},
+{number:5,x:425,y:779},
+{number:6,x:355,y:779},
+{number:8,x:210,y:779},
+{number:9,x:138,y:779},
+{number:11,x:75,y:715},
+{number:12,x:75,y:643},
+{number:13,x:75,y:570},
+{number:14,x:75,y:498},
+{number:15,x:75,y:425},
+{number:16,x:75,y:355},
+{number:17,x:75,y:283},
+{number:19,x:75,y:138},
+{number:21,x:134,y:74},
+{number:22,x:204,y:74},
+{number:24,x:352,y:74},
+{number:25,x:424,y:74},
+{number:26,x:497,y:74},
+{number:27,x:569,y:74},
+{number:28,x:644,y:74},
+{number:29,x:714,y:74},
+{number:31,x:774,y:135},
+{number:33,x:774,y:280},
+{number:34,x:774,y:350},
+{number:35,x:774,y:420},
+{number:37,x:774,y:570},
+{number:38,x:774,y:640},
+{number:39,x:774,y:712},
+{number:40,x:650,y:650},
+{number:41,x:570,y:660},
+{number:42,x:495,y:660},
+{number:44,x:355,y:660},
+{number:45,x:280,y:660},
+{number:46,x:140,y:650},
+{number:47,x:190,y:570},
+{number:50,x:190,y:350},
+{number:51,x:190,y:280},
+{number:52,x:140,y:150},
+{number:53,x:280,y:187},
+{number:56,x:495,y:187},
+{number:57,x:568,y:187},
+{number:58,x:650,y:145},
+{number:59,x:660,y:275},
+{number:63,x:660,y:568}
 ];
-
-
 
 const allSpaces = [
   1,3,4,5,6,8,9,11,12,13,14,15,16,17,19,21,22,24,25,26,27,28,29,31,33,34,35,37,38,39,40,41,42,44,45,46,47,50,51,52,53,56,57,58,59,63
@@ -328,122 +318,81 @@ const allSpaces = [
 
 const group1 = [1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
 const group2 = [11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
-
 const boardButtonsContainer = document.getElementById('boardButtons');
 
-// Mode toggle logic
-const modeButtons = document.querySelectorAll('.mode-btn');
-let currentMode = 'mortgage';
-modeButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-        modeButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentMode = btn.dataset.mode;
-
-        boardButtonsContainer.querySelectorAll('button').forEach(b => {
-            const spaceNum = b.textContent;
-            b.title = `${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)} space ${spaceNum}`;
-        });
-    });
+const modeButtons=document.querySelectorAll('.mode-btn');
+let currentMode='mortgage';
+modeButtons.forEach(btn=>{
+btn.addEventListener('click',()=>{
+modeButtons.forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+currentMode=btn.dataset.mode;
+boardButtonsContainer.querySelectorAll('button').forEach(b=>{
+const spaceNum=b.textContent;
+b.title=`${currentMode.charAt(0).toUpperCase()+currentMode.slice(1)} space ${spaceNum}`;
+});
+});
 });
 
-
-// Generate board buttons
-allSpaces.forEach(spaceNum => {
-    const coords = boardSpaces.find(b => b.number === spaceNum);
-    if (!coords) return;
-
-    const btn = document.createElement('button');
-    btn.textContent = spaceNum;
-    btn.title = `Redeem space ${spaceNum}`;
-    btn.style.position = 'absolute';
-    btn.style.left = `${coords.x}px`;
-    btn.style.top = `${coords.y}px`;
-
-    if (group1.includes(spaceNum)) {
-        btn.style.width = '50px';
-        btn.style.height = '50px';
-        btn.style.fontSize = '0.85em';
-    } else if (group2.includes(spaceNum)) {
-        btn.style.width = '50px';
-        btn.style.height = '50px';
-        btn.style.fontSize = '0.75em';
-    } else {
-        btn.style.width = '110px';
-        btn.style.height = '110px';
-        btn.style.fontSize = '0.8em';
-    }
-
-    btn.style.backgroundColor = 'rgba(128,128,128,0.4)';
-    btn.style.border = '1px solid rgba(255,255,255,0.6)';
-    btn.style.color = 'white';
-    btn.style.zIndex = 50;
-    btn.style.cursor = 'pointer';
-
-    btn.addEventListener('click', () => {
-        socket.emit('sendMessage', { bot: 'player1bot', msg: `!${currentMode} ${spaceNum}` });
-        
-    });
-
-    boardButtonsContainer.appendChild(btn);
+allSpaces.forEach(spaceNum=>{
+const coords=boardSpaces.find(b=>b.number===spaceNum);
+if(!coords)return;
+const btn=document.createElement('button');
+btn.textContent=spaceNum;
+btn.style.position='absolute';
+btn.style.left=`${coords.x}px`;
+btn.style.top=`${coords.y}px`;
+if(group1.includes(spaceNum)){btn.style.width='50px';btn.style.height='50px';btn.style.fontSize='0.85em';}
+else if(group2.includes(spaceNum)){btn.style.width='50px';btn.style.height='50px';btn.style.fontSize='0.75em';}
+else{btn.style.width='110px';btn.style.height='110px';btn.style.fontSize='0.8em';}
+btn.style.backgroundColor='rgba(128,128,gray,0.4)';
+btn.style.border='1px solid rgba(255,255,255,0.6)';
+btn.style.color='white';
+btn.style.zIndex=50;
+btn.style.cursor='pointer';
+btn.addEventListener('click',()=>socket.emit('sendMessage',{bot:'player1bot',msg:`!${currentMode} ${spaceNum}`}));
+boardButtonsContainer.appendChild(btn);
 });
 
-
-// Make board buttons invisible
-boardButtonsContainer.querySelectorAll('button').forEach(btn => {
-    const spaceNum = parseInt(btn.textContent);
-    if (spaceNum >= 1 && spaceNum <= 63) {
-        btn.style.backgroundColor = 'transparent';
-        btn.style.border = 'none';
-        btn.style.color = 'transparent';
-    }
+boardButtonsContainer.querySelectorAll('button').forEach(btn=>{
+const spaceNum=parseInt(btn.textContent);
+if(spaceNum>=1&&spaceNum<=63){
+btn.style.backgroundColor='transparent';
+btn.style.border='none';
+btn.style.color='transparent';
+}
 });
 
-
-
-function scaleBoard() {
-  const container = document.getElementById('boardContainer');
-  const wrapper = document.getElementById('boardWrapper');
-
-  const scaleX = wrapper.clientWidth / 930; // board original width
-  const scaleY = wrapper.clientHeight / 930; // board original height
-  const scale = Math.min(scaleX, scaleY);
-
-  container.style.transform = `scale(${scale})`;
+function scaleBoard(){
+const container=document.getElementById('boardContainer');
+const wrapper=document.getElementById('boardWrapper');
+const scaleX=wrapper.clientWidth/930;
+const scaleY=wrapper.clientHeight/930;
+const scale=Math.min(scaleX,scaleY);
+container.style.transform=`scale(${scale})`;
 }
 
-window.addEventListener('resize', scaleBoard);
-scaleBoard(); // initial scale
-
-if (!window.__SOUND_LISTENER_LOCK__) {
-    window.__SOUND_LISTENER_LOCK__ = true;
-
-    socket.on('play-sound', ({ file }) => {
-        new Audio(file).play();
-    });
-
-    console.log("Sound listener attached (single instance)");
+window.addEventListener('resize',scaleBoard);
+scaleBoard();
+if(!window.__SOUND_LISTENER_LOCK__){
+window.__SOUND_LISTENER_LOCK__=true;
+socket.on('play-sound',({file})=>{
+new Audio(file).play();
+});
+console.log("Sound listener attached (single instance)");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Intercept all form submissions targeting the hidden iframe
-    document.querySelectorAll('form[target="hiddenFrame"]').forEach(form => {
-        form.addEventListener("submit", function(e) {
-            e.preventDefault(); // stop normal iframe submission
-
-            const bot = form.querySelector('[name="bot"]').value;
-            const msg = form.querySelector('[name="msg"]').value;
-            const targetInput = form.querySelector('[name="target"]');
-            const target = targetInput?.value || undefined;
-
-            // Send via fetch instead
-            fetch(form.action, {
-                method: form.method || "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ bot, target, msg })
-            }).catch(err => console.error(err));
-        });
-    });
+document.addEventListener("DOMContentLoaded",()=>{
+document.querySelectorAll('form[target="hiddenFrame"]').forEach(form=>{
+form.addEventListener("submit",function(e){
+e.preventDefault();
+const bot=form.querySelector('[name="bot"]').value;
+const msg=form.querySelector('[name="msg"]').value;
+const targetInput=form.querySelector('[name="target"]');
+const target=targetInput?.value||undefined;
+fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
+});
+});
 });
 
 socket.on('piecesUpdate', updatePieces);
@@ -453,15 +402,18 @@ socket.on('reload-dots', data => { renderDotsFromServer(data); });
 socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));
 socket.on('moneyUpdate', updateMoney);
+socket.on('labelsUpdate', updateLabels);
 socket.on('buildingsUpdate', renderBuildings);
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
-
+// Initial fetch
 fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
 fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
+fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});
 fetch('/building.json').then(r=>r.json()).then(renderBuildings);
 </script>
+
 </body>
 </html>
