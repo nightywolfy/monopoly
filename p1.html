@@ -146,8 +146,11 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
+socket.emit('identify', {page: 'computer'});
 let currentMap = 1;
 let activeDots = {};
+let labels = {p1:'Player1',p2:'Player2',p3:'Player3',p4:'Player4',p5:'Player5',p6:'Player6'};
+let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
 const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
 const buildingPositions={
 1:{x:740,y:795},
@@ -243,13 +246,23 @@ function updateDisplay1(text){ document.getElementById('display1').innerText = t
 function updateDisplay2(text){ document.getElementById('display2').innerText = text || ''; }
 
 // Money
+function renderMoneyBoxes(){
+document.getElementById('money-p1-overlay').textContent = labels.p1 + ': $' + lastMoney.p1;
+document.getElementById('money-p2-overlay').textContent = labels.p2 + ': $' + lastMoney.p2;
+document.getElementById('money-p3-overlay').textContent = labels.p3 + ': $' + lastMoney.p3;
+document.getElementById('money-p4-overlay').textContent = labels.p4 + ': $' + lastMoney.p4;
+document.getElementById('money-p5-overlay').textContent = labels.p5 + ': $' + lastMoney.p5;
+document.getElementById('money-p6-overlay').textContent = labels.p6 + ': $' + lastMoney.p6;
+}
+
 function updateMoney(data){
-document.getElementById('money-p1-overlay').textContent = 'Player1: $' + data.p1;
-document.getElementById('money-p2-overlay').textContent = 'Player2: $' + data.p2;
-document.getElementById('money-p3-overlay').textContent = 'Player3: $' + data.p3;
-document.getElementById('money-p4-overlay').textContent = 'Player4: $' + data.p4;
-document.getElementById('money-p5-overlay').textContent = 'Player5: $' + data.p5;
-document.getElementById('money-p6-overlay').textContent = 'Player6: $' + data.p6;
+lastMoney = {...lastMoney, ...data};
+renderMoneyBoxes();
+}
+
+function updateLabels(data){
+labels = {...labels, ...data};
+renderMoneyBoxes();
 }
 
 function renderBuildings(data){
@@ -412,6 +425,7 @@ socket.on('reload-dots', data => { renderDotsFromServer(data); });
 socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));
 socket.on('moneyUpdate', updateMoney);
+socket.on('labelsUpdate', updateLabels);
 socket.on('buildingsUpdate', renderBuildings);
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
@@ -420,6 +434,7 @@ fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
 fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
+fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});
 fetch('/building.json').then(r=>r.json()).then(renderBuildings);
 
 </script>

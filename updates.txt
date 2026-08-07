@@ -31,4 +31,4 @@ Update Changelog:
 27. Added !housestatus access to the all players page for easier monitoring.
 28. Added the !name and !nameswitch commands, allowing players to use custom names instead of default names (p1/p2/p3/p4/p5/p6).
 29. Updated !status with a cleaner output format, including property names and support for individual player checks (example: !status p1).
-
+30. Added the !label all p1-name p2-name p3-name p4-name p5-name p6-name command for customizing the MoneyBox player labels.
