@@ -30,5 +30,6 @@ Update Changelog:
 26. Added button press visual effects for improved user interaction.
 27. Added !housestatus to the all players page, making house/property monitoring easier.
 28. Added !rename support, allowing players to replace default player names (p1-p6) with custom names.
-29. Improved !status with a cleaner layout, property name display, and individual player lookup support (example: !status p1).
+29. Improved !status with a cleaner layout, property names, and individual player lookup support (example: !status p1).
 30. Added !display p1-name p2-name p3-name p4-name p5-name p6-name for customizing player names shown on the MoneyBox display.
+31. Added Trade menu to all computer users (not available on mobile users).
