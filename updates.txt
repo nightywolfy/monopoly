@@ -32,4 +32,10 @@ Update Changelog:
 28. Added !rename support, allowing players to replace default player names (p1-p6) with custom names.
 29. Improved !status with a cleaner layout, property names, and individual player lookup support (example: !status p1).
 30. Added !display p1-name p2-name p3-name p4-name p5-name p6-name for customizing player names shown on the MoneyBox display.
-31. Added Trade menu to all computer users (not available on mobile users).
+31. Added Trade menu to all users
+32. Lowered the volume of the bidding sound.
+
+todo list
+
+dot bigger
+

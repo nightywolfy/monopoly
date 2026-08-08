@@ -51,23 +51,158 @@ const saveDisplay2=()=>safeWriteJSON(display2File,display2);
 const saveDots=()=>safeWriteJSON(dotsFile,activeDots);
 const saveLabels=()=>safeWriteJSON(labelsFile,labels);
 
+const buildingPositions={
+  1:{x:740,y:795},
+  3:{x:595,y:795},
+  6:{x:373,y:795},
+  8:{x:232,y:795},
+  9:{x:160,y:795},
+  11:{x:105,y:735},
+  12:{x:105,y:665},
+  14:{x:105,y:515},
+  16:{x:105,y:375},
+  17:{x:105,y:300},
+  19:{x:105,y:155},
+  21:{x:156,y:105},
+  22:{x:230,y:105},
+  24:{x:375,y:105},
+  26:{x:520,y:105},
+  28:{x:665,y:105},
+  29:{x:740,y:105},
+  31:{x:793,y:155},
+  33:{x:793,y:300},
+  34:{x:793,y:370},
+  37:{x:793,y:590},
+  39:{x:793,y:730},
+  41:{x:595,y:680},
+  42:{x:525,y:680},
+  63:{x:678,y:590},
+  44:{x:305,y:680},
+  45:{x:218,y:590},
+  47:{x:380,y:680},
+  50:{x:218,y:305},
+  51:{x:218,y:375},
+  53:{x:304,y:220},
+  56:{x:595,y:220},
+  57:{x:678,y:305},
+  59:{x:523,y:220}
+};
+
 const boardSpaces=[
-  {number:0,x:825,y:825},{number:1,x:722,y:825},{number:2,x:650,y:825},{number:3,x:577,y:825},
-  {number:4,x:505,y:825},{number:5,x:430,y:825},{number:6,x:360,y:825},{number:7,x:287,y:825},
-  {number:8,x:215,y:825},{number:9,x:143,y:825},{number:10,x:35,y:825},{number:11,x:35,y:720},
-  {number:12,x:35,y:648},{number:13,x:35,y:575},{number:14,x:35,y:503},{number:15,x:35,y:430},
-  {number:16,x:35,y:360},{number:17,x:35,y:288},{number:18,x:35,y:215},{number:19,x:35,y:143},
-  {number:20,x:35,y:40},{number:21,x:140,y:40},{number:22,x:210,y:40},{number:23,x:285,y:40},
-  {number:24,x:358,y:40},{number:25,x:430,y:40},{number:26,x:503,y:40},{number:27,x:575,y:40},
-  {number:28,x:650,y:40},{number:29,x:720,y:40},{number:30,x:820,y:40},{number:31,x:820,y:140},
-  {number:32,x:820,y:212},{number:33,x:820,y:285},{number:34,x:820,y:355},{number:35,x:820,y:425},
-  {number:36,x:820,y:500},{number:37,x:820,y:575},{number:38,x:820,y:645},{number:39,x:820,y:717},
-  {number:40,x:685,y:710},{number:41,x:577,y:710},{number:42,x:505,y:710},{number:43,x:432,y:710},
-  {number:44,x:360,y:710},{number:45,x:288,y:710},{number:46,x:150,y:710},{number:47,x:150,y:580},
-  {number:48,x:150,y:505},{number:49,x:150,y:430},{number:50,x:150,y:360},{number:51,x:150,y:290},
-  {number:52,x:150,y:150},{number:53,x:285,y:150},{number:54,x:358,y:150},{number:55,x:430,y:150},
-  {number:56,x:500,y:150},{number:57,x:575,y:150},{number:58,x:710,y:150},{number:59,x:710,y:285},
-  {number:60,x:710,y:355},{number:61,x:710,y:430},{number:62,x:710,y:500},{number:63,x:710,y:575}
+  {number:0,x:825,y:825},
+  {number:1,x:722,y:825},
+  {number:2,x:650,y:825},
+  {number:3,x:577,y:825},
+  {number:4,x:505,y:825},
+  {number:5,x:430,y:825},
+  {number:6,x:360,y:825},
+  {number:7,x:287,y:825},
+  {number:8,x:215,y:825},
+  {number:9,x:143,y:825},
+  {number:10,x:35,y:825},
+  {number:11,x:35,y:720},
+  {number:12,x:35,y:648},
+  {number:13,x:35,y:575},
+  {number:14,x:35,y:503},
+  {number:15,x:35,y:430},
+  {number:16,x:35,y:360},
+  {number:17,x:35,y:288},
+  {number:18,x:35,y:215},
+  {number:19,x:35,y:143},
+  {number:20,x:35,y:40},
+  {number:21,x:140,y:40},
+  {number:22,x:210,y:40},
+  {number:23,x:285,y:40},
+  {number:24,x:358,y:40},
+  {number:25,x:430,y:40},
+  {number:26,x:503,y:40},
+  {number:27,x:575,y:40},
+  {number:28,x:650,y:40},
+  {number:29,x:720,y:40},
+  {number:30,x:820,y:40},
+  {number:31,x:820,y:140},
+  {number:32,x:820,y:212},
+  {number:33,x:820,y:285},
+  {number:34,x:820,y:355},
+  {number:35,x:820,y:425},
+  {number:36,x:820,y:500},
+  {number:37,x:820,y:575},
+  {number:38,x:820,y:645},
+  {number:39,x:820,y:717},
+  {number:40,x:685,y:710},
+  {number:41,x:577,y:710},
+  {number:42,x:505,y:710},
+  {number:43,x:432,y:710},
+  {number:44,x:360,y:710},
+  {number:45,x:288,y:710},
+  {number:46,x:150,y:710},
+  {number:47,x:150,y:580},
+  {number:48,x:150,y:505},
+  {number:49,x:150,y:430},
+  {number:50,x:150,y:360},
+  {number:51,x:150,y:290},
+  {number:52,x:150,y:150},
+  {number:53,x:285,y:150},
+  {number:54,x:358,y:150},
+  {number:55,x:430,y:150},
+  {number:56,x:500,y:150},
+  {number:57,x:575,y:150},
+  {number:58,x:710,y:150},
+  {number:59,x:710,y:285},
+  {number:60,x:710,y:355},
+  {number:61,x:710,y:430},
+  {number:62,x:710,y:500},
+  {number:63,x:710,y:575}
+];
+
+
+const clickableSpaces=[
+  {number:1,x:717,y:779},
+  {number:3,x:572,y:779},
+  {number:4,x:500,y:779},
+  {number:5,x:425,y:779},
+  {number:6,x:355,y:779},
+  {number:8,x:210,y:779},
+  {number:9,x:138,y:779},
+  {number:11,x:15,y:715},
+  {number:12,x:15,y:643},
+  {number:13,x:15,y:570},
+  {number:14,x:15,y:498},
+  {number:15,x:15,y:425},
+  {number:16,x:15,y:355},
+  {number:17,x:15,y:283},
+  {number:19,x:15,y:138},
+  {number:21,x:134,y:16},
+  {number:22,x:207,y:16},
+  {number:24,x:352,y:16},
+  {number:25,x:424,y:16},
+  {number:26,x:497,y:16},
+  {number:27,x:569,y:16},
+  {number:28,x:644,y:16},
+  {number:29,x:714,y:16},
+  {number:31,x:774,y:135},
+  {number:33,x:774,y:280},
+  {number:34,x:774,y:350},
+  {number:35,x:774,y:420},
+  {number:37,x:774,y:570},
+  {number:38,x:774,y:640},
+  {number:39,x:774,y:712},
+  {number:40,x:650,y:650},
+  {number:41,x:570,y:660},
+  {number:42,x:495,y:660},
+  {number:44,x:355,y:660},
+  {number:45,x:280,y:660},
+  {number:46,x:140,y:650},
+  {number:47,x:130,y:570},
+  {number:50,x:130,y:350},
+  {number:51,x:130,y:280},
+  {number:52,x:140,y:150},
+  {number:53,x:280,y:129},
+  {number:56,x:495,y:129},
+  {number:57,x:568,y:129},
+  {number:58,x:650,y:145},
+  {number:59,x:660,y:275},
+  {number:63,x:660,y:568}
 ];
 
 const colorMap={p1:'red',p2:'blue',p3:'orange',p4:'green',p5:'purple',p6:'white'};
@@ -276,7 +411,7 @@ function createBot(nick,defaultTarget,options={}){
             if (target?.toLowerCase()!=='all') { safeSay(defaultTarget,'Only !mv all ... allowed'); break; }
             const players = Object.keys(colorMap);
             if (spacesStr.length!==players.length) { safeSay(defaultTarget,`Must provide exactly ${players.length} spaces`); break; }
-            players.forEach((p,i)=>{ const space=parseInt(spacesStr[i],10); if(isNaN(space)||space<0||space>=boardSpaces.length){ safeSay(defaultTarget,`Invalid space "${spacesStr[i]}"`); return; } const {x,y}=boardSpaces[space]; updatePiece(p,x,y); });
+            players.forEach((p,i)=>{ const space=parseInt(spacesStr[i],10); const entry=isNaN(space)?null:boardSpaces.find(s=>s.number===space); if(!entry){ safeSay(defaultTarget,`Invalid space "${spacesStr[i]}"`); return; } updatePiece(p,entry.x,entry.y); });
             break;
           }
           case '!mv2': {
@@ -438,6 +573,8 @@ io.on('connection',(socket)=>{
     });
     socket.emit('map-change',currentMap);
     socket.emit('reload-dots',activeDots);
+    socket.emit('buildingPositions',buildingPositions);
+    socket.emit('clickableSpacesData', clickableSpaces);
     socket.on('cmd-dot',({num,color})=>updateDot(num,color));
     socket.on('cmd-remove',num=>removeDot(num));
     socket.on('cmd-cleardot',()=>clearAllDots());
@@ -510,5 +647,5 @@ async function gracefulShutdown(signal){
 
 // --- Start server ---
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
-//server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));
+//server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
+server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));

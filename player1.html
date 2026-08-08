@@ -140,42 +140,9 @@ let activeDots = {};
 let labels={p1:'Player1',p2:'Player2'};
 let lastMoney={p1:0,p2:0};
 const colorMap={red:"p1",blue:"p2"};
-const buildingPositions={
-1:{x:740,y:795},
-3:{x:595,y:795},
-6:{x:373,y:795},
-8:{x:232,y:795},
-9:{x:160,y:795},
-11:{x:105,y:735},
-12:{x:105,y:665},
-14:{x:105,y:515},
-16:{x:105,y:375},
-17:{x:105,y:300},
-19:{x:105,y:155},
-21:{x:156,y:105},
-22:{x:230,y:105},
-24:{x:375,y:105},
-26:{x:520,y:105},
-28:{x:665,y:105},
-29:{x:740,y:105},
-31:{x:793,y:155},
-33:{x:793,y:300},
-34:{x:793,y:370},
-37:{x:793,y:590},
-39:{x:793,y:730},
-41:{x:595,y:680},
-42:{x:525,y:680},
-63:{x:678,y:590},
-44:{x:305,y:680},
-45:{x:218,y:590},
-47:{x:380,y:680},
-50:{x:218,y:305},
-51:{x:218,y:375},
-53:{x:304,y:220},
-56:{x:595,y:220},
-57:{x:678,y:305},
-59:{x:523,y:220}
-};
+
+let buildingPositions = {};
+let lastBuildingsData = null;
 
 function renderDotsFromServer(data){
 const board=document.getElementById('board');
@@ -268,59 +235,6 @@ board.appendChild(el);
 }
 
 
-const boardSpaces=[
-{number:1,x:717,y:779},
-{number:3,x:572,y:779},
-{number:4,x:500,y:779},
-{number:5,x:425,y:779},
-{number:6,x:355,y:779},
-{number:8,x:210,y:779},
-{number:9,x:138,y:779},
-{number:11,x:15,y:715},
-{number:12,x:15,y:643},
-{number:13,x:15,y:570},
-{number:14,x:15,y:498},
-{number:15,x:15,y:425},
-{number:16,x:15,y:355},
-{number:17,x:15,y:283},
-{number:19,x:15,y:138},
-{number:21,x:134,y:16},
-{number:22,x:207,y:16},
-{number:24,x:352,y:16},
-{number:25,x:424,y:16},
-{number:26,x:497,y:16},
-{number:27,x:569,y:16},
-{number:28,x:644,y:16},
-{number:29,x:714,y:16},
-{number:31,x:774,y:135},
-{number:33,x:774,y:280},
-{number:34,x:774,y:350},
-{number:35,x:774,y:420},
-{number:37,x:774,y:570},
-{number:38,x:774,y:640},
-{number:39,x:774,y:712},
-{number:40,x:650,y:650},
-{number:41,x:570,y:660},
-{number:42,x:495,y:660},
-{number:44,x:355,y:660},
-{number:45,x:280,y:660},
-{number:46,x:140,y:650},
-{number:47,x:130,y:570},
-{number:50,x:130,y:350},
-{number:51,x:130,y:280},
-{number:52,x:140,y:150},
-{number:53,x:280,y:129},
-{number:56,x:495,y:129},
-{number:57,x:568,y:129},
-{number:58,x:650,y:145},
-{number:59,x:660,y:275},
-{number:63,x:660,y:568}
-];
-
-const allSpaces = [
-  1,3,4,5,6,8,9,11,12,13,14,15,16,17,19,21,22,24,25,26,27,28,29,31,33,34,35,37,38,39,40,41,42,44,45,46,47,50,51,52,53,56,57,58,59,63
-];
-
 const group1 = [1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
 const group2 = [11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
 const boardButtonsContainer = document.getElementById('boardButtons');
@@ -410,16 +324,19 @@ socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));
 socket.on('moneyUpdate', updateMoney);
 socket.on('labelsUpdate', updateLabels);
-socket.on('buildingsUpdate', renderBuildings);
+socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
+socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
+socket.on('boardClickPositions', data=>{ buildBoardButtons(data); });
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
+socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
 // Initial fetch
 fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
 fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});
-fetch('/building.json').then(r=>r.json()).then(renderBuildings);
+fetch('/building.json').then(r=>r.json()).then(data=>{ lastBuildingsData=data; renderBuildings(data); });
 </script>
 
 </body>

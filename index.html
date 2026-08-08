@@ -17,18 +17,14 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .white{background:#fff;border-color:#ccc;color:black}
 .dot{width:12px;height:12px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 #centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
-
 #moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:320px}
-
 .moneyBox{padding:3px 8px;border-radius:10px;width:100%;height:45px;box-sizing:border-box;text-align:center;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;word-wrap:break-word;box-shadow:0 0 10px rgba(0,212,255,.8),0 0 15px rgba(106,13,173,.6);border:2px solid rgba(255,255,255,.5);color:black}
-
 .moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
 .moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
 .moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
 .moneyBox.green{background:linear-gradient(135deg,#32cd32,#b6ffb6);color:black}
 .moneyBox.purple{background:linear-gradient(135deg,#8a2be2,#d9a7ff);color:black}
 .moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
-
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center}
 .displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
 .hotel,.house{width:29px;height:29px;position:absolute}
@@ -52,7 +48,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .mobilePlayers .playerGrid{grid-template-columns:repeat(2,1fr);gap:10px}
 .mobilePlayers .playerBtn{font-size:16px;padding:12px;min-height:45px}
 .mobileOnly,.desktopOnly{display:block}
-
 </style>
 </head>
 <body>
@@ -137,6 +132,8 @@ Updates
 </div>
 </div>
 
+
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket = io();
@@ -147,6 +144,8 @@ let labels = {p1:'Player1',p2:'Player2',p3:'Player3',p4:'Player4',p5:'Player5',p
 let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
 const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
 
+let buildingPositions = {};
+let lastBuildingsData = null;
 
 function renderDotsFromServer(data){
 const board=document.getElementById('board');
@@ -224,42 +223,6 @@ labels = {...labels, ...data};
 renderMoneyBoxes();
 }
 
-const buildingPositions={
-1:{x:740,y:795},
-3:{x:595,y:795},
-6:{x:373,y:795},
-8:{x:232,y:795},
-9:{x:160,y:795},
-11:{x:105,y:735},
-12:{x:105,y:665},
-14:{x:105,y:515},
-16:{x:105,y:375},
-17:{x:105,y:300},
-19:{x:105,y:155},
-21:{x:156,y:105},
-22:{x:230,y:105},
-24:{x:375,y:105},
-26:{x:520,y:105},
-28:{x:665,y:105},
-29:{x:740,y:105},
-31:{x:793,y:155},
-33:{x:793,y:300},
-34:{x:793,y:370},
-37:{x:793,y:590},
-39:{x:793,y:730},
-41:{x:595,y:680},
-42:{x:525,y:680},
-63:{x:678,y:590},
-44:{x:305,y:680},
-45:{x:218,y:590},
-47:{x:380,y:680},
-50:{x:218,y:305},
-51:{x:218,y:375},
-53:{x:304,y:220},
-56:{x:595,y:220},
-57:{x:678,y:305},
-59:{x:523,y:220}
-};
 
 function renderBuildings(data){
 const board=document.getElementById('board');
@@ -322,7 +285,8 @@ socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));
 socket.on('moneyUpdate', updateMoney);
 socket.on('labelsUpdate', updateLabels);
-socket.on('buildingsUpdate', renderBuildings);
+socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
+socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
 // Initial fetch
