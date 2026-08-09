@@ -226,7 +226,7 @@ function updateDisplay1(newText){if(display1.text===newText)return;display1.text
 function updateDisplay2(newText){if(display2.text===newText)return;display2.text=newText;saveDisplay2();safeEmit('displayUpdate2',{text:display2.text})}
 function updateMoney(player,amount){if(!colorMap[player]||money[player]===amount)return;money[player]=amount;saveMoney();safeEmit('moneyUpdate',money)}
 
-function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||text.length<3||text.length>8||labels[player]===text)return;labels[player]=text;saveLabels();io.emit('labelsUpdate',labels)}
+function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||text.length<2||text.length>8||labels[player]===text)return;labels[player]=text;saveLabels();io.emit('labelsUpdate',labels)}
 
 function getBuilding(space){return buildings[String(space)]||null}
 
@@ -305,12 +305,64 @@ const coordinates1={1:{x:731,y:761},3:{x:587,y:761},4:{x:518,y:761},5:{x:446,y:7
 21:{x:157,y:124},22:{x:227,y:124},24:{x:373,y:124},25:{x:446,y:124},26:{x:517,y:124},27:{x:591,y:124},28:{x:665,y:124},29:{x:735,y:124},
 31:{x:759,y:153},33:{x:759,y:296},34:{x:759,y:369},35:{x:759,y:443},37:{x:759,y:588},38:{x:759,y:661},39:{x:759,y:732}};
 
-const coordinates2={1:{x:760,y:875},3:{x:617,y:875},4:{x:544,y:875},5:{x:471,y:875},6:{x:399,y:875},8:{x:255,y:875},9:{x:183,y:875},
-11:{x:13,y:760},12:{x:13,y:687},13:{x:13,y:616},14:{x:13,y:542},15:{x:13,y:468},16:{x:13,y:397},17:{x:13,y:324},19:{x:13,y:178},
-21:{x:182,y:12},22:{x:255,y:12},24:{x:400,y:12},25:{x:472,y:12},26:{x:545,y:12},27:{x:616,y:12},28:{x:688,y:12},29:{x:762,y:12},
-31:{x:872,y:178},33:{x:872,y:324},34:{x:872,y:396},35:{x:872,y:469},37:{x:872,y:615},38:{x:872,y:688},39:{x:872,y:760},40:{x:758,y:760},
-41:{x:616,y:760},42:{x:544,y:760},44:{x:399,y:760},45:{x:326,y:760},46:{x:126,y:760},47:{x:126,y:615},50:{x:126,y:395},51:{x:126,y:324},
-52:{x:126,y:126},53:{x:326,y:126},56:{x:545,y:126},57:{x:617,y:126},58:{x:758,y:126},59:{x:758,y:324},63:{x:758,y:616}};
+
+
+const coordinates2 = {
+1:{x:757,y:871},
+3:{x:614,y:871},
+4:{x:542,y:871},
+5:{x:467,y:871},
+6:{x:395,y:871},
+8:{x:250,y:871},
+9:{x:178,y:871},
+21:{x:178,y:12},
+22:{x:250,y:12},
+24:{x:395,y:12},
+25:{x:467,y:12},
+26:{x:542,y:12},
+27:{x:614,y:12},
+28:{x:683,y:12},
+29:{x:757,y:12},
+
+11:{x:12,y:758},
+12:{x:12,y:686},
+13:{x:12,y:611},
+14:{x:12,y:537},
+15:{x:12,y:466},
+16:{x:12,y:394},
+17:{x:12,y:322},
+19:{x:12,y:176},
+31:{x:869,y:176},
+33:{x:869,y:322},
+34:{x:869,y:394},
+35:{x:869,y:466},
+37:{x:869,y:611},
+38:{x:869,y:686},
+39:{x:869,y:758},
+
+41:{x:614,y:758},
+42:{x:542,y:758},
+44:{x:395,y:758},
+45:{x:324,y:758},
+
+53:{x:324,y:126},
+56:{x:542,y:126},
+57:{x:614,y:126},
+
+47:{x:126,y:611},
+50:{x:126,y:394},
+51:{x:126,y:322},
+
+59:{x:756,y:322},
+63:{x:756,y:611},
+
+40:{x:756,y:760},
+52:{x:126,y:126},
+46:{x:126,y:760},
+58:{x:756,y:126}
+
+
+};
 
 let currentMap=2;
 
@@ -404,10 +456,11 @@ function createBot(nick,defaultTarget,options={}){
 
           case '!display': {
             if (args.length !== Object.keys(colorMap).length) { safeSay(defaultTarget, `Usage: !display <names for ${Object.keys(colorMap).length} players>`); break; }
-            if (args.some(n=>!/^[A-Za-z0-9_-]{3,8}$/.test(n))) { safeSay(defaultTarget,'Labels must be 3-8 letters/numbers/-/_ each.'); break; }
+            if (args.some(n=>!/^[A-Za-z0-9_-]{2,8}$/.test(n))) { safeSay(defaultTarget,'Labels must be 2-8 letters/numbers/-/_ each.'); break; }
             Object.keys(colorMap).forEach((p,i)=>updateLabel(p,args[i]));
             break;
           }
+
           case '!mv': {
             const [target,...spacesStr] = args;
             if (target?.toLowerCase()!=='all') { safeSay(defaultTarget,'Only !mv all ... allowed'); break; }
@@ -565,7 +618,7 @@ io.on('connection',(socket)=>{
     socket.on('updateDisplay1',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay1(t)});
     socket.on('updateDisplay2',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay2(t)});
 
-    socket.on('updateLabel',payload=>{const player=payload?.player,text=String(payload?.text||'').trim();if(colorMap[player]&&text.length>=3&&text.length<=8)updateLabel(player,text);});
+    socket.on('updateLabel',payload=>{const player=payload?.player,text=String(payload?.text||'').trim();if(colorMap[player]&&text.length>=2&&text.length<=8)updateLabel(player,text);});
 
     socket.emit('map-change',currentMap);
     socket.emit('reload-dots',activeDots);
@@ -643,5 +696,5 @@ async function gracefulShutdown(signal){
 
 // --- Start server ---
 const PORT = process.env.PORT || 3000;
-//server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
-server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));
+server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
+//server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));
