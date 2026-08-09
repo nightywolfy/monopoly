@@ -40,4 +40,5 @@ Update Changelog:
 todo list
 
 Trade Menu for mobile users
+remove mobile section
 

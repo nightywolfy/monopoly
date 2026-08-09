@@ -1,5 +1,3 @@
-<script src="/socket.io/socket.io.js"></script>
-<script>
 const socket = io();
 const BOT_NAME = document.body.dataset.bot;
 const colorMap = {red:"p1", blue:"p2"};
@@ -189,4 +187,3 @@ fetch('/building.json').then(r=>r.json()).then(data=>{ lastBuildingsData=data; r
 fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
 fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
-</script>

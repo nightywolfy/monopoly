@@ -1,5 +1,3 @@
-<script src="/socket.io/socket.io.js"></script>
-<script>
 const socket = io();
 const BOT_NAME = document.body.dataset.bot;
 const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
@@ -376,5 +374,3 @@ cbSpaceClicked(spaceNum,btn);
 
 /* ==================== INITIALIZE ==================== */
 cbReset();
-
-</script>

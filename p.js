@@ -1,9 +1,7 @@
-<script src="/socket.io/socket.io.js"></script>
-<script>
 const socket = io();
 const BOT_NAME = document.body.dataset.bot;
 const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
-let currentMap = 3;
+let currentMap = 2;
 let activeDots = {};
 let labels = {p1:'Player1',p2:'Player2',p3:'Player3',p4:'Player4',p5:'Player5',p6:'Player6'};
 let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
@@ -196,4 +194,3 @@ fetch('/building.json').then(r=>r.json()).then(data=>{ lastBuildingsData=data; r
 fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
 fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
 fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));
-</script>
