@@ -241,7 +241,7 @@ pickBtn.type='button';
 pickBtn.className='opt';
 pickBtn.style.width='100%';
 pickBtn.style.marginTop='6px';
-pickBtn.textContent=entry.picking?'? Done picking spaces':'?? Pick space(s) for this entry';
+pickBtn.textContent=entry.picking?'Done Picking Properties':'Pick Properties';
 if(entry.picking)pickBtn.classList.add('selected');
 
 pickBtn.addEventListener('click',()=>{
@@ -351,7 +351,7 @@ const cmd=cbBuildCommand();
 if(!cmd)return;
 
 socket.emit('sendMessage',{
-bot:'player1bot',
+bot:BOT_NAME,
 msg:cmd
 });
 

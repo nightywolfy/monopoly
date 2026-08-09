@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
 <title>Trade Menu</title>
 <link rel="stylesheet" href="/trade.css">
 </head>
@@ -22,12 +21,10 @@
 </div>
 </div>
 </div>
-
 <div id="playerContainer">
 <div style="position:relative;width:100%;margin-bottom:20px;display:flex;justify-content:center;align-items:flex-start;">
 <div style="position:absolute;left:30px;top:240px;display:flex;flex-direction:column;gap:10px;"></div>
 </div>
-
 <div id="builder">
 <h2>Trade Menu</h2>
 <button id="resetBtn" class="small-button" style="width:100%;margin-bottom:8px">RESET</button>
@@ -44,6 +41,25 @@
 <div id="cmdLog"></div>
 </div>
 </div>
+<script>
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const playerNum = params.get('p') || '1';
+  document.body.dataset.bot = `player${playerNum}bot`;
+  document.querySelectorAll('input[name="bot"]').forEach(el=>{
+    el.value = `player${playerNum}bot`;
+  });
+  document.querySelectorAll('input[name="msg"]').forEach(el=>{
+    el.value = el.value.replace(/p1\b/g, `p${playerNum}`);
+  });
+  document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
+    el.src = el.src.replace('p1.', `p${playerNum}.`);
+  });
+  document.querySelectorAll('a[href^="trade.html"]').forEach(el=>{
+    el.href = `trade.html?p=${playerNum}`;
+  });
+})();
+</script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/trade.js"></script>
 </body>
