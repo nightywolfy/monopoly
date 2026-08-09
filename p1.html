@@ -3,68 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Monopoly Board</title>
-<style>
-html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family:sans-serif;display:flex}
-#boardWrapper{width:50%;height:100%;display:flex;justify-content:center;align-items:center;background:black;overflow:hidden}
-#boardContainer{width:50%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
-#board{position:relative;height:900px;width:900px}
-#boardImg{width:100%;height:100%}
-#displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;transform:translateY(-35px)}
-.displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
-#propertyLink,#rulesLink{position:absolute;z-index:20}
-#propertyLink img,#rulesLink img{width:75px;border-radius:8px;box-shadow:0 0 6px rgba(255,255,255,0.5)}
-#propertyLink{top:40%;left:265px;transform:translateY(-50%)}#rulesLink{top:50%;right:560px;transform:translateY(-50%)}
-.hotel,.house{width:29px;height:29px;position:absolute}
-#topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
-.buttonRow{display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center}
-#topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
-.dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
-#controlsContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column}
-#controlsInner{display:flex;flex-direction:column;height:100%;padding:10px;box-sizing:border-box}
-#chatFrame{flex-grow:1;width:100%;margin-top:15px;border:none;min-height:0}
-#moneyContainer{display:grid;grid-template-columns:repeat(3,250px);gap:10px;justify-content:center;width:100%;padding:10px;box-sizing:border-box}
-.moneyBox{width:250px;height:35px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;box-shadow:0 0 10px #00d4ff;color:white;box-sizing:border-box}
-.moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
-.moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
-.moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
-.moneyBox.green{background:linear-gradient(135deg,#32cd32,#b6ffb6);color:black}
-.moneyBox.purple{background:linear-gradient(135deg,#8a2be2,#d9a7ff);color:black}
-.moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
-.piece { width:32px; height:32px; border-radius:50%; position:absolute; display:flex; align-items:center; justify-content:center; font-weight:bold; border:3px solid transparent; box-shadow:0 0 6px rgba(0,0,0,0.4); transition:left 0.4s ease, top 0.4s ease; color:white; }
-.red { background:#ff4d4d; border-color:#ff8080; }
-.blue { background:#3399ff; border-color:#66a3ff; }
-.orange { background:goldenrod; border-color:#ffde59; color:black; }
-.green { background:limegreen; border-color:#aaffaa; color:black; }
-.purple { background:#9933ff; border-color:#cc99ff; }
-.white{background:#ffffff;border-color:#cccccc;color:black;}
-.mode-btn{padding:6px 12px;font-size:.9em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
-.mode-btn.active{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
-.mode-btn:hover{background:#333}
-.mode-btn.active:hover{background:#0077ff!important}
-#modeToggle{display:flex;justify-content:center;align-items:center;gap:2px;margin-top:-7px;z-index:60;position:relative}
-.white-btn.plus{background-color:#28a745!important;border:1px solid #1e7e34!important;color:white!important;padding:.1px .1px;border-radius:3px;font-weight:bold;cursor:pointer;}
-.white-btn.minus{background-color:#dc3545!important;border:1px solid #b02a37!important;color:white!important;padding:.1px .1px;border-radius:3px;font-weight:bold;cursor:pointer;}
-.white-btn.clr-brown { background-color:#7D4900 !important; border-color:#5c3600 !important; color:white !important; }
-.white-btn.clr-dblue { background-color:#02497F !important; border-color:#01324f !important; color:white !important; }
-.white-btn.clr-blue { background-color:#00BFF5 !important; border-color:#0090b8 !important; color:black !important; }
-.white-btn.clr-green { background-color:#38B74C !important; border-color:#2a8a39 !important; color:white !important; }
-.white-btn.clr-yellow { background-color:#FFEF03 !important; border-color:#c9bc00 !important; color:black !important; }
-.white-btn.clr-pink { background-color:#ED008C !important; border-color:#b8006b !important; color:white !important; }
-.white-btn.clr-orange { background-color:#F8941C !important; border-color:#c7740f !important; color:black !important; }
-.white-btn.clr-red { background-color:#FE0000 !important; border-color:#c00000 !important; color:white !important; }
-.white-btn.clr-white { background-color:#DCE6F0 !important; border-color:#a9b8c9 !important; color:black !important; }
-.white-btn.clr-aqua { background-color:#01EA97 !important; border-color:#019c68 !important; color:black !important; }
-.white-btn.clr-purple { background-color:#59017C !important; border-color:#3d0155 !important; color:white !important; }
-.white-btn.clr-black { background-color:#010101 !important; border-color:#555555 !important; color:white !important; }
-.small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}
-.small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}
-.small-button{width:60px;height:60px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#222;cursor:pointer;transform:translateY(-5px)}
-.small-button img{width:100%;height:100%;object-fit:contain}
-#centralDisplayContainer{position:absolute;top:53%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
-</style>
+<link rel="stylesheet" href="/computer.css">
 </head>
 <body>
-
 <div id="boardWrapper">
 <div id="boardContainer">
 <div id="board">
@@ -129,7 +70,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 </div>
 </div>
 </div>
-
 <div id="controlsContainer">
 <div id="controlsInner">
 <div id="moneyContainer">
@@ -345,8 +285,5 @@ fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});
 fetch('/building.json').then(r=>r.json()).then(data=>{ lastBuildingsData=data; renderBuildings(data); });
 </script>
-
-
-
 </body>
 </html>

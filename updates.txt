@@ -2,12 +2,12 @@ Update Summary
 
 Update Changelog:
 
-1. Prevented dice rolls while an auction is active to maintain proper game flow and avoid conflicts between auctions and player turns.
-2. Fixed an issue where houses were not displaying correctly on the inner board (spaces 40-63).
+1. Prevented dice rolls while an auction is active to maintain proper game flow and prevent conflicts between auctions and player turns.
+2. Fixed an issue where houses were not displaying correctly on the inner board (spaces 40–63).
 3. Updated the auction system from a traditional player-turn-based format to a Richup-style auction system.
 4. Added an automatic fold feature that activates after 12 seconds of auction inactivity.
 5. Added automatic !update execution to reduce the need for manual updates.
-6. Implemented automatic jail release after three turns if the player fails to roll a double.
+6. Implemented automatic jail release after three turns if a player fails to roll a double.
 7. Added the !jailpay command with an adjusted bail system based on the number of turns spent in jail.
 8. Added the !freeloan command for Free Parking (space 20).
 9. Added the !insert command, allowing additional players to join an active game session.
@@ -22,20 +22,22 @@ Update Changelog:
 18. Improved command response performance by reducing !propertylist execution time from approximately 60 seconds to 15 seconds.
 19. Fixed an issue where !jailpay could be used outside of the player's active turn.
 20. Updated house management controls to allow adding or removing one house at a time instead of modifying three houses simultaneously.
-21. Added property house-count display support, showing the number of houses built on each property (1-4 houses).
+21. Added property house-count display support, showing the number of houses built on each property (1–4 houses).
 22. Added dedicated mobile pages for improved mobile support.
 23. Added a restriction preventing !switch from being used with players currently in jail.
-24. Updated turn-ending messages to correctly display the next player's turn (example: "Player 3 turn" instead of "Player 2 turn ended").
+24. Updated turn-ending messages to correctly display the next player's turn (for example, "Player 3 turn" instead of "Player 2 turn ended").
 25. Added smoother button transitions when switching between mortgage and redeem modes.
-26. Added button press visual effects for improved user interaction.
-27. Added !housestatus to the all players page, making house/property monitoring easier.
-28. Added !rename support, allowing players to replace default player names (p1-p6) with custom names.
-29. Improved !status with a cleaner layout, property names, and individual player lookup support (example: !status p1).
-30. Added !display p1-name p2-name p3-name p4-name p5-name p6-name for customizing player names shown on the MoneyBox display.
-31. Added Trade menu to all users
-32. Lowered the volume of the bidding sound.
+26. Added button-press visual effects for improved user interaction.
+27. Added !housestatus to the All Players page, making house and property monitoring easier.
+28. Added !rename support, allowing players to replace default player names (p1–p6) with custom names.
+29. Improved !status with a cleaner layout, property names, and individual player lookup support (for example, !status p1).
+30. Added the !display command to allow customization of the player names shown on the MoneyBox display (p1-name through p6-name).
+31. Added the Trade Menu for computer users.
+32. Reduced the volume of the bidding sound.
+33. Increased the size of the board dots for improved visibility.
+
 
 todo list
 
-dot bigger
+Trade Menu for mobile users
 

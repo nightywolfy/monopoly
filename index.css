@@ -1,0 +1,47 @@
+html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family:sans-serif;display:flex}
+
+#board{position:relative;height:900px;width:900px}
+#boardContainer{width:50%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
+#boardImg{width:100%;height:100%}
+#boardWrapper{width:50%;height:100%;display:flex;justify-content:center;align-items:center;background:black;overflow:hidden}
+
+#centralDisplayContainer{position:absolute;top:53%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px}
+#displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center}
+.displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
+
+#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:320px}
+.moneyBox{padding:3px 8px;border-radius:10px;width:100%;height:45px;box-sizing:border-box;text-align:center;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;word-wrap:break-word;box-shadow:0 0 10px rgba(0,212,255,.8),0 0 15px rgba(106,13,173,.6);border:2px solid rgba(255,255,255,.5);color:black}
+.moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
+.moneyBox.green{background:linear-gradient(135deg,#32cd32,#b6ffb6);color:black}
+.moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
+.moneyBox.purple{background:linear-gradient(135deg,#8a2be2,#d9a7ff);color:black}
+.moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
+.moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
+
+.piece{width:32px;height:32px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid transparent;box-shadow:0 0 6px rgba(0,0,0,0.4);transition:left 0.4s ease,top 0.4s ease;color:white}
+.blue{background:#3399ff;border-color:#66a3ff}
+.green{background:limegreen;border-color:#aaffaa;color:black}
+.orange{background:goldenrod;border-color:#ffde59;color:black}
+.purple{background:#9933ff;border-color:#cc99ff}
+.red{background:#ff4d4d;border-color:#ff8080}
+.white{background:#ffffff;border-color:#cccccc;color:black}
+
+.hotel,.house{width:29px;height:29px;position:absolute}
+.dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
+
+#playerContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:15px;box-shadow:inset 0 0 40px rgba(0,212,255,.3);padding:10px;box-sizing:border-box;overflow-y:auto}
+.playerSection{width:100%;max-width:260px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:10px;text-align:center;box-shadow:0 0 25px rgba(0,0,0,.4)}
+.playerSection h2{color:#FFD700;margin:0 0 10px;font-size:16px;text-shadow:0 0 8px black}
+.playerGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.playerBtn{display:flex;align-items:center;justify-content:center;text-decoration:none;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;padding:10px 6px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer;transition:.2s;min-height:35px}
+.playerBtn:hover{transform:scale(1.05);box-shadow:0 0 20px #00d4ff,0 0 30px #6a0dad}
+.playerBtn:active{transform:scale(.97)}
+
+.sixPlayerSection{width:100%;max-width:320px;padding:10px}
+.sixPlayerSection .playerGrid{grid-template-columns:repeat(2,1fr);gap:10px}
+.sixPlayerSection .playerBtn{font-size:16px;padding:12px;min-height:45px}
+
+.mobilePlayers{display:none;width:100%;max-width:320px}
+.mobilePlayers .playerGrid{grid-template-columns:repeat(2,1fr);gap:10px}
+.mobilePlayers .playerBtn{font-size:16px;padding:12px;min-height:45px}
+.mobileOnly,.desktopOnly{display:block}
