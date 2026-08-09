@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
 <title>Monopoly Player Selection</title>
 <link rel="stylesheet" href="/index.css">
 </head>
@@ -33,7 +35,7 @@
 </div>
 <div id="playerContainer">
 <div style="position:relative;width:100%;margin-bottom:20px;display:flex;justify-content:center;align-items:flex-start;">
-<div style="position:absolute;left:30px;top:240px;display:flex;flex-direction:column;gap:10px;">
+<div style="position:absolute;left:0;top:240px;display:flex;flex-direction:column;gap:10px;">
 <a href="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" target="_blank">
 <img src="https://raw.githubusercontent.com/nightywolfy/monopoly/main/property3.png" style="width:80px;height:auto;border-radius:10px;box-shadow:0 0 12px #00d4ff;">
 </a>
@@ -57,28 +59,16 @@ Updates
 <div class="playerSection sixPlayerSection">
 <h2>6 Player Game</h2>
 <div class="playerGrid">
-<a href="p1.html" class="playerBtn">Player 1</a>
-<a href="p2.html" class="playerBtn">Player 2</a>
-<a href="p3.html" class="playerBtn">Player 3</a>
-<a href="p4.html" class="playerBtn">Player 4</a>
-<a href="p5.html" class="playerBtn">Player 5</a>
-<a href="p6.html" class="playerBtn">Player 6</a>
+<a href="p1detect.html" class="playerBtn">Player 1</a>
+<a href="p2detect.html" class="playerBtn">Player 2</a>
+<a href="p3detect.html" class="playerBtn">Player 3</a>
+<a href="p4detect.html" class="playerBtn">Player 4</a>
+<a href="p5detect.html" class="playerBtn">Player 5</a>
+<a href="p6detect.html" class="playerBtn">Player 6</a>
 </div>
 </div>
 </div>
-<div class="mobileOnly mobilePlayers">
-<div class="playerSection">
-<h2>Mobile 6 Player</h2>
-<div class="playerGrid">
-<a href="p1m.html" class="playerBtn">Player 1</a>
-<a href="p2m.html" class="playerBtn">Player 2</a>
-<a href="p3m.html" class="playerBtn">Player 3</a>
-<a href="p4m.html" class="playerBtn">Player 4</a>
-<a href="p5m.html" class="playerBtn">Player 5</a>
-<a href="p6m.html" class="playerBtn">Player 6</a>
-</div>
-</div>
-</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/index.js"></script>
 </body>

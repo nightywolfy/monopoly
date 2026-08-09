@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Monopoly</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;background:#000;font-family:Arial,sans-serif;color:#fff}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+#loading{width:90%;max-width:500px;text-align:center;padding:35px 25px;background:linear-gradient(145deg,#111,#222);border:1px solid #333;border-radius:20px;box-shadow:0 0 30px rgba(0,212,255,.25)}
+.logo{font-size:48px;margin-bottom:10px;text-shadow:0 0 15px #00d4ff}
+.title{font-size:28px;font-weight:bold;color:#00d4ff;margin-bottom:10px}
+.message{font-size:16px;color:#aaa;margin-bottom:25px}
+.loader{width:45px;height:45px;margin:0 auto;border:5px solid #333;border-top:5px solid #00d4ff;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.error{display:none;color:#ff5555;margin-top:20px}
+</style>
+</head>
+<body>
+<div id="loading">
+<div class="logo">MONOPOLY</div>
+<div class="title">Monopoly</div>
+<div class="loader"></div>
+</div>
+<script>
+function detectDevice(){
+const mobile=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+window.location.href=mobile?'p5m.html':'p5.html';
+}
+detectDevice();
+</script>
+</body>
+</html>

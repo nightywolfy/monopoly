@@ -71,12 +71,12 @@ board.appendChild(el);
 }
 
 function scaleBoard(){
-const container=document.getElementById('board');
+const board=document.getElementById('board');
 const wrapper=document.getElementById('boardWrapper');
-const scaleX=wrapper.clientWidth/930;
-const scaleY=wrapper.clientHeight/930;
-const scale=Math.min(scaleX,scaleY);
-container.style.transform=`scale(${scale})`;
+if(!board||!wrapper)return;
+const scale=Math.min(wrapper.clientWidth/900,wrapper.clientHeight/900);
+board.style.transform=`scale(${scale})`;
+board.style.transformOrigin='center center';
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
