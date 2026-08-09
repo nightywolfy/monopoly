@@ -225,7 +225,9 @@ function updatePiece(player,x,y){const color=colorMap[player];if(!color)return;c
 function updateDisplay1(newText){if(display1.text===newText)return;display1.text=newText;saveDisplay1();safeEmit('displayUpdate1',{text:display1.text})}
 function updateDisplay2(newText){if(display2.text===newText)return;display2.text=newText;saveDisplay2();safeEmit('displayUpdate2',{text:display2.text})}
 function updateMoney(player,amount){if(!colorMap[player]||money[player]===amount)return;money[player]=amount;saveMoney();safeEmit('moneyUpdate',money)}
-function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||labels[player]===text)return;labels[player]=text;saveLabels();safeEmitTo('computer','labelsUpdate',labels)}
+
+function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||text.length<3||text.length>8||labels[player]===text)return;labels[player]=text;saveLabels();io.emit('labelsUpdate',labels)}
+
 function getBuilding(space){return buildings[String(space)]||null}
 
 function setBuilding(space,type,unset=false){
@@ -402,7 +404,7 @@ function createBot(nick,defaultTarget,options={}){
 
           case '!display': {
             if (args.length !== Object.keys(colorMap).length) { safeSay(defaultTarget, `Usage: !display <names for ${Object.keys(colorMap).length} players>`); break; }
-            if (args.some(n=>!/^[A-Za-z0-9_-]{1,10}$/.test(n))) { safeSay(defaultTarget,'Labels must be 1-10 letters/numbers/-/_ each.'); break; }
+            if (args.some(n=>!/^[A-Za-z0-9_-]{3,8}$/.test(n))) { safeSay(defaultTarget,'Labels must be 3-8 letters/numbers/-/_ each.'); break; }
             Object.keys(colorMap).forEach((p,i)=>updateLabel(p,args[i]));
             break;
           }
@@ -542,10 +544,6 @@ io.on('connection',(socket)=>{
   try{
     const ip=socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`[Socket] Frontend connected: ${ip}`);
-    socket.on('identify',payload=>{
-      const page=String(payload?.page||'').toLowerCase();
-      if(page==='computer'||page==='mobile'){socket.join(page);socket.data.page=page}
-    });
     socket.on('sendMessage',payload=>{
       if(!payload||typeof payload!=='object')return;
       const {bot,msg}=payload;
@@ -566,11 +564,9 @@ io.on('connection',(socket)=>{
     });
     socket.on('updateDisplay1',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay1(t)});
     socket.on('updateDisplay2',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay2(t)});
-    socket.on('updateLabel',payload=>{
-      if(socket.data.page!=='computer')return;
-      const player=payload?.player,text=String(payload?.text||'').trim().slice(0,12);
-      if(colorMap[player]&&text)updateLabel(player,text);
-    });
+
+    socket.on('updateLabel',payload=>{const player=payload?.player,text=String(payload?.text||'').trim();if(colorMap[player]&&text.length>=3&&text.length<=8)updateLabel(player,text);});
+
     socket.emit('map-change',currentMap);
     socket.emit('reload-dots',activeDots);
     socket.emit('buildingPositions',buildingPositions);

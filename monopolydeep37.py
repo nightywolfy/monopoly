@@ -301,7 +301,7 @@ class MonopolyBot(SingleServerIRCBot):
                 for n in (1,2,3,4):
                     if groups[n]:
                         threading.Timer(delay,lambda x=n:self.connection.privmsg("player1bot",f"!house{x} {' '.join(map(str,groups[x]))}")).start()
-                        delay+=2
+                        delay+=1
                 if groups["hotel"]:
                     threading.Timer(delay,lambda:self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,groups['hotel']))}")).start()
             except Exception:pass
