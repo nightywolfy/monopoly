@@ -1,26 +1,35 @@
-for 2 player game:
-this game has a new rule such that instead of letting the dice throws be determined by chance,
-one person choooses one die and another person chooses the other die..
-so you can choose 6 and your opponent choose 2, you both choose at the same time so no one has information until the result is determined.
-then you add them up as normal, and you would move 8 squares.
+For 2-Player Game only:
 
-1. Log into chat with username of your choice. leave "password" part empty
-2. Push "DICE" button when it is your turn then press 1 or 2 or 3 or 4 or 5 or 6 then wait until opponent does the same.
-3. When opponent pushed "DICE' on their turn, you also have to press 1 or 2 or 3 or 4 or 5 or 6
-4. When you are in Jail push "JAIL" button instead of "DICE" button then press 1 or 2 or 3 or 4 or 5 or 6
-5. To mortgage your property: select "mortgage on menu" then press the property on the map itself
-6. To unmortgage your property: select "redeem on menu" then press the property on the map itself
-7. press 5/10/25/50 during auction is active. 
-8. once you are in jail.  first turn cost = $100  second turn cost = $50  third turn cost = $25  4th turn = free
-9. You can mortagage/unmortgage/buyhouse/sellhouse any time you want except during auction
-10. landing on treasure-chest =  you gain + $50
-11. Clover square = Tax on either property/house/totalbalance
-12. 1st Clover = pay property/house at $5
-13. 2nd Clover = $5 per house + 5% of your current money
-14. 3rd Clover = $10 per non mortgaged property + $5 per mortgaged property
-15. for 2-player game only: if you hit 3 doubles in a row: you have option to goto jail or pay $25 to keep rolling again
-16. Landing on "parking" gives you option to get free loan of $100 which you need to payback slowly over time
-17. Landing on 62 (inner) give you option to run auction on any unowned property of your choice.
+This game uses a special dice-selection system instead of relying entirely on random dice rolls.
+Each player independently chooses one die from 1 to 6. Both players make their selections at the same time, so neither player knows which number the other player has chosen before the selections are revealed.
+For example, if you choose 6 and your opponent chooses 2, the two dice are added together:
+6 + 2 = 8
+The player then moves 8 spaces, following the normal game rules.
+Because both players choose their dice simultaneously, neither player can use the other player's selection as information when making their own choice.
+
+
+For 3-6 Player Game:
+
+1. Log in to the chat using a username of your choice. Leave the password field empty.
+2. Type the !start command. Details are provided at the bottom.
+3. When it is your turn, press the DICE button.
+4. When you are in Jail, press the JAIL button instead of the DICE button.
+5. Jail payment costs are based on the number of turns spent in Jail. If you want to get out early before the 4th turn, press the KEY button.
+   1st turn: $100
+   2nd turn: $50
+   3rd turn: $25
+   4th turn: Free
+6. During an active auction, use the 5, 10, 25, or 50 buttons to increase your bid.
+7. To mortgage a property, select Mortgage from the menu, then select the property directly on the map.
+8. To redeem a mortgaged property, select Redeem from the menu, then select the property directly on the map.
+9. Properties may be mortgaged or redeemed, and houses may be purchased or sold, at any time except during an active auction.
+10. Landing on a Treasure Chest space awards the player $50.
+11. Landing on a Clover space activates a tax based on properties, houses, or the player's total balance.
+12. 1st Clover: Pay $5 for each property and house.
+13. 2nd Clover: Pay $5 for each house plus 5% of your current balance.
+14. 3rd Clover: Pay $10 for each non-mortgaged property and $5 for each mortgaged property.
+15. Landing on the Parking space gives the player the option to receive a $100 free loan. The loan must be repaid gradually over time.
+16. Landing on space 62 in the inner board gives the player the option to start an auction for any unowned property of their choice.
 
 Start Game:
 !start <number of players> <deep/regular> <amount>
@@ -29,8 +38,8 @@ Examples:  !start 6 deep 1400 | !start 4 regular 1200
 Commands that needs to run during a game:
 !auction 39 (manually start auction on china)
 !switch p1 p2 (used for space-54)
-!remove p1 (remove player1 from the game if they bankrupt or AFK)
-!insert p4 700  (insert player4 in the middle of game with total amount of $700)
+!remove p1 (Removes Player 1 from the current game. Use this when a player has gone bankrupt or is AFK.)
+!insert p4 700  (insert player4 in the middle of game with a starting balance of $700)
 
 Trading:
 !offer-p1 5,15,25,35 money:25 p2 39 money:1000  -->  p1 offers 5,15,25,35 (4 railroads) + $25  for p2's $1000 and china
@@ -39,7 +48,7 @@ Trading:
 
 set Display-name for All 6 Players
 Example:  !display MC1 AMAHRIA2 AB3 SARAF4 TODO5 CRINJAL6 
-Example:  !display Mary1 John2 Barb3 Will4 0 0
+Example:  !display Mary1 John2 Barb3 Will4 p5 p6
 
 rename to custom name (2 letters + 1 number only)
 Example: !rename p1 AL1 | !rename p2 ED2
