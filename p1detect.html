@@ -13,14 +13,57 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 .loader{width:45px;height:45px;margin:0 auto;border:5px solid #333;border-top:5px solid #00d4ff;border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .error{display:none;color:#ff5555;margin-top:20px}
+#nameInput{width:100%;box-sizing:border-box;padding:12px;border-radius:8px;border:1px solid #555;background:#111;color:white;font-size:16px;text-align:center;margin-bottom:12px}
+#nameInput::placeholder{color:#777}
+#startBtn{width:100%;padding:12px;border:0;border-radius:8px;background:#00d4ff;color:#000;font-weight:bold;font-size:16px;cursor:pointer}
+#startBtn:hover{filter:brightness(1.15)}
+#error{display:none;color:#ff5555;margin-top:12px}
 </style>
 </head>
 <body>
 <div id="loading">
 <div class="logo">MONOPOLY</div>
-<div class="loader"></div>
+<div class="title">Enter Your Name</div>
+<div class="message">Enter 1-7 letters</div>
+<input id="nameInput" type="text" maxlength="7" autocomplete="off" placeholder="Enter name">
+<button id="startBtn">START</button>
+<div id="error"></div>
 </div>
+
 <script>
+async function startGame(){
+const input=document.getElementById('nameInput');
+const error=document.getElementById('error');
+const name=input.value.trim();
+
+if(!/^[A-Za-z]{1,7}$/.test(name)){
+error.textContent='Name must be 1-7 letters only.';
+error.style.display='block';
+input.focus();
+return;
+}
+
+error.style.display='none';
+
+try{
+const response=await fetch('/send-irc',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({
+bot:'player1bot',
+msg:`!display p1 ${name}`
+})
+});
+
+if(!response.ok)throw new Error('Failed to send command');
+
+detectDevice();
+}catch(e){
+error.textContent='Unable to start the game.';
+error.style.display='block';
+}
+}
+
 function detectDevice(){
 const ua=navigator.userAgent;
 const mobile=/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
@@ -34,7 +77,11 @@ window.location.href='mobile.html?p=1';
 window.location.href='computer.html?p=1';
 }
 }
-detectDevice();
+
+document.getElementById('startBtn').addEventListener('click',startGame);
+document.getElementById('nameInput').addEventListener('keydown',e=>{
+if(e.key==='Enter')startGame();
+});
 </script>
 </body>
 </html>

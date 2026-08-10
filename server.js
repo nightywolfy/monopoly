@@ -488,9 +488,19 @@ function createBot(nick,defaultTarget,options={}){
           }
 
           case '!display': {
-            if (args.length !== Object.keys(colorMap).length) { safeSay(defaultTarget, `Usage: !display <names for ${Object.keys(colorMap).length} players>`); break; }
-            if (args.some(n=>!/^[A-Za-z0-9_-]{2,8}$/.test(n))) { safeSay(defaultTarget,'Labels must be 2-8 letters/numbers/-/_ each.'); break; }
-            Object.keys(colorMap).forEach((p,i)=>updateLabel(p,args[i]));
+            const playerCount = Object.keys(colorMap).length;
+            if (args.length === playerCount) {
+              if (args.some(n=>!/^[A-Za-z]{1,7}$/.test(n))) { safeSay(defaultTarget,'Labels must be 1-7 letters only.'); break; }
+              Object.keys(colorMap).forEach((p,i)=>updateLabel(p,`${args[i]}${p.replace('p','')}`));
+              break;
+            }
+            if (args.length === 2 && /^p[1-6]$/i.test(args[0])) {
+              const player = args[0].toLowerCase();
+              if (!/^[A-Za-z]{1,7}$/.test(args[1])) { safeSay(defaultTarget,'Label must be 1-7 letters only.'); break; }
+              updateLabel(player,`${args[1]}${player.replace('p','')}`);
+              break;
+            }
+            safeSay(defaultTarget,`Usage: !display <names for ${playerCount} players> OR !display p1-p${playerCount} <name>`);
             break;
           }
 
