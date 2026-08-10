@@ -1,7 +1,7 @@
 const socket = io();
 const BOT_NAME = document.body.dataset.bot;
 const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
-let currentMap = 2;
+let currentMap = 3;
 let activeDots = {};
 let labels = {p1:'Player1',p2:'Player2',p3:'Player3',p4:'Player4',p5:'Player5',p6:'Player6'};
 let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
@@ -79,6 +79,8 @@ const scaleY=wrapper.clientHeight/930;
 const scale=Math.min(scaleX,scaleY);
 container.style.transform=`scale(${scale})`;
 }
+window.addEventListener('resize',scaleBoard);
+scaleBoard();
 
 document.addEventListener("DOMContentLoaded",()=>{
 document.querySelectorAll('form[target="hiddenFrame"]').forEach(form=>{
@@ -122,15 +124,12 @@ el.style.zIndex=20;
 }
 }
 
-window.addEventListener('resize',scaleBoard);
-scaleBoard();
 if(!window.SOUND_LISTENER_LOCK){
 window.SOUND_LISTENER_LOCK=true;
 socket.on('play-sound',({file})=>{
 new Audio(file).play();
 });
 }
-
 
 function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }
 function updateDisplay2(text){ document.getElementById('display2').innerText = text || ''; }

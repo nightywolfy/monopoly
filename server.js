@@ -53,39 +53,47 @@ const saveLabels=()=>safeWriteJSON(labelsFile,labels);
 
 const buildingPositions={
   1:{x:740,y:795},
-  3:{x:595,y:795},
-  6:{x:373,y:795},
+  3:{x:594,y:795},
+  6:{x:376,y:795},
   8:{x:232,y:795},
   9:{x:160,y:795},
-  11:{x:105,y:735},
-  12:{x:105,y:665},
-  14:{x:105,y:515},
-  16:{x:105,y:375},
-  17:{x:105,y:300},
-  19:{x:105,y:155},
-  21:{x:156,y:105},
-  22:{x:230,y:105},
-  24:{x:375,y:105},
-  26:{x:520,y:105},
-  28:{x:665,y:105},
+  
+  21:{x:160,y:105},
+  22:{x:232,y:105},
+  24:{x:376,y:105},
+  26:{x:522,y:105},
+  28:{x:666,y:105},
   29:{x:740,y:105},
-  31:{x:793,y:155},
+
+  11:{x:105,y:736},
+  12:{x:105,y:665},
+  14:{x:105,y:516},
+  16:{x:105,y:370},
+  17:{x:105,y:300},
+  19:{x:105,y:156},
+  
+  31:{x:793,y:156},
   33:{x:793,y:300},
   34:{x:793,y:370},
   37:{x:793,y:590},
-  39:{x:793,y:730},
-  41:{x:595,y:680},
-  42:{x:525,y:680},
-  63:{x:678,y:590},
-  44:{x:305,y:680},
-  45:{x:218,y:590},
-  47:{x:380,y:680},
-  50:{x:218,y:305},
-  51:{x:218,y:375},
+  39:{x:793,y:736},
+  
+  41:{x:594,y:680},
+  42:{x:524,y:680},
+  44:{x:376,y:680},
+  45:{x:305,y:680},
+  
+  47:{x:218,y:590},
+  50:{x:218,y:375},
+  51:{x:218,y:305},
+  
   53:{x:304,y:220},
-  56:{x:595,y:220},
-  57:{x:678,y:305},
-  59:{x:523,y:220}
+  56:{x:523,y:220},
+  57:{x:595,y:220},
+  
+
+  59:{x:678,y:300},
+  63:{x:678,y:590}
 };
 
 const boardSpaces=[
@@ -721,5 +729,5 @@ async function gracefulShutdown(signal){
 ['SIGINT','SIGTERM'].forEach(sig=>process.on(sig,()=>gracefulShutdown(sig)));
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
-//server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));
+//server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
+server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));

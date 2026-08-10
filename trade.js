@@ -81,6 +81,9 @@ const scale=Math.min(scaleX,scaleY);
 container.style.transform=`scale(${scale})`;
 }
 
+window.addEventListener('resize',scaleBoard);
+scaleBoard();
+
 document.addEventListener("DOMContentLoaded",()=>{
 document.querySelectorAll('form[target="hiddenFrame"]').forEach(form=>{
 form.addEventListener("submit",function(e){
@@ -93,6 +96,35 @@ fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"applicati
 });
 });
 });
+
+function updatePieces(data){
+if(!data||typeof data!=="object"){console.warn("Pieces data invalid:",data);return;}
+const posMap={};
+for(const [color,pos] of Object.entries(data)){
+if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number"){console.warn("Invalid position for",color,pos);continue;}
+const key=`${pos.x},${pos.y}`;
+if(!posMap[key])posMap[key]=[];
+posMap[key].push(color);
+}
+for(const [key,colors] of Object.entries(posMap)){
+const [baseX,baseY]=key.split(',').map(Number);
+colors.forEach((color,idx)=>{
+const id=colorMap[color];
+if(!id)return;
+const el=document.getElementById(id);
+if(!el)return;
+let offsetX=0,offsetY=0;
+if(idx===1){offsetX=10;}
+if(idx===2){offsetY=10;}
+if(idx===3){offsetX=10;offsetY=10;}
+if(idx===4){offsetX=20;}
+if(idx===5){offsetX=20;offsetY=10;}
+el.style.left=(baseX+offsetX)+'px';
+el.style.top=(baseY+offsetY)+'px';
+el.style.zIndex=20;
+});
+}
+}
 
 const boardSpaceBtns={};
 const group1=[1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
@@ -135,9 +167,12 @@ socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(dat
 socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
 socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
 socket.on('boardClickPositions', data=>{ buildBoardButtons(data); });
+socket.on('piecesUpdate', updatePieces);
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});
 fetch('/building.json').then(r=>r.json()).then(data=>{ lastBuildingsData=data; renderBuildings(data); });
+fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
+
 
 
 
@@ -148,29 +183,6 @@ const entriesContainer=document.getElementById('entriesContainer');
 const cbPreview=document.getElementById('preview');
 const enterBtn=document.getElementById('enterBtn');
 const cmdLog=document.getElementById('cmdLog');
-
-/* ==================== CREATE ENTRY ==================== */
-function makeEntry(player){
-const id=nextEntryId++;
-const entry={id,players:[player],amount:'0',spaces:[],picking:false};
-entries.push(entry);
-renderEntries();
-cbUpdatePreview();
-}
-
-/* ==================== REMOVE ENTRY ==================== */
-function removeEntry(id){
-const index=entries.findIndex(en=>en.id===id);
-if(index<2)return;
-const entry=entries[index];
-entry.spaces.forEach(sp=>{
-const b=boardSpaceBtns[sp];
-if(b)b.classList.remove('spacePicked',`entryColor${(entry.id%6)||6}`);
-});
-entries.splice(index,1);
-renderEntries();
-cbUpdatePreview();
-}
 
 /* ==================== RENDER ENTRIES ==================== */
 function renderEntries(){
@@ -186,13 +198,6 @@ const label=document.createElement('span');
 label.textContent=`Entry ${idx+1}`;
 top.appendChild(label);
 
-if(idx>=2){
-const removeBtn=document.createElement('button');
-removeBtn.className='removeEntryBtn';
-removeBtn.textContent='? Remove';
-removeBtn.addEventListener('click',()=>removeEntry(entry.id));
-top.appendChild(removeBtn);
-}
 card.appendChild(top);
 
 const playerLabel=document.createElement('div');
@@ -229,8 +234,11 @@ const amountInput=document.createElement('input');
 amountInput.type='number';
 amountInput.className='amountInput';
 amountInput.placeholder='Enter amount...';
+amountInput.min='0';
+amountInput.step='25';
 amountInput.value=entry.amount;
 amountInput.addEventListener('input',()=>{
+if(amountInput.value!==''&&parseFloat(amountInput.value)<0)amountInput.value='0';
 entry.amount=amountInput.value;
 cbUpdatePreview();
 });
@@ -241,7 +249,7 @@ pickBtn.type='button';
 pickBtn.className='opt';
 pickBtn.style.width='100%';
 pickBtn.style.marginTop='6px';
-pickBtn.textContent=entry.picking?'Done Picking Properties':'Pick Properties';
+pickBtn.textContent=entry.picking?'? Done picking spaces':'?? Pick space(s) for this entry';
 if(entry.picking)pickBtn.classList.add('selected');
 
 pickBtn.addEventListener('click',()=>{
@@ -249,6 +257,7 @@ entries.forEach(en=>{
 if(en.id!==entry.id)en.picking=false;
 });
 entry.picking=!entry.picking;
+if(entry.picking&&typeof auctionSetPicking==='function')auctionSetPicking(false);
 renderEntries();
 cbUpdatePreview();
 });
@@ -320,26 +329,13 @@ if(b)b.classList.remove('spacePicked',`entryColor${(entry.id%6)||6}`);
 });
 });
 
-entries=[];
-nextEntryId=1;
-makeEntry('p1');
-makeEntry('p2');
+entries=[
+{id:1,players:['p1'],amount:'0',spaces:[],picking:false},
+{id:2,players:['p2'],amount:'0',spaces:[],picking:false}
+];
+nextEntryId=3;
 renderEntries();
 cbUpdatePreview();
-}
-
-/* ==================== ADD ENTRY ==================== */
-const addEntryBtn=document.getElementById('addEntryBtn');
-
-if(addEntryBtn){
-addEntryBtn.addEventListener('click',()=>{
-if(entries.length<6){
-const players=['p1','p2','p3','p4','p5','p6'];
-const used=entries.map(e=>e.players[0]);
-const nextPlayer=players.find(p=>!used.includes(p))||'p3';
-makeEntry(nextPlayer);
-}
-});
 }
 
 /* ==================== RESET BUTTON ==================== */
@@ -369,7 +365,217 @@ if(!btn)return;
 const spaceNum=parseInt(btn.textContent,10);
 if(isNaN(spaceNum))return;
 
+if(auctionPicking){
+auctionSpaceClicked(spaceNum,btn);
+return;
+}
 cbSpaceClicked(spaceNum,btn);
+});
+
+/* ==================== QUICK COMMAND BUILDER ==================== */
+const qcCmdRow=document.getElementById('qcCmdRow');
+const qcPlayerRow=document.getElementById('qcPlayerRow');
+const qcAmountRow=document.getElementById('qcAmountRow');
+const qcAmount=document.getElementById('qcAmount');
+const qcPreview=document.getElementById('qcPreview');
+const qcSendBtn=document.getElementById('qcSendBtn');
+
+let qcCommand=null,qcPlayer=null;
+
+['!status','!insert','!remove'].forEach(cmd=>{
+const b=document.createElement('button');
+b.type='button';
+b.className='opt';
+b.textContent=cmd;
+b.addEventListener('click',()=>{
+qcCommand=cmd;
+qcCmdRow.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
+b.classList.add('selected');
+qcAmountRow.style.display=cmd==='!insert'?'block':'none';
+if(cmd==='!insert')qcAmount.value='1000';
+qcUpdatePreview();
+});
+qcCmdRow.appendChild(b);
+});
+
+['p1','p2','p3','p4','p5','p6'].forEach(p=>{
+const b=document.createElement('button');
+b.type='button';
+b.className=`opt ${p}`;
+b.textContent=p.toUpperCase();
+b.addEventListener('click',()=>{
+qcPlayer=p;
+qcPlayerRow.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
+b.classList.add('selected');
+qcUpdatePreview();
+});
+qcPlayerRow.appendChild(b);
+});
+
+qcAmount.addEventListener('input',()=>{
+if(qcAmount.value!==''&&parseFloat(qcAmount.value)<0)qcAmount.value='0';
+qcUpdatePreview();
+});
+
+function qcBuildCommand(){
+if(!qcCommand||!qcPlayer)return null;
+if(qcCommand==='!insert'){
+if(qcAmount.value===''||qcAmount.value==null)return null;
+return `${qcCommand} ${qcPlayer} ${qcAmount.value}`;
+}
+return `${qcCommand} ${qcPlayer}`;
+}
+
+function qcUpdatePreview(){
+const cmd=qcBuildCommand();
+qcPreview.textContent=cmd||'(select a command and player)';
+qcSendBtn.disabled=!cmd;
+}
+
+qcSendBtn.addEventListener('click',()=>{
+const cmd=qcBuildCommand();
+if(!cmd)return;
+
+socket.emit('sendMessage',{
+bot:BOT_NAME,
+msg:cmd
+});
+
+const line=document.createElement('div');
+line.textContent=`Sent: ${cmd}`;
+cmdLog.prepend(line);
+});
+
+/* ==================== AUCTION MENU BUILDER ==================== */
+const auctionPickBtn=document.getElementById('auctionPickBtn');
+const auctionSpacesLabel=document.getElementById('auctionSpacesLabel');
+const auctionPreview=document.getElementById('auctionPreview');
+const auctionSendBtn=document.getElementById('auctionSendBtn');
+
+let auctionPicking=false,auctionSpace=null;
+
+function auctionSetPicking(val){
+auctionPicking=val;
+auctionPickBtn.textContent=auctionPicking?'Done picking space':'Pick space for this entry';
+auctionPickBtn.classList.toggle('selected',auctionPicking);
+}
+
+auctionPickBtn.addEventListener('click',()=>{
+if(!auctionPicking){
+entries.forEach(en=>en.picking=false);
+renderEntries();
+}
+auctionSetPicking(!auctionPicking);
+});
+
+function auctionSpaceClicked(spaceNum,btn){
+if(auctionSpace===spaceNum){
+btn.classList.remove('spacePicked');
+auctionSpace=null;
+}else{
+if(auctionSpace!==null){
+const prevBtn=boardSpaceBtns[auctionSpace];
+if(prevBtn)prevBtn.classList.remove('spacePicked');
+}
+auctionSpace=spaceNum;
+btn.classList.add('spacePicked');
+}
+auctionUpdatePreview();
+}
+
+function auctionBuildCommand(){
+if(auctionSpace===null)return null;
+return `!auction ${auctionSpace}`;
+}
+
+function auctionUpdatePreview(){
+auctionSpacesLabel.textContent=auctionSpace!==null?`Space: ${auctionSpace}`:'';
+const cmd=auctionBuildCommand();
+auctionPreview.textContent=cmd||'(pick a space to auction)';
+auctionSendBtn.disabled=!cmd;
+}
+
+auctionSendBtn.addEventListener('click',()=>{
+const cmd=auctionBuildCommand();
+if(!cmd)return;
+
+socket.emit('sendMessage',{
+bot:BOT_NAME,
+msg:cmd
+});
+
+const line=document.createElement('div');
+line.textContent=`Sent: ${cmd}`;
+cmdLog.prepend(line);
+
+if(auctionSpace!==null){
+const b=boardSpaceBtns[auctionSpace];
+if(b)b.classList.remove('spacePicked');
+}
+auctionSpace=null;
+auctionSetPicking(false);
+auctionUpdatePreview();
+});
+
+/* ==================== SWITCH MENU BUILDER ==================== */
+const switchPlayerRow1=document.getElementById('switchPlayerRow1');
+const switchPlayerRow2=document.getElementById('switchPlayerRow2');
+const switchPreview=document.getElementById('switchPreview');
+const switchSendBtn=document.getElementById('switchSendBtn');
+
+let switchPlayer1=null,switchPlayer2=null;
+
+['p1','p2','p3','p4','p5','p6'].forEach(p=>{
+const b=document.createElement('button');
+b.type='button';
+b.className=`opt ${p}`;
+b.textContent=p.toUpperCase();
+b.addEventListener('click',()=>{
+switchPlayer1=p;
+switchPlayerRow1.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
+b.classList.add('selected');
+switchUpdatePreview();
+});
+switchPlayerRow1.appendChild(b);
+});
+
+['p1','p2','p3','p4','p5','p6'].forEach(p=>{
+const b=document.createElement('button');
+b.type='button';
+b.className=`opt ${p}`;
+b.textContent=p.toUpperCase();
+b.addEventListener('click',()=>{
+switchPlayer2=p;
+switchPlayerRow2.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
+b.classList.add('selected');
+switchUpdatePreview();
+});
+switchPlayerRow2.appendChild(b);
+});
+
+function switchBuildCommand(){
+if(!switchPlayer1||!switchPlayer2)return null;
+return `!switch ${switchPlayer1} ${switchPlayer2}`;
+}
+
+function switchUpdatePreview(){
+const cmd=switchBuildCommand();
+switchPreview.textContent=cmd||'(select two players)';
+switchSendBtn.disabled=!cmd;
+}
+
+switchSendBtn.addEventListener('click',()=>{
+const cmd=switchBuildCommand();
+if(!cmd)return;
+
+socket.emit('sendMessage',{
+bot:BOT_NAME,
+msg:cmd
+});
+
+const line=document.createElement('div');
+line.textContent=`Sent: ${cmd}`;
+cmdLog.prepend(line);
 });
 
 /* ==================== INITIALIZE ==================== */

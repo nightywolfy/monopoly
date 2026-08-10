@@ -1008,10 +1008,9 @@ class MonopolyBot(SingleServerIRCBot):
     def _handle_dice4(self,c,p):self._roll_and_handle(c,p,[1,2,3,4,5,6],[1,2,3,4,5,6],"dice4",False)
     def _roll_and_handle(self,c,p,p1,p2,d,nl=True):
         f,s=random.choice(p1),random.choice(p2);t=f+s;pl=f"p{p}";display=self.pname(pl);dbl=f==s
-
+        sound="dice.mp3" if d=="dice4" else "click.mp3"
         if pl not in self.players:return
         self.dice_rolls[p]=(f,s);self.consecutive_doubles[pl]=self.consecutive_doubles.get(pl,0)+1 if dbl else 0
-        
         c.privmsg(self.channel,f"{d} rolled by {display} {f}+{s}")
         if self.consecutive_doubles[pl]>=CONSECUTIVE_DOUBLES_FOR_TELEPORT:
             self.consecutive_doubles[pl]=0;c.privmsg(self.channel,f"{display} rolled doubles twice. Turn lost")
@@ -1027,7 +1026,7 @@ class MonopolyBot(SingleServerIRCBot):
             except:pass
             return
         if nl or dbl:
-            try:c.privmsg("player2bot","!sound click.mp3")
+            try:c.privmsg("player2bot",f"!sound {sound}")
             except:pass
             try:self.handle_command("dicebot",f"!move {pl} {t}")
             except:pass
@@ -1035,9 +1034,8 @@ class MonopolyBot(SingleServerIRCBot):
             threading.Timer(0.2,lambda:self.handle_command("dicebot","!up")).start()
         else:
             threading.Timer(0.3,lambda:c.privmsg("player1bot",f'!d1 "{self._next_turn_label()}"')).start()
-            try:c.privmsg("player2bot","!sound click.mp3")
+            try:c.privmsg("player2bot",f"!sound {sound}")
             except:pass
-            
     # --- GO SYSTEM ---
     def handle_go_session_command(self,c,nick,msg):
         if msg.startswith('!gostart'):

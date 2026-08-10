@@ -84,21 +84,22 @@
 </div>
 <script>
 (function(){
-  const params = new URLSearchParams(window.location.search);
-  const playerNum = params.get('p') || '1';
-  document.body.dataset.bot = `player${playerNum}bot`;
-  document.querySelectorAll('input[name="bot"]').forEach(el=>{
-    el.value = `player${playerNum}bot`;
-  });
-  document.querySelectorAll('input[name="msg"]').forEach(el=>{
-    el.value = el.value.replace(/p1\b/g, `p${playerNum}`);
-  });
-  document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
-    el.src = el.src.replace('p1.', `p${playerNum}.`);
-  });
-  document.querySelectorAll('a[href^="trade.html"]').forEach(el=>{
-    el.href = `trade.html?p=${playerNum}`;
-  });
+const params=new URLSearchParams(window.location.search);
+const playerNum=params.get('p')||'1';
+document.body.dataset.bot=`player${playerNum}bot`;
+document.querySelectorAll('input[name="bot"]').forEach(el=>{
+el.value=`player${playerNum}bot`;
+});
+document.querySelectorAll('input[name="msg"]').forEach(el=>{
+el.value=el.value.replace(/p1\b/g,`p${playerNum}`);
+});
+document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
+el.src=el.src.replace('p1.',`p${playerNum}.`);
+});
+document.querySelectorAll('a[href^="trade.html"],a[href^="trade-mobile.html"],a[href^="trade-tablet.html"]').forEach(el=>{
+const page=el.href.split('/').pop().split('?')[0];
+el.href=`${page}?p=${playerNum}`;
+});
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>

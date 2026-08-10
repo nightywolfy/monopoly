@@ -7,11 +7,17 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #boardImg{width:900px;height:900px}
 .dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 .hotel,.house{width:29px;height:29px;position:absolute}
-
+.piece{width:32px;height:32px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid transparent;box-shadow:0 0 6px rgba(0,0,0,0.4);transition:left 0.4s ease,top 0.4s ease;color:white}
+.blue{background:#3399ff;border-color:#66a3ff}
+.green{background:limegreen;border-color:#aaffaa;color:black}
+.orange{background:goldenrod;border-color:#ffde59;color:black}
+.purple{background:#9933ff;border-color:#cc99ff}
+.red{background:#ff4d4d;border-color:#ff8080}
+.white{background:#ffffff;border-color:#cccccc;color:black}
 /* ==================== CENTRAL DISPLAY ==================== */
 #centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
-#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:320px}
-.moneyBox{padding:3px 8px;border-radius:10px;width:100%;height:45px;box-sizing:border-box;text-align:center;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;word-wrap:break-word;box-shadow:0 0 10px rgba(0,212,255,.8),0 0 15px rgba(106,13,173,.6);border:2px solid rgba(255,255,255,.5);color:black}
+#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:360px}
+.moneyBox{padding:4px 9px;border-radius:11px;width:100%;height:52px;box-sizing:border-box;text-align:center;font-weight:bold;font-size:18px;display:flex;align-items:center;justify-content:center;word-wrap:break-word;box-shadow:0 0 10px rgba(0,212,255,.8),0 0 15px rgba(106,13,173,.6);border:2px solid rgba(255,255,255,.5);color:black}
 .moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
 .moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
 .moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
@@ -20,7 +26,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center}
 .displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
-
 /* ==================== PLAYER PANEL ==================== */
 #playerContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:10px;box-shadow:inset 0 0 40px rgba(0,212,255,.3);padding:8px;box-sizing:border-box;overflow-y:auto}
 .playerSection{width:100%;max-width:260px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:10px;text-align:center;box-shadow:0 0 25px rgba(0,0,0,.4)}
@@ -100,3 +105,32 @@ button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-co
 #builder .actionButtons{display:flex;gap:6px;margin-bottom:8px}
 #builder .actionButtons form{flex:1;margin:0}
 #builder .actionButtons button{width:100%;padding:7px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.15);font-size:12px;font-weight:bold;cursor:pointer}
+
+/* ==================== QUICK COMMAND BUILDER (mirrors #builder) ==================== */
+#buildersRow{display:flex;flex-direction:row;gap:12px;width:100%;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+#quickAuctionColumn{display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px}
+#quickBuilder{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:10px;box-shadow:0 0 18px rgba(0,0,0,.4);box-sizing:border-box}
+#quickBuilder h2{margin:0 0 10px;text-align:center;color:#FFD700;text-shadow:0 0 8px black;font-size:14px}
+#qcCmdRow{grid-template-columns:repeat(3,1fr);margin-bottom:10px}
+#qcAmount{width:100%;box-sizing:border-box;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-size:12px}
+#qcAmount::placeholder{color:#777}
+#qcPreview{background:#000;border:1px solid #6a0dad;border-radius:7px;padding:7px 8px;font-family:monospace;font-size:12px;color:#00ffae;min-height:15px;word-break:break-all}
+#qcSendBtn{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s}
+#qcSendBtn:hover{filter:brightness(1.1)}
+#qcSendBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+
+/* ==================== AUCTION MENU (mirrors #builder) ==================== */
+#auctionBuilder{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:10px;box-shadow:0 0 18px rgba(0,0,0,.4);box-sizing:border-box}
+#auctionBuilder h2{margin:0 0 10px;text-align:center;color:#FFD700;text-shadow:0 0 8px black;font-size:14px}
+#auctionPreview{background:#000;border:1px solid #6a0dad;border-radius:7px;padding:7px 8px;font-family:monospace;font-size:12px;color:#00ffae;min-height:15px;word-break:break-all}
+#auctionSendBtn{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s}
+#auctionSendBtn:hover{filter:brightness(1.1)}
+#auctionSendBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+
+/* ==================== SWITCH MENU (mirrors #builder) ==================== */
+#switchBuilder{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:10px;box-shadow:0 0 18px rgba(0,0,0,.4);box-sizing:border-box}
+#switchBuilder h2{margin:0 0 10px;text-align:center;color:#FFD700;text-shadow:0 0 8px black;font-size:14px}
+#switchPreview{background:#000;border:1px solid #6a0dad;border-radius:7px;padding:7px 8px;font-family:monospace;font-size:12px;color:#00ffae;min-height:15px;word-break:break-all}
+#switchSendBtn{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s}
+#switchSendBtn:hover{filter:brightness(1.1)}
+#switchSendBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}

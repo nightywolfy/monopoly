@@ -75,6 +75,8 @@ const scaleY=wrapper.clientHeight/930;
 const scale=Math.min(scaleX,scaleY);
 container.style.transform=`scale(${scale})`;
 }
+window.addEventListener('resize',scaleBoard);
+scaleBoard();
 
 document.addEventListener("DOMContentLoaded",()=>{
 document.querySelectorAll('form[target="hiddenFrame"]').forEach(form=>{
@@ -89,8 +91,6 @@ fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"applicati
 });
 });
 
-window.addEventListener('resize',scaleBoard);
-scaleBoard();
 if(!window.SOUND_LISTENER_LOCK){
 window.SOUND_LISTENER_LOCK=true;
 socket.on('play-sound',({file})=>{

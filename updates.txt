@@ -29,10 +29,11 @@ Update Changelog:
 27. Added !rename support, allowing players to replace default player names (p1-p6) with custom names.
 28. Improved !status with a cleaner layout, property names, and individual player lookup support (for example, !status p1).
 29. Added the !display command to allow customization of the player names shown on the MoneyBox display (p1-name through p6-name).
-30. Added a Trade Menu for computer users to improve trade management.
+30. Added a Trade Menu to improve trade management.
 31. Reduced the bidding sound volume for a more comfortable user experience.
 32. Increased the size of board dots to improve visibility.
-33. Removed the separate mobile page section and integrated mobile support into the main page.
-
-TODO LIST
+33. Added full compatibility for iPad and Android tablets.
+34. Removed the separate mobile page section and integrated mobile device support directly into the main page.
+35. Updated the dice sound effect used when rolling the jail dice.
+36. Updated the Trade Menu with additional commands
 

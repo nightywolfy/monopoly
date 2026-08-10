@@ -28,7 +28,7 @@ For 3-6 Player Game:
 12. 1st Clover: Pay $5 for each property and house.
 13. 2nd Clover: Pay $5 for each house plus 5% of your current balance.
 14. 3rd Clover: Pay $10 for each non-mortgaged property and $5 for each mortgaged property.
-15. Landing on the Parking space gives the player the option to receive a $100 free loan. The loan must be repaid gradually over time.
+15. Landing on the Parking space awards the player a $100 loan. The loan must be repaid gradually over time.
 16. Landing on space 62 in the inner board gives the player the option to start an auction for any unowned property of their choice.
 
 Start Game:
