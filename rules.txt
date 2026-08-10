@@ -46,9 +46,8 @@ Trading:
 !accept
 !reject
 
-set Display-name for All 6 Players
-Example:  !display MC1 AMAHRIA2 AB3 SARAF4 TODO5 CRINJAL6 
-Example:  !display Mary1 John2 Barb3 Will4 p5 p6
+set Display-name
+Example: !display p1 owner | Example: !display p2 king
 
 rename to custom name (2 letters + 1 number only)
 Example: !rename p1 AL1 | !rename p2 ED2
