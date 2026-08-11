@@ -870,7 +870,7 @@ class MonopolyBot(SingleServerIRCBot):
                     self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{display} pays to {self.pname(owner)} {sp}*{mult}={rent}"
                 elif new in (40,46,52,58):
                     group=(40,46,52,58);u=[x for x in group if self.properties.get(x)==owner and x not in self.mortgaged]
-                    mult={1:4,2:8,3:16,4:25}.get(len(u),5);rent=abs(sp)*mult
+                    mult={1:4,2:8,3:16,4:30}.get(len(u),5);rent=abs(sp)*mult
                     self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{display} pays to {self.pname(owner)} {sp}*{mult}={rent}"
                 else:
                     hc=self.houses.get(new,0);rents=self.house_rents.get(new,[0]);hc=min(hc,len(rents)-1);rent=rents[hc]

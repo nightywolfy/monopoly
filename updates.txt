@@ -35,5 +35,5 @@ Update Changelog:
 33. Added full compatibility for iPad and Android tablets.
 34. Removed the separate mobile page section and integrated mobile device support directly into the main page.
 35. Updated the dice sound effect used when rolling the jail dice.
-36. Updated the Trade Menu with additional commands
-
+36. Enhanced the Trade Menu with additional commands.
+37. Added a name input section for each player, requiring players to enter their name before proceeding.

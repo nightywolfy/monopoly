@@ -93,6 +93,13 @@ el.value=`player${playerNum}bot`;
 document.querySelectorAll('input[name="msg"]').forEach(el=>{
 el.value=el.value.replace(/p1\b/g,`p${playerNum}`);
 });
+document.querySelectorAll('input[name="msg"]').forEach(el=>{
+if(el.value==='!go1'){
+el.value=`!go${playerNum}`;
+}else if(el.value==='!go3'){
+el.value=`!go${Number(playerNum)+2}`;
+}
+});
 document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
 el.src=el.src.replace('p1.',`p${playerNum}.`);
 });
