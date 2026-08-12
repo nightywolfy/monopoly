@@ -1,11 +1,10 @@
-import express from 'express';
 import http from 'http';
 import path from 'path';
 import {fileURLToPath} from 'url';
 import {Server} from 'socket.io';
 import IRC from 'irc-framework';
 import {readFileSync,writeFileSync,existsSync,renameSync} from 'fs';
-import crypto from 'crypto';
+import express from 'express';
 
 const __filename=fileURLToPath(import.meta.url);
 const __dirname=path.dirname(__filename);
@@ -56,40 +55,33 @@ const buildingPositions={
   6:{x:376,y:795},
   8:{x:232,y:795},
   9:{x:160,y:795},
-  
   21:{x:160,y:105},
   22:{x:232,y:105},
   24:{x:376,y:105},
   26:{x:522,y:105},
   28:{x:666,y:105},
   29:{x:740,y:105},
-
   11:{x:105,y:736},
   12:{x:105,y:665},
   14:{x:105,y:516},
   16:{x:105,y:370},
   17:{x:105,y:300},
   19:{x:105,y:156},
-  
   31:{x:793,y:156},
   33:{x:793,y:300},
   34:{x:793,y:370},
   37:{x:793,y:590},
   39:{x:793,y:736},
-  
   41:{x:594,y:680},
   42:{x:524,y:680},
   44:{x:376,y:680},
   45:{x:305,y:680},
-  
   47:{x:218,y:590},
   50:{x:218,y:375},
   51:{x:218,y:305},
-  
   53:{x:304,y:220},
   56:{x:523,y:220},
   57:{x:595,y:220},
-
   59:{x:678,y:300},
   63:{x:678,y:590}
 };
@@ -106,7 +98,6 @@ const boardSpaces=[
   {number:8,x:214,y:825},
   {number:9,x:142,y:825},
   {number:10,x:35,y:825},
-  
   {number:21,x:142,y:40},
   {number:22,x:214,y:40},
   {number:23,x:286,y:40},
@@ -116,7 +107,6 @@ const boardSpaces=[
   {number:27,x:576,y:40},
   {number:28,x:650,y:40},
   {number:29,x:722,y:40},
-
   {number:11,x:35,y:720},
   {number:12,x:35,y:648},
   {number:13,x:35,y:574},
@@ -127,7 +117,6 @@ const boardSpaces=[
   {number:18,x:35,y:212},
   {number:19,x:35,y:140},
   {number:20,x:35,y:40},
-
   {number:30,x:820,y:40},
   {number:31,x:820,y:140},
   {number:32,x:820,y:212},
@@ -138,12 +127,10 @@ const boardSpaces=[
   {number:37,x:820,y:574},
   {number:38,x:820,y:648},
   {number:39,x:820,y:720},
-  
   {number:40,x:686,y:710},
   {number:46,x:150,y:710},
   {number:52,x:150,y:150},
   {number:58,x:686,y:150},
-  
   {number:41,x:576,y:710},
   {number:42,x:504,y:710},
   {number:43,x:432,y:710},
@@ -154,7 +141,6 @@ const boardSpaces=[
   {number:55,x:432,y:150},
   {number:56,x:504,y:150},
   {number:57,x:576,y:150},
-
   {number:47,x:150,y:576},
   {number:48,x:150,y:504},
   {number:49,x:150,y:430},
@@ -325,7 +311,6 @@ const coordinates1={
 27:{x:588,y:124},
 28:{x:664,y:124},
 29:{x:732,y:124},
-
 11:{x:124,y:730},
 12:{x:124,y:660},
 13:{x:124,y:586},
@@ -359,7 +344,6 @@ const coordinates2 = {
 27:{x:614,y:12},
 28:{x:686,y:12},
 29:{x:757,y:12},
-
 11:{x:12,y:758},
 12:{x:12,y:686},
 13:{x:12,y:614},
@@ -375,23 +359,18 @@ const coordinates2 = {
 37:{x:869,y:614},
 38:{x:869,y:686},
 39:{x:869,y:758},
-
 41:{x:614,y:758},
 42:{x:542,y:758},
 44:{x:395,y:758},
 45:{x:324,y:758},
-
 53:{x:324,y:126},
 56:{x:542,y:126},
 57:{x:614,y:126},
-
 47:{x:126,y:614},
 50:{x:126,y:394},
 51:{x:126,y:322},
-
 59:{x:756,y:322},
 63:{x:756,y:614},
-
 40:{x:756,y:760},
 52:{x:126,y:126},
 46:{x:126,y:760},
