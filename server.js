@@ -28,7 +28,6 @@ function safeReadJSON(file,fallback={}){
   try{if(!existsSync(file))return fallback;return JSON.parse(readFileSync(file,'utf-8'))}
   catch(err){console.error(`Error reading ${file}:`,err);return fallback}
 }
-
 function safeWriteJSON(file,data){
   const tmpFile=`${file}.tmp`;const json=JSON.stringify(data,null,2);
   try{writeFileSync(tmpFile,json,'utf-8');renameSync(tmpFile,file)}
@@ -90,7 +89,6 @@ const buildingPositions={
   53:{x:304,y:220},
   56:{x:523,y:220},
   57:{x:595,y:220},
-  
 
   59:{x:678,y:300},
   63:{x:678,y:590}
@@ -100,69 +98,74 @@ const boardSpaces=[
   {number:0,x:825,y:825},
   {number:1,x:722,y:825},
   {number:2,x:650,y:825},
-  {number:3,x:577,y:825},
-  {number:4,x:505,y:825},
+  {number:3,x:576,y:825},
+  {number:4,x:504,y:825},
   {number:5,x:430,y:825},
   {number:6,x:360,y:825},
-  {number:7,x:287,y:825},
-  {number:8,x:215,y:825},
-  {number:9,x:143,y:825},
+  {number:7,x:286,y:825},
+  {number:8,x:214,y:825},
+  {number:9,x:142,y:825},
   {number:10,x:35,y:825},
+  
+  {number:21,x:142,y:40},
+  {number:22,x:214,y:40},
+  {number:23,x:286,y:40},
+  {number:24,x:360,y:40},
+  {number:25,x:430,y:40},
+  {number:26,x:504,y:40},
+  {number:27,x:576,y:40},
+  {number:28,x:650,y:40},
+  {number:29,x:722,y:40},
+
   {number:11,x:35,y:720},
   {number:12,x:35,y:648},
-  {number:13,x:35,y:575},
-  {number:14,x:35,y:503},
-  {number:15,x:35,y:430},
-  {number:16,x:35,y:360},
-  {number:17,x:35,y:288},
-  {number:18,x:35,y:215},
-  {number:19,x:35,y:143},
+  {number:13,x:35,y:574},
+  {number:14,x:35,y:502},
+  {number:15,x:35,y:428},
+  {number:16,x:35,y:354},
+  {number:17,x:35,y:286},
+  {number:18,x:35,y:212},
+  {number:19,x:35,y:140},
   {number:20,x:35,y:40},
-  {number:21,x:140,y:40},
-  {number:22,x:210,y:40},
-  {number:23,x:285,y:40},
-  {number:24,x:358,y:40},
-  {number:25,x:430,y:40},
-  {number:26,x:503,y:40},
-  {number:27,x:575,y:40},
-  {number:28,x:650,y:40},
-  {number:29,x:720,y:40},
+
   {number:30,x:820,y:40},
   {number:31,x:820,y:140},
   {number:32,x:820,y:212},
-  {number:33,x:820,y:285},
-  {number:34,x:820,y:355},
-  {number:35,x:820,y:425},
-  {number:36,x:820,y:500},
-  {number:37,x:820,y:575},
-  {number:38,x:820,y:645},
-  {number:39,x:820,y:717},
-  {number:40,x:685,y:710},
-  {number:41,x:577,y:710},
-  {number:42,x:505,y:710},
+  {number:33,x:820,y:286},
+  {number:34,x:820,y:354},
+  {number:35,x:820,y:428},
+  {number:36,x:820,y:502},
+  {number:37,x:820,y:574},
+  {number:38,x:820,y:648},
+  {number:39,x:820,y:720},
+  
+  {number:40,x:686,y:710},
+  {number:46,x:150,y:710},
+  {number:52,x:150,y:150},
+  {number:58,x:686,y:150},
+  
+  {number:41,x:576,y:710},
+  {number:42,x:504,y:710},
   {number:43,x:432,y:710},
   {number:44,x:360,y:710},
-  {number:45,x:288,y:710},
-  {number:46,x:150,y:710},
-  {number:47,x:150,y:580},
-  {number:48,x:150,y:505},
-  {number:49,x:150,y:430},
-  {number:50,x:150,y:360},
-  {number:51,x:150,y:290},
-  {number:52,x:150,y:150},
-  {number:53,x:285,y:150},
-  {number:54,x:358,y:150},
-  {number:55,x:430,y:150},
-  {number:56,x:500,y:150},
-  {number:57,x:575,y:150},
-  {number:58,x:710,y:150},
-  {number:59,x:710,y:285},
-  {number:60,x:710,y:355},
-  {number:61,x:710,y:430},
-  {number:62,x:710,y:500},
-  {number:63,x:710,y:575}
-];
+  {number:45,x:286,y:710},
+  {number:53,x:286,y:150},
+  {number:54,x:360,y:150},
+  {number:55,x:432,y:150},
+  {number:56,x:504,y:150},
+  {number:57,x:576,y:150},
 
+  {number:47,x:150,y:576},
+  {number:48,x:150,y:504},
+  {number:49,x:150,y:430},
+  {number:50,x:150,y:356},
+  {number:51,x:150,y:286},
+  {number:59,x:710,y:286},
+  {number:60,x:710,y:356},
+  {number:61,x:710,y:430},
+  {number:62,x:710,y:504},
+  {number:63,x:710,y:576}
+];
 
 const clickableSpaces=[
   {number:1,x:717,y:779},
@@ -233,9 +236,7 @@ function updatePiece(player,x,y){const color=colorMap[player];if(!color)return;c
 function updateDisplay1(newText){if(display1.text===newText)return;display1.text=newText;saveDisplay1();safeEmit('displayUpdate1',{text:display1.text})}
 function updateDisplay2(newText){if(display2.text===newText)return;display2.text=newText;saveDisplay2();safeEmit('displayUpdate2',{text:display2.text})}
 function updateMoney(player,amount){if(!colorMap[player]||money[player]===amount)return;money[player]=amount;saveMoney();safeEmit('moneyUpdate',money)}
-
 function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||text.length<2||text.length>8||labels[player]===text)return;labels[player]=text;saveLabels();io.emit('labelsUpdate',labels)}
-
 function getBuilding(space){return buildings[String(space)]||null}
 
 function setBuilding(space,type,unset=false){
@@ -652,13 +653,11 @@ io.on('connection',(socket)=>{
     });
     socket.on('updateDisplay1',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay1(t)});
     socket.on('updateDisplay2',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay2(t)});
-
     socket.on('updateLabel',payload=>{const player=payload?.player,text=String(payload?.text||'').trim();if(colorMap[player]&&text.length>=2&&text.length<=8)updateLabel(player,text);});
-
     socket.emit('map-change',currentMap);
-    socket.emit('reload-dots',activeDots);
     socket.emit('buildingPositions',buildingPositions);
     socket.emit('clickableSpacesData', clickableSpaces);
+    socket.emit('reload-dots',activeDots);
     socket.on('cmd-dot',({num,color})=>updateDot(num,color));
     socket.on('cmd-remove',num=>removeDot(num));
     socket.on('cmd-cleardot',()=>clearAllDots());
