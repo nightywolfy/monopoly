@@ -692,12 +692,8 @@ function createBot(nick,defaultTarget,options={}){
 }
 
 const bots={
-  player1bot:createBot('player1bot','##rento',{delay:15000}),
-  player2bot:createBot('player2bot','##rento',{delay:30000}),
-  player3bot:createBot('player3bot','##rento',{delay:45000}),
-  player4bot:createBot('player4bot','##rento',{delay:60000}),
-  player5bot:createBot('player5bot','##rento',{delay:75000}),
-  player6bot:createBot('player6bot','##rento',{delay:90000})
+
+  player1bot:createBot('player7bot','##rento',{delay:90000})
 };
 
 
@@ -739,7 +735,11 @@ io.on('connection',(socket)=>{
       const cleanMsg=msg.trim().slice(0,200).replace(/\n/g,' ');
       if(!cleanMsg)return;
       const finalTarget=typeof target==='string'&&target.trim()?target.trim():bots[botId].defaultTarget;
-      bots[botId].say(finalTarget,cleanMsg);
+      if(finalTarget.toLowerCase()==='rentobot'){
+        safeEmit('rentoCommand',{from:botId,msg:cleanMsg});
+      }else{
+        bots[botId].say(finalTarget,cleanMsg);
+      }
     });
 
     socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
@@ -815,5 +815,5 @@ async function gracefulShutdown(signal){
 ['SIGINT','SIGTERM'].forEach(sig=>process.on(sig,()=>gracefulShutdown(sig)));
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
-//server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));
+//server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
+server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));

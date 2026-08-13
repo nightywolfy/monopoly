@@ -19,18 +19,18 @@
 <div id="centralDisplayContainer">
 <div id="topButtons">
 <div class="buttonRow">
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!dice0-p1"><img src="dice.jpg"></button>
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!dice4-p1"><img src="jail.jpg"></button>
-<button type="button" class="small-button" data-from="player1bot" data-msg="!jailpay p1"><img src="key.jpg"></button>
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!housestatus"><img src="house.jpg"></button>
+<button type="button" class="ws-btn" data-msg="!dice0-p1"><img src="dice.jpg"></button>
+<button type="button" class="ws-btn" data-msg="!dice4-p1"><img src="jail.jpg"></button>
+<button type="button" class="ws-btn" data-msg="!jailpay p1"><img src="key.jpg"></button>
+<button type="button" class="ws-btn" data-msg="!housestatus"><img src="house.jpg"></button>
 <a href="trade.html?p=1" target="_blank"><button type="button" class="small-button"><img src="p1.jpg"></button></a>
 </div>
 <div class="buttonRow">
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 5"><img src="5.jpg"></button>
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 10"><img src="10.jpg"></button>
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 25"><img src="25.jpg"></button>
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 50"><img src="50.jpg"></button>
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!fold"><img src="fold.jpg"></button>
+<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 5"><img src="5.jpg"></button>
+<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 10"><img src="10.jpg"></button>
+<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 25"><img src="25.jpg"></button>
+<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 50"><img src="50.jpg"></button>
+<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!fold"><img src="fold.jpg"></button>
 </div>
 </div>
 <div id="displayContainer">
@@ -40,32 +40,33 @@
 </div>
 </div>
 <div id="modeToggle">
-<button type="button" class="white-btn plus clr-dblue" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse dblue">DB+</button>
-<button type="button" class="white-btn plus clr-brown" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse brown">BR+</button>
-<button type="button" class="white-btn plus clr-blue" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse blue">BL+</button>
-<button type="button" class="white-btn plus clr-green" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse green">GR+</button>
-<button type="button" class="white-btn plus clr-yellow" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse yellow">YE+</button>
-<button type="button" class="white-btn plus clr-pink" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse pink">PI+</button>
-<button type="button" class="white-btn plus clr-orange" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse orange">OR+</button>
-<button type="button" class="white-btn plus clr-red" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse red">RE+</button>
-<button type="button" class="white-btn plus clr-white" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse white">WH+</button>
-<button type="button" class="white-btn plus clr-aqua" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse aqua">AQ+</button>
-<button type="button" class="white-btn plus clr-purple" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse purple">PU+</button>
-<button type="button" class="white-btn plus clr-black" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse black">BL+</button>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse dblue"><button class="white-btn plus clr-dblue">DB+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse brown"><button class="white-btn plus clr-brown">BR+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse blue"><button class="white-btn plus clr-blue">BL+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse green"><button class="white-btn plus clr-green">GR+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse yellow"><button class="white-btn plus clr-yellow">YE+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse pink"><button class="white-btn plus clr-pink">PI+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse orange"><button class="white-btn plus clr-orange">OR+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse red"><button class="white-btn plus clr-red">RE+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse white"><button class="white-btn plus clr-white">WH+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse aqua"><button class="white-btn plus clr-aqua">AQ+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse purple"><button class="white-btn plus clr-purple">PU+</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!addonehouse black"><button class="white-btn plus clr-black">BL+</button></form>
 <button type="button" class="mode-btn active" data-mode="mortgage">Mortgage</button>
 <button type="button" class="mode-btn" data-mode="redeem">Redeem</button>
-<button type="button" class="white-btn minus clr-dblue" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse dblue">DB-</button>
-<button type="button" class="white-btn minus clr-brown" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse brown">BR-</button>
-<button type="button" class="white-btn minus clr-blue" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse blue">BL-</button>
-<button type="button" class="white-btn minus clr-green" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse green">GR-</button>
-<button type="button" class="white-btn minus clr-yellow" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse yellow">YE-</button>
-<button type="button" class="white-btn minus clr-pink" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse pink">PI-</button>
-<button type="button" class="white-btn minus clr-orange" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse orange">OR-</button>
-<button type="button" class="white-btn minus clr-red" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse red">RE-</button>
-<button type="button" class="white-btn minus clr-white" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse white">WH-</button>
-<button type="button" class="white-btn minus clr-aqua" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse aqua">AQ-</button>
-<button type="button" class="white-btn minus clr-purple" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse purple">PU-</button>
-<button type="button" class="white-btn minus clr-black" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse black">BL-</button>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse dblue"><button class="white-btn minus clr-dblue">DB-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse brown"><button class="white-btn minus clr-brown">BR-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse blue"><button class="white-btn minus clr-blue">BL-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse green"><button class="white-btn minus clr-green">GR-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse yellow"><button class="white-btn minus clr-yellow">YE-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse pink"><button class="white-btn minus clr-pink">PI-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse orange"><button class="white-btn minus clr-orange">OR-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse red"><button class="white-btn minus clr-red">RE-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse white"><button class="white-btn minus clr-white">WH-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse aqua"><button class="white-btn minus clr-aqua">AQ-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse purple"><button class="white-btn minus clr-purple">PU-</button></form>
+<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="target" value="rentobot"><input type="hidden" name="msg" value="!removeonehouse black"><button class="white-btn minus clr-black">BL-</button></form>
+</div>
 </div>
 </div>
 <div id="controlsContainer">
@@ -81,28 +82,17 @@
 <iframe id="chatFrame" src="https://web.libera.chat/#%23rento" style="border:none;"></iframe>
 </div>
 </div>
-<script src="/socket.io/socket.io.js"></script>
 <script>
 (function(){
-// Reuse a socket p.js may have already opened; otherwise open one here.
-window.socket = window.socket || io();
-const socket = window.socket;
-
 const params=new URLSearchParams(window.location.search);
 const playerNum=params.get('p')||'1';
-const botId=`player${playerNum}bot`;
-document.body.dataset.bot=botId;
-
-// Swap p1 -> pN in every command button's message.
-document.querySelectorAll('[data-msg]').forEach(el=>{
-el.dataset.msg=el.dataset.msg.replace(/p1\b/g,`p${playerNum}`);
+document.body.dataset.bot=`player${playerNum}bot`;
+document.querySelectorAll('input[name="bot"]').forEach(el=>{
+el.value=`player${playerNum}bot`;
 });
-
-// Swap player1bot -> playerNbot in every command button's from-bot.
-document.querySelectorAll('[data-from]').forEach(el=>{
-el.dataset.from=el.dataset.from.replace('player1bot',botId);
+document.querySelectorAll('input[name="msg"]').forEach(el=>{
+el.value=el.value.replace(/p1\b/g,`p${playerNum}`);
 });
-
 document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
 el.src=el.src.replace('p1.',`p${playerNum}.`);
 });
@@ -110,15 +100,9 @@ document.querySelectorAll('a[href^="trade.html"],a[href^="trade-mobile.html"],a[
 const page=el.href.split('/').pop().split('?')[0];
 el.href=`${page}?p=${playerNum}`;
 });
-
-// Every command button sends over the socket instead of POSTing to /send-irc.
-document.querySelectorAll('[data-msg]').forEach(el=>{
-el.addEventListener('click',()=>{
-socket.emit('sendMessage',{from:el.dataset.from||botId,target:el.dataset.target,msg:el.dataset.msg});
-});
-});
 })();
 </script>
+<script src="/socket.io/socket.io.js"></script>
 <script src="/p.js"></script>
 </body>
 </html>
