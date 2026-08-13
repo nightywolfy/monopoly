@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Monopoly Board</title>
+<link rel="stylesheet" href="/computer.css">
+</head>
+<body>
+<div id="boardWrapper">
+<div id="boardContainer">
+<div id="board">
+<img id="boardImg" src="map3.png" alt="Monopoly Board">
+<div id="p1" class="piece red">p1</div>
+<div id="p2" class="piece blue">p2</div>
+<div id="p3" class="piece orange">p3</div>
+<div id="p4" class="piece green">p4</div>
+<div id="p5" class="piece purple">p5</div>
+<div id="p6" class="piece white">p6</div>
+<div id="boardButtons"></div>
+<div id="centralDisplayContainer">
+<div id="topButtons">
+<div class="buttonRow">
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!dice0-p1"><img src="dice.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!dice4-p1"><img src="jail.jpg"></button>
+<button type="button" class="small-button" data-from="player1bot" data-msg="!jailpay p1"><img src="key.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!housestatus"><img src="house.jpg"></button>
+<a href="trade.html?p=1" target="_blank"><button type="button" class="small-button"><img src="p1.jpg"></button></a>
+</div>
+<div class="buttonRow">
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 5"><img src="5.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 10"><img src="10.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 25"><img src="25.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 50"><img src="50.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!fold"><img src="fold.jpg"></button>
+</div>
+</div>
+<div id="displayContainer">
+<div id="display1" class="displayBox">Display 1</div>
+<div id="display2" class="displayBox">Display 2</div>
+</div>
+</div>
+</div>
+<div id="modeToggle">
+<button type="button" class="white-btn plus clr-dblue" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse dblue">DB+</button>
+<button type="button" class="white-btn plus clr-brown" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse brown">BR+</button>
+<button type="button" class="white-btn plus clr-blue" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse blue">BL+</button>
+<button type="button" class="white-btn plus clr-green" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse green">GR+</button>
+<button type="button" class="white-btn plus clr-yellow" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse yellow">YE+</button>
+<button type="button" class="white-btn plus clr-pink" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse pink">PI+</button>
+<button type="button" class="white-btn plus clr-orange" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse orange">OR+</button>
+<button type="button" class="white-btn plus clr-red" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse red">RE+</button>
+<button type="button" class="white-btn plus clr-white" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse white">WH+</button>
+<button type="button" class="white-btn plus clr-aqua" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse aqua">AQ+</button>
+<button type="button" class="white-btn plus clr-purple" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse purple">PU+</button>
+<button type="button" class="white-btn plus clr-black" data-target="rentobot" data-from="player1bot" data-msg="!addonehouse black">BL+</button>
+<button type="button" class="mode-btn active" data-mode="mortgage">Mortgage</button>
+<button type="button" class="mode-btn" data-mode="redeem">Redeem</button>
+<button type="button" class="white-btn minus clr-dblue" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse dblue">DB-</button>
+<button type="button" class="white-btn minus clr-brown" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse brown">BR-</button>
+<button type="button" class="white-btn minus clr-blue" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse blue">BL-</button>
+<button type="button" class="white-btn minus clr-green" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse green">GR-</button>
+<button type="button" class="white-btn minus clr-yellow" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse yellow">YE-</button>
+<button type="button" class="white-btn minus clr-pink" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse pink">PI-</button>
+<button type="button" class="white-btn minus clr-orange" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse orange">OR-</button>
+<button type="button" class="white-btn minus clr-red" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse red">RE-</button>
+<button type="button" class="white-btn minus clr-white" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse white">WH-</button>
+<button type="button" class="white-btn minus clr-aqua" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse aqua">AQ-</button>
+<button type="button" class="white-btn minus clr-purple" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse purple">PU-</button>
+<button type="button" class="white-btn minus clr-black" data-target="rentobot" data-from="player1bot" data-msg="!removeonehouse black">BL-</button>
+</div>
+</div>
+<div id="controlsContainer">
+<div id="controlsInner">
+<div id="moneyContainer">
+<div id="money-p1-overlay" class="moneyBox red">Player1: $0</div>
+<div id="money-p3-overlay" class="moneyBox orange">Player3: $0</div>
+<div id="money-p5-overlay" class="moneyBox purple">Player5: $0</div>
+<div id="money-p2-overlay" class="moneyBox blue">Player2: $0</div>
+<div id="money-p4-overlay" class="moneyBox green">Player4: $0</div>
+<div id="money-p6-overlay" class="moneyBox white">Player6: $0</div>
+</div>
+<iframe id="chatFrame" src="https://web.libera.chat/#%23rento" style="border:none;"></iframe>
+</div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(function(){
+// Reuse a socket p.js may have already opened; otherwise open one here.
+window.socket = window.socket || io();
+const socket = window.socket;
+
+const params=new URLSearchParams(window.location.search);
+const playerNum=params.get('p')||'1';
+const botId=`player${playerNum}bot`;
+document.body.dataset.bot=botId;
+
+// Swap p1 -> pN in every command button's message.
+document.querySelectorAll('[data-msg]').forEach(el=>{
+el.dataset.msg=el.dataset.msg.replace(/p1\b/g,`p${playerNum}`);
+});
+
+// Swap player1bot -> playerNbot in every command button's from-bot.
+document.querySelectorAll('[data-from]').forEach(el=>{
+el.dataset.from=el.dataset.from.replace('player1bot',botId);
+});
+
+document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
+el.src=el.src.replace('p1.',`p${playerNum}.`);
+});
+document.querySelectorAll('a[href^="trade.html"],a[href^="trade-mobile.html"],a[href^="trade-tablet.html"]').forEach(el=>{
+const page=el.href.split('/').pop().split('?')[0];
+el.href=`${page}?p=${playerNum}`;
+});
+
+// Every command button sends over the socket instead of POSTing to /send-irc.
+document.querySelectorAll('[data-msg]').forEach(el=>{
+el.addEventListener('click',()=>{
+socket.emit('sendMessage',{from:el.dataset.from||botId,target:el.dataset.target,msg:el.dataset.msg});
+});
+});
+})();
+</script>
+<script src="/p.js"></script>
+</body>
+</html>

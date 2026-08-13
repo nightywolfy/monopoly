@@ -6,7 +6,6 @@ class MonopolyBot(SingleServerIRCBot):
     def __init__(self, ch, nick, server, port, users=None, num_players=6):
         super().__init__([(server, port)], nick, nick, connect_factory=Factory(ipv6=True))
         self.channel = ch.lower()
-
         self.board_regular = {0:"Start",1:"x-Libya",2:"Chest",3:"x-Sudan",4:"x-WaterPlant",5:"x-StationJapan",6:"x-Turkey",7:"Clover",8:"x-Greece",9:"x-Bulgaria",10:"Jail",11:"x-Poland",12:"x-Russia",13:"x-HealthCare",14:"x-Ukraine",15:"x-StationSpain",16:"x-Lithuania",17:"x-Latvia",18:"Chest",19:"x-Estonia",20:"Parking",21:"x-Norway",22:"x-Sweden",23:"Clover",24:"x-Finland",25:"x-StationKorea",26:"x-Germany",27:"x-Wifi",28:"x-France",29:"x-UK",30:"GotoJail",31:"x-Canada",32:"Clover",33:"x-Mexico",34:"x-USA",35:"x-StationIndia",36:"Chest",37:"x-Qatar",38:"x-SolarPlant",39:"x-China"}
         self.board_deep = {40:"x-Hospital",41:"x-Serbia",42:"x-Croatia",43:"Japan",44:"x-Austria",45:"x-Italy",46:"x-Internet",47:"x-Belgium",48:"Chest",49:"Spain",50:"x-Chile",51:"x-Argentina",52:"x-Power",53:"x-Brazil",54:"Switch",55:"Korea",56:"x-Indonesia",57:"x-Malaysia",58:"x-Water",59:"x-Singapore",60:"Clover",61:"India",62:"Auction",63:"x-Romania"}
         self.non_property_regular = {0,2,7,10,18,20,23,30,32,36}

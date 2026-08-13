@@ -692,12 +692,12 @@ function createBot(nick,defaultTarget,options={}){
 }
 
 const bots={
-  player1bot:createBot('player1bot','##rento',{delay:0}),
-  player2bot:createBot('player2bot','##rento',{delay:10000}),
-  player3bot:createBot('player3bot','##rento',{delay:20000}),
-  player4bot:createBot('player4bot','##rento',{delay:30000}),
-  player5bot:createBot('player5bot','##rento',{delay:40000}),
-  player6bot:createBot('player6bot','##rento',{delay:50000})
+  player1bot:createBot('player1bot','##rento',{delay:15000}),
+  player2bot:createBot('player2bot','##rento',{delay:30000}),
+  player3bot:createBot('player3bot','##rento',{delay:45000}),
+  player4bot:createBot('player4bot','##rento',{delay:60000}),
+  player5bot:createBot('player5bot','##rento',{delay:75000}),
+  player6bot:createBot('player6bot','##rento',{delay:90000})
 };
 
 
@@ -733,10 +733,13 @@ io.on('connection',(socket)=>{
 
     socket.on('sendMessage',payload=>{
       if(!payload||typeof payload!=='object')return;
-      const {bot,msg}=payload;
-      if(!bots[bot]||typeof msg!=='string')return;
+      const {bot,from,msg,target}=payload;
+      const botId=from||bot;
+      if(!bots[botId]||typeof msg!=='string')return;
       const cleanMsg=msg.trim().slice(0,200).replace(/\n/g,' ');
-      if(cleanMsg)bots[bot].say(bots[bot].defaultTarget,cleanMsg);
+      if(!cleanMsg)return;
+      const finalTarget=typeof target==='string'&&target.trim()?target.trim():bots[botId].defaultTarget;
+      bots[botId].say(finalTarget,cleanMsg);
     });
 
     socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
