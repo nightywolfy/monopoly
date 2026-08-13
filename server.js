@@ -691,8 +691,9 @@ function createBot(nick,defaultTarget,options={}){
   };
 }
 
+
 const bots={
-  player1bot:createBot('player1bot','##rento',{delay:15000}),
+  player1bot:createBot('player1bot','##rento',{delay:20000}),
   player2bot:createBot('player2bot','##rento',{delay:30000}),
   player3bot:createBot('player3bot','##rento',{delay:45000}),
   player4bot:createBot('player4bot','##rento',{delay:60000}),
@@ -819,5 +820,5 @@ async function gracefulShutdown(signal){
 ['SIGINT','SIGTERM'].forEach(sig=>process.on(sig,()=>gracefulShutdown(sig)));
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
 //server.listen(PORT, () => console.log(`[Server] Running at http://192.168.1.67:${PORT}`));
+server.listen(PORT, () => console.log(`[Server] Running at http://127.0.0.1:${PORT}`));
