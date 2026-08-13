@@ -48,10 +48,7 @@ class MonopolyBot(SingleServerIRCBot):
         self.up_timer = None
         self.up_timer_lock = threading.Lock()
         self.admin_users = {u.lower() for u in {"juntao", "crinjal"}}
-        self.house_cmd_queues = {}
-        self.house_cmd_lock = threading.Lock()
-
-        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "192.168.1.67")
+        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "https://monopoly-production-ef33.up.railway.app")
         self.sio = socketio.Client(reconnection=True, reconnection_delay=2, reconnection_delay_max=10)
         self._setup_ws_handlers()
         self.ws_thread = threading.Thread(target=self._run_ws_client, daemon=True)
@@ -90,9 +87,6 @@ class MonopolyBot(SingleServerIRCBot):
         msg=str(data.get('msg','')).strip().lower()
         if not nick or not msg:return
         try:
-            # Same entry point as a real IRC privmsg, so !bidadd/!fold/
-            # !addonehouse/!removeonehouse/!dice*/!jailpay etc. all behave
-            # identically regardless of which transport delivered them.
             self.handle_private_message(self.connection,nick,msg)
         except Exception as e:
             print(f"[WS] Command error: {e}")
@@ -105,7 +99,7 @@ class MonopolyBot(SingleServerIRCBot):
         if re.match(r"!go[1-4](?:\s+\d+)?",msg.strip()):self.handle_go_command(c,msg.strip(),nick);return
         success,r=self.handle_command(nick,msg)
         if r:
-            if low.startswith(("!bidadd","!fold","!addonehouse","!removeonehouse")):c.privmsg(self.channel,r)
+            if low.startswith(("!bidadd","!fold","!addonehouse","!removeonehouse","!jailpay")):c.privmsg(self.channel,r)
             else:c.privmsg(nick,r)
         if success and low.startswith(("!addonehouse","!removeonehouse")):self.auto_up()
         self.handle_go_privmsg(c,nick,msg)
@@ -169,14 +163,7 @@ class MonopolyBot(SingleServerIRCBot):
             self.up_timer=threading.Timer(delay,self.auto_up)
             self.up_timer.daemon=True
             self.up_timer.start()
-    def _house_cmd_rate_limited(self,caller):
-        with self.house_cmd_lock:
-            q=self.house_cmd_queues.setdefault(caller,queue.Queue(maxsize=1))
-        try:q.put_nowait(True)
-        except queue.Full:return True
-        threading.Timer(1.5,q.get_nowait).start()
-        return False
-          
+
     def auto_up(self):
         if not self.players:return
         pos=[];money=[];props=[];houses=[]
@@ -190,11 +177,11 @@ class MonopolyBot(SingleServerIRCBot):
             else:
                 pos+=["0"];money+=["0"];props+=["0"];houses+=["0"]
         try:
-            self.connection.privmsg("player1bot","!mv all "+" ".join(pos))
-            self.connection.privmsg("player1bot","!set all "+" ".join(money))
-            self.connection.topic(self.channel," ".join(pos+money+props+houses))
-        except Exception:
-            pass
+            self.sio.emit("cmd-mv-all",pos)
+            self.sio.emit("cmd-set-all",money)
+        except Exception as e:
+            print(f"[WS] auto_up error: {e}")
+
     def handle_command(self,who,body):
         body=body.strip();caller=who.lower()
 
@@ -211,23 +198,25 @@ class MonopolyBot(SingleServerIRCBot):
             return True,self.pname(f"Alias '{a}' added for {pl}")
             
         if m:=re.match(r"!start\s+(\d+)\s*(deep|regular)?\s*(\d+)?",body):
-            n,mode,money=int(m.group(1)),m.group(2)or"regular",int(m.group(3)or 1000)
-            if not 2<=n<=6:return False,"Number of players must be 2-6"
-            self.reset_state();self.num_players=n
-            self.players={f"p{i+1}":{"money":money,"pos":0}for i in range(n)}
-            self.active_board=self.board_regular.copy()if mode=="regular" else{**self.board_regular,**self.board_deep}
-            self.non_property=set(self.non_property_regular)if mode=="regular" else set(self.non_property_regular)|set(self.non_property_deep)
-            self.max_pos=39 if mode=="regular" else 63
-            for i in range(n):self.aliases.setdefault(f"p{i+1}",set()).add(f"player{i+1}bot")
-            try:
-                for cmd in["!cleardot","!clearall",f"!dotlocation {'1' if mode=='regular' else '2'}",f"!map {'1' if mode=='regular' else '3'}"]:
-                    self.connection.privmsg("player1bot",cmd)
-                self._handle_dicestart(self.connection,n)
-            except Exception as e:
-                return False,f"Game started but failed to send initial commands: {e}"
-            self.connection.privmsg("player1bot","!d1 Game has started")
-            self.connection.privmsg("player1bot","!d2 P1's Turn to Roll")
-            return True,f"Game started with {n} players ({mode}) ${money} each"
+                n,mode,money=int(m.group(1)),m.group(2)or"regular",int(m.group(3)or 1000)
+                if not 2<=n<=6:return False,"Number of players must be 2-6"
+                self.reset_state();self.num_players=n
+                self.players={f"p{i+1}":{"money":money,"pos":0}for i in range(n)}
+                self.active_board=self.board_regular.copy()if mode=="regular" else{**self.board_regular,**self.board_deep}
+                self.non_property=set(self.non_property_regular)if mode=="regular" else set(self.non_property_regular)|set(self.non_property_deep)
+                self.max_pos=39 if mode=="regular" else 63
+                for i in range(n):self.aliases.setdefault(f"p{i+1}",set()).add(f"player{i+1}bot")
+                try:
+                        self.sio.emit("cmd-cleardot")
+                        self.sio.emit("cmd-clear-buildings")
+                        self.sio.emit("cmd-dotlocation",1 if mode=="regular" else 2)
+                        self.sio.emit("cmd-map",1 if mode=="regular" else 3)
+                        self._handle_dicestart(self.connection,n)
+                except Exception as e:
+                        return False,f"Game started but failed to initialize board: {e}"
+                self.sio.emit("updateDisplay1",{"text":"Game has started"})
+                self.sio.emit("updateDisplay2",{"text":"P1's Turn to Roll"})
+                return True,f"Game started with {n} players ({mode}) ${money} each"
       
         if m:=re.match(r"!rename\s+(\S+)\s+(\S+)",body):
             old,new=m.groups()
@@ -308,7 +297,7 @@ class MonopolyBot(SingleServerIRCBot):
 
         if m:=re.match(r"!propertylist$",body.lower()):
             try:
-                self.connection.privmsg("player1bot","!cleardot")
+                self.sio.emit("cmd-cleardot")
                 non_props=self.non_property;groups={}
                 for pos in sorted(self.active_board):
                     if pos in non_props:continue
@@ -318,17 +307,14 @@ class MonopolyBot(SingleServerIRCBot):
                     color=self.unmortgaged_colors.get(owner) if owner and owner[0]=="p" else self.mortgaged2_colors.get(owner)
                     if not color:continue
                     groups.setdefault((owner,color),[]).append(pos)
-                delay=0
                 for (owner,color),positions in groups.items():
-                    nums=" ".join(str(x) for x in positions)
-                    threading.Timer(delay,lambda n=nums,c=color:self.connection.privmsg("player1bot",f"!dot {n} {c}")).start()
-                    delay+=2
+                    self.sio.emit("cmd-dot",{"num":positions,"color":color})
                 return True,""
             except Exception as e:
                 return False,f"Could not process property list: {e}"
 
         if m:=re.match(r"!housestatus$",body.lower()):
-            try:self.connection.privmsg("player1bot","!clearall")
+            try:self.sio.emit("cmd-clear-buildings")
             except Exception:pass
             groups={1:[],2:[],3:[],4:[],"hotel":[]}
             for color,positions in self.color_sets.items():
@@ -338,13 +324,11 @@ class MonopolyBot(SingleServerIRCBot):
                     if h==5:groups["hotel"].append(p)
                     elif 1<=h<=4:groups[h].append(p)
             try:
-                delay=1
                 for n in (1,2,3,4):
                     if groups[n]:
-                        threading.Timer(delay,lambda x=n:self.connection.privmsg("player1bot",f"!house{x} {' '.join(map(str,groups[x]))}")).start()
-                        delay+=1
+                        self.sio.emit("cmd-house",{"type":f"house{n}","spaces":groups[n]})
                 if groups["hotel"]:
-                    threading.Timer(delay,lambda:self.connection.privmsg("player1bot",f"!hotel {' '.join(map(str,groups['hotel']))}")).start()
+                    self.sio.emit("cmd-house",{"type":"hotel","spaces":groups["hotel"]})
             except Exception:pass
             return True,None
 
@@ -394,7 +378,7 @@ class MonopolyBot(SingleServerIRCBot):
             if self.players[pl]["money"]<cost:return False,f"{self.pname(pl)} does not have enough money to pay bail ({cost})"
             self.players[pl]["money"]-=cost;self.jailed[pl]=False
             self.go_jail_attempts[pl]=0;self.dice4_streak[pl]=0
-            try:self.connection.privmsg("player2bot","!sound key.mp3")
+            try:self.sio.emit("cmd-sound",{"file":"key.mp3"})
             except Exception:pass
             return True,self.pname(f"{pl} paid ${cost} bail (turn {turn+1}) and is now out of jail. Balance: {self.players[pl]['money']}")
             
@@ -417,7 +401,7 @@ class MonopolyBot(SingleServerIRCBot):
             self.free_loans[pl]["owed"]+=amount;self.free_loans[pl]["outer"]+=cut;self.free_loans[pl]["inner"]+=cut
             self.players[pl]["money"]+=amount
             return True,self.pname(f"{pl} received ${amount} free loan. Owes ${self.free_loans[pl]['owed']} (-${self.free_loans[pl]['outer']} outer GO / -${self.free_loans[pl]['inner']} inner GO each pass)")
-            
+          
         if m:=re.match(r"!auction\s+(\d+)$",body):
             pos=int(m.group(1))
             if not self.players:return False,"No game in progress."
@@ -429,9 +413,10 @@ class MonopolyBot(SingleServerIRCBot):
             self.active_board[pos]=prop if prop.startswith("x-") else f"x-{prop}"
             self.current_auction={"pos":pos,"bids":{},"last_bidder":None,"bid_timer":None,"active":set(self.players.keys())}
             if self.auction_required:self.auction_required=False
-            try:self.connection.privmsg("player1bot",f"!d2 Auction started for {prop}")
+            display_prop=prop[2:] if prop.startswith("x-") else prop
+            try:self.sio.emit("updateDisplay2",{"text":f"Auction started for {display_prop}"})
             except Exception:pass
-            return True,self.pname(f"Auction started for {prop}. Use !bidadd <amount> or !fold.")
+            return True,self.pname(f"Auction started for {display_prop}")
             
         if m:=re.match(r"!bidadd\s+(\d+)$",body):
             if not self.current_auction:return False,None
@@ -448,7 +433,7 @@ class MonopolyBot(SingleServerIRCBot):
             if auc["bids"] and player_key==max(auc["bids"],key=auc["bids"].get):return False,None
             new_bid=max(auc["bids"].values(),default=0)+inc
             if player_key not in self.players:return False,"Player is no longer in the game"
-            if self.players[player_key]["money"]<new_bid:return False,f"Not enough money ({new_bid})"
+            if self.players[player_key]["money"]<new_bid:return False,None
             auc["bids"][player_key]=new_bid;auc["last_bidder"]=player_key
             if auc.get("bid_timer"):auc["bid_timer"].cancel()
             def auto_win():
@@ -464,10 +449,10 @@ class MonopolyBot(SingleServerIRCBot):
                     color=self.unmortgaged_colors.get(winner,"red")
                     wname=self.pname(winner)
                     self.msg_queue.put((self.channel,f"{wname} wins {name} for {amt}"))
-                    self.msg_queue.put(("player2bot","!sound sold.mp3"))
-                    self.msg_queue.put(("player1bot",f"!d2 {wname} wins {name} for {amt}"))
-                    self.msg_queue.put(("player1bot",f"!dot {pos} {color}"))
-                    self.msg_queue.put(("rentobot","!up"))
+                    self.sio.emit("cmd-sound",{"file":"sold.mp3"})
+                    self.sio.emit("updateDisplay2",{"text":f"{wname} wins {name} for {amt}"})
+                    self.sio.emit("cmd-dot",{"num":pos,"color":color})
+                    self.sio.emit("rentoCommand",{"from":"rentobot","msg":"!up"})
                     if auc.get("bid_timer"):auc["bid_timer"].cancel()
                     self.current_auction=None
             auc["bid_timer"]=threading.Timer(12,auto_win)
@@ -476,8 +461,8 @@ class MonopolyBot(SingleServerIRCBot):
             prop=self.active_board.get(auc["pos"],f"Position {auc['pos']}")
             prop=prop[2:] if prop.startswith("x-") else prop
             msg=f"{self.pname(player_key)} winning {new_bid} on {prop}"
-            self.msg_queue.put(("player2bot","!sound bid.mp3"))
-            self.msg_queue.put(("player1bot",f"!d2 {msg}"))
+            self.sio.emit("cmd-sound",{"file":"bid.mp3"})
+            self.sio.emit("updateDisplay2",{"text":msg})
             return True,None
 
         if m:=re.match(r"!fold$",body.lower()):
@@ -515,10 +500,9 @@ class MonopolyBot(SingleServerIRCBot):
                     color=self.unmortgaged_colors.get(winner,"red")
                     wname=self.pname(winner)
                     self.msg_queue.put((self.channel,f"{wname} wins {name} for {amt}"))
-                    self.msg_queue.put(("player2bot","!sound sold.mp3"))
-                    self.msg_queue.put(("player1bot",f"!d2 {wname} wins {name} for {amt}"))
-                    self.msg_queue.put(("player1bot",f"!dot {pos} {color}"))
-                    self.msg_queue.put(("rentobot","!up"))
+                    self.sio.emit("cmd-sound",{"file":"sold.mp3"})
+                    self.sio.emit("updateDisplay2",{"text":f"{wname} wins {name} for {amt}"})
+                    self.sio.emit("cmd-dot",{"num":pos,"color":color})
                     self.current_auction=None
                     return True,None
                 self.current_auction=None
@@ -531,89 +515,98 @@ class MonopolyBot(SingleServerIRCBot):
             if auc.get("bid_timer"):
                 auc["bid_timer"].cancel()
                 auc["bid_timer"]=None
-            pos=auc["pos"];raw=self.active_board.get(pos,"")
-            if raw and not raw.startswith("x-"):self.active_board[pos]=f"x-{raw}"
+            pos=auc["pos"]
+            raw=self.active_board.get(pos,f"Position {pos}")
+            prop=raw[2:] if raw.startswith("x-") else raw
+            self.active_board[pos]=f"x-{prop}"
             auc["bids"]={}
             auc["last_bidder"]=None
             auc["active"]=set(self.players.keys())
-            return True,self.pname(f"Auction for property {pos} has been RESET. Bidding restarted.")
+            msg=f"Auction for {prop} has been RESET. Bidding restarted."
+            try:self.sio.emit("updateDisplay2",{"text":msg})
+            except Exception:pass
+            return True,self.pname(msg)
 
-        if re.match(r"!mortgage\s+(\d+)",body) or re.match(r"!redeem\s+(\d+)",body):
-            def queue_func():
-                with self.state_lock:
-                    msg=None
-                    success=False
-                    m=re.match(r"!mortgage\s+(\d+)",body)
-                    if m:
-                        pos=int(m.group(1))
-                        if self.current_auction:
-                            msg="Cannot mortgage during an auction"
-                        elif pos not in self.properties:
-                            msg=f"Position {pos} is not owned"
+        if m:=re.match(r"!mortgage\s+(\d+)",body):
+            with self.state_lock:
+                msg=None
+                success=False
+                pos=int(m.group(1))
+                if self.current_auction:
+                    msg="Cannot mortgage during an auction"
+                elif pos not in self.properties:
+                    msg=f"Position {pos} is not owned"
+                else:
+                    owner=self.properties[pos]
+                    owner_display=self.pname(owner)
+                    caller_player=next((k for k,s in self.aliases.items() if caller in s or caller==k),caller)
+                    if caller_player!=owner:
+                        msg=f"Only the owner ({owner_display}) can mortgage this property"
+                    elif pos in self.mortgaged:
+                        msg=f"Property {pos} is already mortgaged"
+                    elif any(self.houses.get(x,0)>0 for group in self.color_sets.values() if pos in group for x in group):
+                        msg=f"Cannot mortgage property {pos} because the color set has houses"
+                    else:
+                        val=self.mortgage_table.get(pos,0)
+                        if val<=0:
+                            msg=f"Property {pos} cannot be mortgaged"
                         else:
-                            owner=self.properties[pos];owner_display=self.pname(owner)
-                            caller_player=next((k for k,s in self.aliases.items() if caller in s or caller==k),caller)
-                            if caller_player!=owner:
-                                msg=f"Only the owner ({owner_display}) can mortgage this property"
-                            elif pos in self.mortgaged:
-                                msg=f"Property {pos} is already mortgaged"
-                            elif any(self.houses.get(x,0)>0 for group in self.color_sets.values() if pos in group for x in group):
-                                msg=f"Cannot mortgage property {pos} because the color set has houses"
-                            else:
-                                val=self.mortgage_table.get(pos,0)
-                                if val<=0:
-                                    msg=f"Property {pos} cannot be mortgaged"
-                                else:
-                                    pen=int(val*0.10)
-                                    self.players[owner]['money']+=val-pen
-                                    self.mortgaged.add(pos)
-                                    old=self.active_board.get(pos,f"Position {pos}")
-                                    name=old.split('-',1)[-1] if '-' in old else old
-                                    pref=f"m{owner[-1]}" if owner.startswith("p") else f"m-{owner}"
-                                    self.active_board[pos]=f"{pref}-{name}"
-                                    msg=f"mortgaged {owner_display} {name} for {val-pen} (10% penalty)"
-                                    success=True
-                                    self.msg_queue.put(("player1bot",f"!d2 {msg}"))
-                                    self.msg_queue.put(("player2bot","!sound mortgage.mp3"))
-                                    self.msg_queue.put(("player1bot",f"!dot {pos} {self.mortgaged_colors.get(owner,'black')}"))
-                                   
-                    m=re.match(r"!redeem\s+(\d+)",body)
-                    if m:
-                        pos=int(m.group(1))
-                        if self.current_auction:
-                            msg="Cannot redeem/unmortgage during an auction"
-                        elif pos not in self.properties:
-                            msg=f"Position {pos} is not owned."
+                            pen=int(val*0.10)
+                            self.players[owner]['money']+=val-pen
+                            self.mortgaged.add(pos)
+                            old=self.active_board.get(pos,f"Position {pos}")
+                            name=old.split('-',1)[-1] if '-' in old else old
+                            pref=f"m{owner[-1]}" if owner.startswith("p") else f"m-{owner}"
+                            self.active_board[pos]=f"{pref}-{name}"
+                            msg=f"mortgaged {owner_display} {name} for {val-pen} (10% penalty)"
+                            success=True
+                            self.sio.emit("cmd-sound",{"file":"mortgage.mp3"})
+                            self.sio.emit("cmd-dot",{"num":pos,"color":self.mortgaged_colors.get(owner,"black")})
+                if msg:
+                    self.connection.privmsg(self.channel,msg)
+                if success:
+                    self.schedule_auto_up()
+            return True,None
+
+        if m:=re.match(r"!redeem\s+(\d+)",body):
+            with self.state_lock:
+                msg=None
+                success=False
+                pos=int(m.group(1))
+                if self.current_auction:
+                    msg="Cannot redeem/unmortgage during an auction"
+                elif pos not in self.properties:
+                    msg=f"Position {pos} is not owned."
+                else:
+                    owner=self.properties[pos]
+                    owner_display=self.pname(owner)
+                    caller_player=next((k for k,s in self.aliases.items() if caller in s or caller==k),caller)
+                    if caller_player!=owner:
+                        msg=f"Only the owner ({owner_display}) can redeem this property"
+                    elif pos not in self.mortgaged:
+                        msg=f"Property {pos} is not mortgaged."
+                    else:
+                        cost=self.mortgage_table.get(pos,0)
+                        if self.players[owner]['money']<cost:
+                            msg=f"{owner_display} does not have enough money to unmortgage {pos} ({cost})"
                         else:
-                            owner=self.properties[pos];owner_display=self.pname(owner)
-                            caller_player=next((k for k,s in self.aliases.items() if caller in s or caller==k),caller)
-                            if caller_player!=owner:
-                                msg=f"Only the owner ({owner_display}) can redeem this property"
-                            elif pos not in self.mortgaged:
-                                msg=f"Property {pos} is not mortgaged."
-                            else:
-                                cost=self.mortgage_table.get(pos,0)
-                                if self.players[owner]['money']<cost:
-                                    msg=f"{owner_display} does not have enough money to unmortgage {pos} ({cost})"
-                                else:
-                                    self.players[owner]['money']-=cost
-                                    self.mortgaged.remove(pos)
-                                    old=self.active_board.get(pos,f"Position {pos}")
-                                    name=old.split('-',1)[-1] if '-' in old else old
-                                    self.active_board[pos]=f"{owner}-{name}"
-                                    msg=f"redeemed {owner_display} {name} for {cost}"
-                                    success=True
-                                    self.msg_queue.put(("player1bot",f"!d2 {msg}"))
-                                    self.msg_queue.put(("player2bot","!sound redeem.mp3"))
-                                    self.msg_queue.put(("player1bot",f"!dot {pos} {self.unmortgaged_colors.get(owner,'red')}"))
-
-                    if msg:self.msg_queue.put((self.channel,msg))
-                    if success:self.schedule_auto_up()
-            self.cmd_queue.put(queue_func)
-
+                            self.players[owner]['money']-=cost
+                            self.mortgaged.remove(pos)
+                            old=self.active_board.get(pos,f"Position {pos}")
+                            name=old.split('-',1)[-1] if '-' in old else old
+                            self.active_board[pos]=f"{owner}-{name}"
+                            msg=f"redeemed {owner_display} {name} for {cost}"
+                            success=True
+                            self.sio.emit("cmd-sound",{"file":"redeem.mp3"})
+                            self.sio.emit("cmd-dot",{"num":pos,"color":self.unmortgaged_colors.get(owner,"red")})
+                if msg:
+                    self.connection.privmsg(self.channel,msg)
+                if success:
+                    self.schedule_auto_up()
+            return True,None
+            
         m=re.match(r"!addonehouse\s+(\w+)",body)
         if m:
-            if self._house_cmd_rate_limited(caller):return False,None
             if self.current_auction:return False,"Cannot add houses during an auction"
             color=m.group(1)
             if color not in self.color_sets:return False,f"Color {color} does not exist"
@@ -633,12 +626,11 @@ class MonopolyBot(SingleServerIRCBot):
             if self.players[owner]['money']<cost:return False,f"{self.pname(owner)} does not have enough money to buy a house ({cost} required)"
             self.players[owner]['money']-=cost
             self.houses[target]=self.houses.get(target,0)+1
-            self.connection.privmsg("player2bot","!sound build1.mp3")
+            self.sio.emit("cmd-sound",{"file":"build1.mp3"})
             return True,self.pname(f"Added 1 house to property {target} in {color} set. {owner} charged {cost}")
 
         m=re.match(r"!removeonehouse\s+(\w+)",body)
         if m:
-            if self._house_cmd_rate_limited(caller):return False,None
             if self.current_auction:return False,"Cannot remove houses during an auction"
             color=m.group(1)
             if color not in self.color_sets:return False,f"Color {color} does not exist"
@@ -655,7 +647,7 @@ class MonopolyBot(SingleServerIRCBot):
             target=candidates[0];refund=self.house_costs.get(color,0)//2
             self.players[owner]['money']+=refund
             self.houses[target]=max(0,self.houses.get(target,0)-1)
-            self.connection.privmsg("player2bot","!sound destroy1.mp3")
+            self.sio.emit("cmd-sound",{"file":"destroy1.mp3"})
             return True,self.pname(f"Removed 1 house from property {target} in {color} set. {owner} refunded {refund}")
 
         m=re.match(r"!save\s*(\S+)?",body)
@@ -811,22 +803,18 @@ class MonopolyBot(SingleServerIRCBot):
 
         return True,None
 
-
     def move_player(self,p,sp):
         if p not in self.players:return "","Player not found"
         display=self.pname(p)
-        def play_rent_sound():self.connection.privmsg("player2bot","!sound rent.mp3")
+        def play_rent_sound():self.sio.emit("cmd-sound",{"file":"rent.mp3"})
         old=self.players[p]["pos"];in_reg=old<=39
         new=(old+sp)%40 if in_reg else ((old-40+sp)%24)+40
-
         if self.jailed.get(p,False) and old==10 and sp>0:
             self.jailed[p]=False;self.connection.privmsg(self.channel,f"{display} is now out of jail")
         bonus_data=self.passgo_bonus.get(p);loan=self.free_loans.get(p);loan_msg="";bonus_msg=""
-
         if in_reg and old+sp>39:
             base=200;extra=0
             if bonus_data:
-                
                 rem=max(0,bonus_data["cap"]-bonus_data["used"]);extra=min(bonus_data["outer"],rem);bonus_data["used"]+=extra
                 if extra:bonus_msg=f" GO bonus +{extra}"
             self.players[p]["money"]+=base+extra
@@ -836,7 +824,6 @@ class MonopolyBot(SingleServerIRCBot):
         elif not in_reg and old-40+sp>=24:
             base=100;extra=0
             if bonus_data:
-                
                 rem=max(0,bonus_data["cap"]-bonus_data["used"]);extra=min(bonus_data["inner"],rem);bonus_data["used"]+=extra
                 if extra:bonus_msg=f" GO bonus +{extra}"
             self.players[p]["money"]+=base+extra
@@ -849,8 +836,6 @@ class MonopolyBot(SingleServerIRCBot):
             if m:
                 self.connection.privmsg(self.channel,msg+bonus_msg+loan_msg)
                 self.connection.privmsg("player1bot",f"!d2 {msg}{bonus_msg}{loan_msg}")
-                
-               
         rails={5:43,15:49,25:55,35:61,43:5,49:15,55:25,61:35}
         if new in rails:
             if new in (5,15,25,35):
@@ -876,21 +861,20 @@ class MonopolyBot(SingleServerIRCBot):
                         rc=[x for x in (5,15,25,35) if self.properties.get(x)==owner and x not in self.mortgaged]
                         rent={1:25,2:50,3:100,4:200}.get(len(rc),25)
                         self.players[p]["money"]-=rent;self.players[owner]["money"]+=rent;play_rent_sound();msg+=f"{display} pays {rent} to {self.pname(owner)}"
-
         total_houses=sum(h for pos,h in self.houses.items() if self.properties.get(pos)==p)
         total_props=sum(1 for o in self.properties.values() if o==p)
         if new in (2,18,36,48):
-            self.players[p]["money"]+=50;msg+=f"{display} received +50";self.connection.privmsg("player2bot","!sound bonus.mp3")
+            self.players[p]["money"]+=50;msg+=f"{display} received +50";self.sio.emit("cmd-sound",{"file":"bonus.mp3"})
         elif new in (7,60):
-            fee=total_houses*5+total_props*5;self.players[p]["money"]-=fee;msg+=f"{display} pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
+            fee=total_houses*5+total_props*5;self.players[p]["money"]-=fee;msg+=f"{display} pays {fee}";self.sio.emit("cmd-sound",{"file":"tax.mp3"})
         elif new==23:
-            fee=total_houses*5+max(0,int(self.players[p]["money"]*0.05));self.players[p]["money"]-=fee;msg+=f"{display} pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
+            fee=total_houses*5+max(0,int(self.players[p]["money"]*0.05));self.players[p]["money"]-=fee;msg+=f"{display} pays {fee}";self.sio.emit("cmd-sound",{"file":"tax.mp3"})
         elif new==32:
             unmortgaged=sum(1 for pos,o in self.properties.items() if o==p and pos not in self.mortgaged)
             mortgaged=sum(1 for pos,o in self.properties.items() if o==p and pos in self.mortgaged)
-            fee=unmortgaged*10+mortgaged*5;self.players[p]["money"]-=fee;msg+=f"{display} pays {fee}";self.connection.privmsg("player2bot","!sound tax.mp3")
+            fee=unmortgaged*10+mortgaged*5;self.players[p]["money"]-=fee;msg+=f"{display} pays {fee}";self.sio.emit("cmd-sound",{"file":"tax.mp3"})
         elif new==20:
-            self.handle_command("dicebot",f"!freeloan {p} 100 25")
+            self.handle_command("dicebot",f"!freeloan {p} 100 50")
             msg+=f"{display} received 100 free loan"
         elif new==62:
             msg+=f"{display} can auction any unowned property"
@@ -898,7 +882,7 @@ class MonopolyBot(SingleServerIRCBot):
             self.jailed[p]=True
             self.players[p]["pos"]=10
             msg+=" goes to jail"
-            self.connection.privmsg("player2bot","!sound jail.mp3")
+            self.sio.emit("cmd-sound",{"file":"jail.mp3"})
             send_msg(f"{display} {msg}")
             return "Jail",msg
         if new==54:
@@ -927,7 +911,7 @@ class MonopolyBot(SingleServerIRCBot):
             self.current_auction={"pos":new,"bids":{},"last_bidder":None,"bid_timer":None,"active":set(self.players.keys())}
             raw=self.active_board.get(new,"")
             prop=raw[2:] if raw.startswith("x-") else raw
-            try:self.connection.privmsg("player1bot",f"!d2 Auction started for {prop}")
+            try:self.sio.emit("updateDisplay2",{"text":f"Auction started for {prop}"})
             except:pass
             return name,""
         if msg:
@@ -956,7 +940,6 @@ class MonopolyBot(SingleServerIRCBot):
                 pl=self.resolve_player(x.group(1))
                 if pl:self._handle_dice_command(c,d,int(pl[1:]),nick)
                 return
-
     def _handle_dicestart(self,c,m):
         if isinstance(m,int):n=m
         else:
@@ -971,37 +954,30 @@ class MonopolyBot(SingleServerIRCBot):
             self.dice_override=False
             self.disabled_dice.clear()
         c.privmsg(self.channel,f"Dice mode started for {n} players. Order: {', '.join(self.pname(f'p{x}') for x in self.dice_order)}")
-
     def _handle_dicestop(self,c):
         with self.dice_lock:self.dice_mode=False;self.dice_players=None;self.dice_order=[];self.expected_player_index=0;self.dice_override=False;self.disabled_dice.clear()
         c.privmsg(self.channel,"Dice mode stopped. Dice commands disabled.")
-
     def _handle_diceoverride(self,c,nick):
         with self.dice_lock:
             if not self.dice_mode:c.privmsg(self.channel,"Dice mode not active.");return
             self.dice_override=True
         c.privmsg(self.channel,"Diceoverride activated. Any player may roll next.")
-
     def _handle_dicedisable(self,c,d):
         with self.dice_lock:
             if not self.dice_mode:c.privmsg(self.channel,"Dice mode not active.");return
             self.disabled_dice.add(f"dice{d}")
         c.privmsg(self.channel,f"dice{d} disabled for this dice session.")
-
     def _handle_diceremove(self,c,pn):
         with self.dice_lock:
             if not self.dice_mode:c.privmsg(self.channel,"Dice mode not active.");return
             pl_key=f"p{pn}";display=self.pname(pl_key)
             if pn not in self.dice_order:c.privmsg(self.channel,f"Player {display} not in order");return
-
             i=self.dice_order.index(pn);self.dice_order.pop(i)
             if i<=self.expected_player_index and self.expected_player_index>0:self.expected_player_index-=1
             if not self.dice_order:
                 self.dice_mode=False;c.privmsg(self.channel,"All players removed. Dice mode stopped.");return
             self.expected_player_index%=len(self.dice_order)
-
         c.privmsg(self.channel,f"Player {display} removed. Order: {', '.join(self.pname(f'p{x}') for x in self.dice_order)}")
-        
     def _handle_diceadd(self,c,pn):
         with self.dice_lock:
             if not self.dice_mode:c.privmsg(self.channel,"Dice mode not active.");return
@@ -1012,14 +988,11 @@ class MonopolyBot(SingleServerIRCBot):
             self.dice_order.append(pn);self.dice_order.sort()
             if cur is not None and cur in self.dice_order:self.expected_player_index=self.dice_order.index(cur)
             elif self.dice_order:self.expected_player_index%=len(self.dice_order)
-
         c.privmsg(self.channel,f"Player {display} added. Order: {', '.join(self.pname(f'p{x}') for x in self.dice_order)}")
-
     def _next_turn_label(self):
         if not self.dice_order:return "?'s Turn to Roll"
         player_id=self.dice_order[self.expected_player_index%len(self.dice_order)]
         return f"{self.pname(f'p{player_id}')}'s Turn to Roll"
-        
     def _handle_dice_command(self,c,d,p,nick):
         pl_key=f"p{p}";display=self.pname(pl_key)
         if self.switch_required:c.privmsg(self.channel,"!switch is required before next dice roll.");return
@@ -1035,12 +1008,10 @@ class MonopolyBot(SingleServerIRCBot):
             elif self.jailed.get(pl_key,False):c.privmsg(self.channel,f"{display} is in jail! Only !dice4 can be used.");return
             self.dice4_streak[pl_key]=self.dice4_streak.get(pl_key,0)+1 if d=="dice4" else 0
         getattr(self,f"_handle_{d}",lambda*a:None)(c,p)
-   
         if d=="dice4" and self.dice4_streak.get(pl_key,0)>=3 and self.jailed.get(pl_key,False):
             self.dice4_streak[pl_key]=0;self.jailed[pl_key]=False
-            
             c.privmsg(self.channel,f"{display} rolled dice4 three times in a row! Released from jail for free.")
-            try:c.privmsg("player2bot","!sound key.mp3")
+            try:self.sio.emit("cmd-sound",{"file":"key.mp3"})
             except:pass
         with self.dice_lock:
             r=self.dice_rolls.get(p)
@@ -1060,17 +1031,17 @@ class MonopolyBot(SingleServerIRCBot):
             self.consecutive_doubles[pl]=0;c.privmsg(self.channel,f"{display} rolled doubles twice. Turn lost")
             try:self.handle_command("dicebot",f"!teleport {pl} 10");c.privmsg("##rento",f"{display} was teleported to position 10 jail");self.jailed[pl]=True
             except:pass
-            try:c.privmsg("player2bot","!sound jail.mp3")
+            try:self.sio.emit("cmd-sound",{"file":"jail.mp3"})
             except:pass
             threading.Timer(0.1,lambda:c.privmsg("player1bot",f'!d1 "{self._next_turn_label()}"')).start()
             threading.Timer(0.2,lambda:self.handle_command("dicebot","!up")).start()
             with self.dice_lock:
                 if self.dice_mode and self.dice_order:self.expected_player_index=(self.expected_player_index+1)%len(self.dice_order)
-            try:c.privmsg("player2bot","!sound click.mp3")
+            try:self.sio.emit("cmd-sound",{"file":"click.mp3"})
             except:pass
             return
         if nl or dbl:
-            try:c.privmsg("player2bot",f"!sound {sound}")
+            try:self.sio.emit("cmd-sound",{"file":sound})
             except:pass
             try:self.handle_command("dicebot",f"!move {pl} {t}")
             except:pass
@@ -1078,7 +1049,7 @@ class MonopolyBot(SingleServerIRCBot):
             threading.Timer(0.2,lambda:self.handle_command("dicebot","!up")).start()
         else:
             threading.Timer(0.3,lambda:c.privmsg("player1bot",f'!d1 "{self._next_turn_label()}"')).start()
-            try:c.privmsg("player2bot",f"!sound {sound}")
+            try:self.sio.emit("cmd-sound",{"file":sound})
             except:pass
     # --- GO SYSTEM ---
     def handle_go_session_command(self,c,nick,msg):
@@ -1097,12 +1068,12 @@ class MonopolyBot(SingleServerIRCBot):
     def override_turn(self,c,nick,msg):
         if msg=='!gooverride':
             if self.go_active:
-                c.privmsg(self.channel,f"{nick} used GO override! !go{self.go_active} stopped")
+                c.privmsg(self.channel,f"{nick} used GO override !go{self.go_active} stopped")
                 if self.go_timer:self.go_timer.cancel();self.go_timer=None
                 self.go_active=None;self.go_numbers={};self.go_owner=None
                 if self.go_lock.locked():self.go_lock.release()
             self.override_next_turn=True
-            c.privmsg(self.channel,f"{nick} used GO override! Next turn open")
+            c.privmsg(self.channel,f"{nick} used GO override Next turn open")
     def announce_go_turn(self,c,player):
         label=f'!d1 "Player - {1 if player=="p1" else 2} - Turn"'
         c.privmsg("player1bot",label)
@@ -1133,7 +1104,7 @@ class MonopolyBot(SingleServerIRCBot):
         self.go_numbers[user]=int(msg)
         c.privmsg(user,f"number {msg} received for !go{self.go_active}")
         if user.lower() in ("player1bot","player2bot"):
-            try:c.privmsg("player2bot",f"!sound {'click.mp3' if user.lower()=='player1bot' else 'dice.mp3'}")
+            try:self.sio.emit("cmd-sound",{"file":"click.mp3" if user.lower()=="player1bot" else "dice.mp3"})
             except:pass
         if len(self.go_numbers)==len(self.go_input_users):self.end_go(c,"completed")
     def start_go(self,c,m):
@@ -1160,7 +1131,7 @@ class MonopolyBot(SingleServerIRCBot):
                     self.jailed[p]=False
                     self.go_jail_attempts[p]=0
                     c.privmsg(self.channel,f"{p} used !go{self.go_active} three times. Released from jail for free.")
-                    try:c.privmsg("player2bot","!sound key.mp3")
+                    try:self.sio.emit("cmd-sound",{"file":"key.mp3"})
                     except:pass
             else:self.go_jail_attempts[p]=0
             if jail and not double:

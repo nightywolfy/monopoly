@@ -36,7 +36,7 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .mode-btn:hover{background:#333}
 
 #topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
-#topButtons button:not(.small-button):not(.ws-btn){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
+#topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
 .buttonRow{display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center}
 
 .small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}

@@ -29,15 +29,15 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .hotel,.house{width:29px;height:29px;position:absolute}
 .dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 
-#topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
-#topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
-.buttonRow{display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center}
-
 #modeToggle{display:flex;justify-content:center;align-items:center;gap:2px;margin-top:-7px;z-index:60;position:relative}
 .mode-btn{padding:6px 12px;font-size:.9em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
 .mode-btn.active{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
 .mode-btn.active:hover{background:#0077ff!important}
 .mode-btn:hover{background:#333}
+
+#topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
+#topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
+.buttonRow{display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center}
 
 .small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}
 .small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}

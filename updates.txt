@@ -37,3 +37,4 @@ Update Changelog:
 35. Updated the dice sound effect used when rolling the jail dice.
 36. Enhanced the Trade Menu with additional commands.
 37. Added a name input section for each player, requiring players to enter their name before proceeding.
+38. Implemented webSocket communication for 90% of game inputs, significantly reducing latency and improving overall responsiveness. Property and house updates now takes less than one second.

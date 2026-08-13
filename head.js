@@ -89,7 +89,6 @@ const target=targetInput?.value||undefined;
 fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
 });
 });
-});
 
 document.querySelectorAll('[data-msg]').forEach(el=>{
 el.addEventListener('click',()=>{
@@ -98,7 +97,6 @@ socket.emit('sendMessage',{from:el.dataset.from||BOT_NAME,target:el.dataset.targ
 });
 });
 });
-
 
 function updatePieces(data){
 if(!data||typeof data!=="object"){console.warn("Pieces data invalid:",data);return;}
@@ -171,7 +169,7 @@ btn.style.color='transparent';
 btn.style.zIndex='100';
 btn.style.cursor='pointer';
 btn.style.pointerEvents='auto';
-btn.addEventListener('click',()=>socket.emit('sendMessage',{bot:BOT_NAME,msg:`!${currentMode} ${spaceNum}`}));
+btn.addEventListener('click',()=>socket.emit('sendMessage',{from:BOT_NAME,target:'rentobot',msg:`!${currentMode} ${spaceNum}`}));
 boardButtonsContainer.appendChild(btn);
 });
 }
