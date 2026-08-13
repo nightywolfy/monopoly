@@ -177,7 +177,7 @@ socket.on('labelsUpdate', updateLabels);
 socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
 socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
 socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
-socket.on('boardClickPositions', data=>{ buildBoardButtons(data); });
+//socket.on('boardClickPositions', data=>{ buildBoardButtons(data); });
 socket.on('piecesUpdate', updatePieces);
 socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));

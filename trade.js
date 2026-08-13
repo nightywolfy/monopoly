@@ -166,7 +166,7 @@ socket.on('labelsUpdate', updateLabels);
 socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
 socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
 socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
-socket.on('boardClickPositions', data=>{ buildBoardButtons(data); });
+//socket.on('boardClickPositions', data=>{ buildBoardButtons(data); });
 socket.on('piecesUpdate', updatePieces);
 fetch('/money.json').then(res=>res.json()).then(updateMoney);
 fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});

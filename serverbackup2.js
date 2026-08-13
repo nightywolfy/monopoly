@@ -202,6 +202,99 @@ const clickableSpaces=[
   {number:63,x:660,y:568}
 ];
 
+const colorMap={p1:'red',p2:'blue',p3:'orange',p4:'green',p5:'purple',p6:'white'};
+
+function initializeDefaults(){
+  Object.keys(colorMap).forEach(p=>{if(money[p]===undefined)money[p]=10});
+  if(!buildings||typeof buildings!=='object')buildings={};
+  for(const color of Object.values(colorMap)){if(!pieces[color])pieces[color]={x:825,y:755}}
+  if(!display1.text)display1.text="";
+  if(!display2.text)display2.text="";
+  if(!labels||typeof labels!=='object')labels={};
+  Object.keys(colorMap).forEach(p=>{if(!labels[p])labels[p]=p});
+  saveMoney();saveBuildings();savePieces();saveDisplay1();saveDisplay2();saveDots();saveLabels();
+}
+initializeDefaults();
+
+function safeEmit(event,data){try{io.emit(event,data)}catch(err){console.error(`[Socket] Emit failed (${event}):`,err)}}
+function safeEmitTo(room,event,data){try{io.to(room).emit(event,data)}catch(err){console.error(`[Socket] Emit failed (${event} -> ${room}):`,err)}}
+function updatePiece(player,x,y){const color=colorMap[player];if(!color)return;const current=pieces[color];if(current&&current.x===x&&current.y===y)return;pieces[color]={x,y};savePieces();safeEmit('piecesUpdate',pieces)}
+function updateDisplay1(newText){if(display1.text===newText)return;display1.text=newText;saveDisplay1();safeEmit('displayUpdate1',{text:display1.text})}
+function updateDisplay2(newText){if(display2.text===newText)return;display2.text=newText;saveDisplay2();safeEmit('displayUpdate2',{text:display2.text})}
+function updateMoney(player,amount){if(!colorMap[player]||money[player]===amount)return;money[player]=amount;saveMoney();safeEmit('moneyUpdate',money)}
+function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||text.length<2||text.length>8||labels[player]===text)return;labels[player]=text;saveLabels();io.emit('labelsUpdate',labels)}
+function getBuilding(space){return buildings[String(space)]||null}
+
+function setBuilding(space,type,unset=false){
+  const key=String(Number(space));
+  if(Number.isNaN(Number(key)))return false;
+  if(unset){
+    if(!buildings[key])return false;
+    const old=buildings[key];
+    delete buildings[key];
+    saveBuildings();
+    safeEmit('buildingsUpdate',buildings);
+    safeEmit('building-removed',{space:Number(key),type:old});
+    return true;
+  }else{
+    const old=buildings[key];
+    if(old===type)return false;
+    if(old)delete buildings[key];
+    buildings[key]=type;
+    saveBuildings();
+    safeEmit('buildingsUpdate',buildings);
+    safeEmit('building-set',{space:Number(key),type});
+    return {removed:old||null,set:type};
+  }
+}
+
+function bulkUpdateBuildings(spaces,type=null,unset=false){
+  let changed=false;
+  const sanitized=spaces.map(s=>Number(s)).filter(n=>!Number.isNaN(n)&&n>=0&&n<=63);
+  sanitized.forEach(space=>{
+    const key=String(space);
+    if(unset){if(buildings[key]){delete buildings[key];changed=true}}
+    else if(type&&buildings[key]!==type){buildings[key]=type;changed=true}
+  });
+  if(!changed)return false;
+  saveBuildings();
+  safeEmit('buildingsUpdate',buildings);
+  return true;
+}
+
+function clearAllBuildings(){
+  const count=Object.keys(buildings).length;
+  buildings={};
+  saveBuildings();
+  safeEmit('buildingsUpdate',buildings);
+  return count;
+}
+
+function updateDot(num,color){
+  const n=Number(num);if(Number.isNaN(n))return false;
+  const table=currentMap===1?coordinates1:coordinates2;
+  const pos=table[n];if(!pos)return false;
+  activeDots[String(n)]={x:pos.x,y:pos.y,color:String(color)};
+  saveDots();
+  safeEmit('draw-dot',{x:pos.x,y:pos.y,color,num:n});
+  return true;
+}
+
+function removeDot(num){
+  const n=Number(num);
+  if(isNaN(n)||!activeDots[String(n)])return false;
+  delete activeDots[String(n)];
+  saveDots();
+  safeEmit('remove-dot',n);
+  return true;
+}
+
+function clearAllDots(){
+  activeDots={};
+  saveDots();
+  safeEmit('clear-all-dots');
+}
+
 const coordinates1={
 1:{x:732,y:758},
 3:{x:588,y:758},
@@ -286,227 +379,6 @@ const coordinates2 = {
 
 let currentMap=2;
 
-const colorMap={p1:'red',p2:'blue',p3:'orange',p4:'green',p5:'purple',p6:'white'};
-const PLAYERS=Object.keys(colorMap);
-const HOUSE_TYPES=new Set(['house1','house2','house3','house4','hotel']);
-
-function initializeDefaults(){
-  PLAYERS.forEach(p=>{if(money[p]===undefined)money[p]=10});
-  if(!buildings||typeof buildings!=='object')buildings={};
-  for(const color of Object.values(colorMap)){if(!pieces[color])pieces[color]={x:825,y:755}}
-  if(!display1.text)display1.text="";
-  if(!display2.text)display2.text="";
-  if(!labels||typeof labels!=='object')labels={};
-  PLAYERS.forEach(p=>{if(!labels[p])labels[p]=p});
-  saveMoney();saveBuildings();savePieces();saveDisplay1();saveDisplay2();saveDots();saveLabels();
-}
-initializeDefaults();
-
-function safeEmit(event,data){try{io.emit(event,data)}catch(err){console.error(`[Socket] Emit failed (${event}):`,err)}}
-function updatePiece(player,x,y){const color=colorMap[player];if(!color)return;const current=pieces[color];if(current&&current.x===x&&current.y===y)return;pieces[color]={x,y};savePieces();safeEmit('piecesUpdate',pieces)}
-function updateDisplay1(newText){if(display1.text===newText)return;display1.text=newText;saveDisplay1();safeEmit('displayUpdate1',{text:display1.text})}
-function updateDisplay2(newText){if(display2.text===newText)return;display2.text=newText;saveDisplay2();safeEmit('displayUpdate2',{text:display2.text})}
-function updateMoney(player,amount){if(!colorMap[player]||money[player]===amount)return;money[player]=amount;saveMoney();safeEmit('moneyUpdate',money)}
-function updateLabel(player,text){if(!colorMap[player]||typeof text!=='string'||text.length<2||text.length>8||labels[player]===text)return;labels[player]=text;saveLabels();safeEmit('labelsUpdate',labels)}
-
-function setBuilding(space,type,unset=false){
-  const key=String(Number(space));
-  if(Number.isNaN(Number(key)))return false;
-  if(unset){
-    if(!buildings[key])return false;
-    const old=buildings[key];
-    delete buildings[key];
-    saveBuildings();
-    safeEmit('buildingsUpdate',buildings);
-    safeEmit('building-removed',{space:Number(key),type:old});
-    return true;
-  }else{
-    const old=buildings[key];
-    if(old===type)return false;
-    if(old)delete buildings[key];
-    buildings[key]=type;
-    saveBuildings();
-    safeEmit('buildingsUpdate',buildings);
-    safeEmit('building-set',{space:Number(key),type});
-    return {removed:old||null,set:type};
-  }
-}
-
-function bulkUpdateBuildings(spaces,type=null,unset=false){
-  let changed=false;
-  const sanitized=spaces.map(s=>Number(s)).filter(n=>!Number.isNaN(n)&&n>=0&&n<=63);
-  sanitized.forEach(space=>{
-    const key=String(space);
-    if(unset){if(buildings[key]){delete buildings[key];changed=true}}
-    else if(type&&buildings[key]!==type){buildings[key]=type;changed=true}
-  });
-  if(!changed)return false;
-  saveBuildings();
-  safeEmit('buildingsUpdate',buildings);
-  return true;
-}
-
-function clearAllBuildings(){
-  const count=Object.keys(buildings).length;
-  buildings={};
-  saveBuildings();
-  safeEmit('buildingsUpdate',buildings);
-  return count;
-}
-
-function updateDot(num,color){
-  const n=Number(num);if(Number.isNaN(n))return false;
-  const table=currentMap===1?coordinates1:coordinates2;
-  const pos=table[n];if(!pos)return false;
-  activeDots[String(n)]={x:pos.x,y:pos.y,color:String(color)};
-  saveDots();
-  safeEmit('draw-dot',{x:pos.x,y:pos.y,color,num:n});
-  return true;
-}
-
-function removeDot(num){
-  const n=Number(num);
-  if(isNaN(n)||!activeDots[String(n)])return false;
-  delete activeDots[String(n)];
-  saveDots();
-  safeEmit('remove-dot',n);
-  return true;
-}
-
-function clearAllDots(){
-  activeDots={};
-  saveDots();
-  safeEmit('clear-all-dots');
-}
-
-
-
-/* ------------------------------------------------------------------ */
-/* Shared command layer — both IRC and WebSocket call into these,     */
-/* so every command is available on both transports with one          */
-/* implementation and one set of validation rules.                    */
-/* ------------------------------------------------------------------ */
-
-function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
-
-const commands={
-  setAll(amounts){
-    // amounts: array of numbers/strings, one per player, in PLAYERS order
-    if(!Array.isArray(amounts)||amounts.length!==PLAYERS.length)return{ok:false,error:`Expected ${PLAYERS.length} amounts`};
-    const parsed=amounts.map(a=>parseInt(a,10));
-    if(parsed.some(a=>isNaN(a)))return{ok:false,error:'All amounts must be valid numbers'};
-    PLAYERS.forEach((p,i)=>updateMoney(p,clamp(parsed[i],-999,9999)));
-    return{ok:true};
-  },
-  setMoney(player,amount){
-    const amt=parseInt(amount,10);
-    if(!colorMap[player])return{ok:false,error:'Invalid player'};
-    if(isNaN(amt)||amt<-999||amt>9999)return{ok:false,error:'Amount out of range'};
-    updateMoney(player,amt);
-    return{ok:true};
-  },
-  setDisplayLabel(player,label){
-    if(!colorMap[player])return{ok:false,error:'Invalid player'};
-    if(typeof label!=='string'||!/^[A-Za-z]{1,7}$/.test(label))return{ok:false,error:'Label must be 1-7 letters only'};
-    updateLabel(player,`${label}${player.replace('p','')}`);
-    return{ok:true};
-  },
-  moveAll(spaces){
-    // spaces: array of space numbers, one per player, in PLAYERS order
-    if(!Array.isArray(spaces)||spaces.length!==PLAYERS.length)return{ok:false,error:`Must provide exactly ${PLAYERS.length} spaces`};
-    const errors=[];
-    PLAYERS.forEach((p,i)=>{
-      const space=parseInt(spaces[i],10);
-      const entry=isNaN(space)?null:boardSpaces.find(s=>s.number===space);
-      if(!entry){errors.push(`Invalid space "${spaces[i]}"`);return;}
-      updatePiece(p,entry.x,entry.y);
-    });
-    return errors.length?{ok:false,error:errors.join('; ')}:{ok:true};
-  },
-  movePiece(player,x,y){
-    const nx=parseInt(x,10),ny=parseInt(y,10);
-    if(!colorMap[player]||isNaN(nx)||isNaN(ny))return{ok:false,error:'Invalid player or coordinates'};
-    updatePiece(player,nx,ny);
-    return{ok:true};
-  },
-  moveToSpace(player,spaceNum){
-    const space=parseInt(spaceNum,10);
-    const entry=isNaN(space)?null:boardSpaces.find(s=>s.number===space);
-    if(!colorMap[player]||!entry)return{ok:false,error:'Invalid player or space'};
-    updatePiece(player,entry.x,entry.y);
-    return{ok:true};
-  },
-  buildBulk(type,spaces){
-    if(!HOUSE_TYPES.has(type))return{ok:false,error:'Invalid building type'};
-    const list=Array.isArray(spaces)?spaces:[spaces];
-    const sanitized=list.map(s=>parseInt(s,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
-    if(sanitized.length===0)return{ok:false,error:'No valid spaces provided'};
-    bulkUpdateBuildings(sanitized,type,false);
-    return{ok:true};
-  },
-  setBuilding(space,type){
-    if(!HOUSE_TYPES.has(type))return{ok:false,error:'Invalid building type'};
-    setBuilding(space,type,false);
-    return{ok:true};
-  },
-  removeBuilding(space){
-    setBuilding(space,null,true);
-    return{ok:true};
-  },
-  clearAllBuildings(){
-    clearAllBuildings();
-    return{ok:true};
-  },
-  setDisplay1(text){
-    const t=String(text||'').trim().replace(/^"(.*)"$/,'$1');
-    if(!t)return{ok:false,error:'Text required'};
-    updateDisplay1(t);
-    return{ok:true};
-  },
-  setDisplay2(text){
-    const t=String(text||'').trim().replace(/^"(.*)"$/,'$1');
-    if(!t)return{ok:false,error:'Text required'};
-    updateDisplay2(t);
-    return{ok:true};
-  },
-  dot(nums,color){
-    const list=Array.isArray(nums)?nums:[nums];
-    const c=color||'red';
-    list.forEach(n=>updateDot(n,c));
-    return{ok:true};
-  },
-  removeDot(num){
-    if(!removeDot(num))return{ok:false,error:`No dot at ${num}`};
-    return{ok:true};
-  },
-  clearAllDots(){
-    clearAllDots();
-    return{ok:true};
-  },
-  setDotLocation(num){
-    const n=parseInt(num,10);
-    if(n!==1&&n!==2)return{ok:false,error:'Must be 1 or 2'};
-    currentMap=n;
-    safeEmit('reload-dots',activeDots);
-    return{ok:true};
-  },
-
-  setMap(num){
-    const n=parseInt(num,10);
-    if(n!==1&&n!==2&&n!==3)return{ok:false,error:'Map must be 1, 2, or 3'};
-    currentMap=n;
-    safeEmit('map-change',currentMap);
-    safeEmit('reload-dots',activeDots);
-    return{ok:true};
-  },
-  
-  playSound(file){
-    if(!file)return{ok:false,error:'File required'};
-    safeEmit('play-sound',{file});
-    return{ok:true};
-  }
-};
-
 function createBot(nick,defaultTarget,options={}){
   const client=new IRC.Client();
   const host=options.host||'irc.libera.chat';
@@ -514,9 +386,9 @@ function createBot(nick,defaultTarget,options={}){
   const secure=!!options.secure;
   const nickServ=options.nickServ||null;
   let reconnectDelay=9000,isConnecting=false,isConnected=false,destroyed=false;
-  let reconnectTimer=null;
   const sendQueue=[],SEND_INTERVAL_MS=900;
   let sendInterval=null;
+
   function startSendLoop(){
     if(sendInterval)return;
     sendInterval=setInterval(()=>{
@@ -526,23 +398,18 @@ function createBot(nick,defaultTarget,options={}){
     },SEND_INTERVAL_MS);
   }
   startSendLoop();
+
   function stopSendLoop(){
     if(sendInterval){clearInterval(sendInterval);sendInterval=null}
   }
+
   function safeSay(target,msg){
     if(!msg||typeof msg!=='string')return;
     const clean=msg.trim().slice(0,200).replace(/\r?\n/g,' ');
     if(!clean)return;
     sendQueue.push({target,msg:clean});
   }
-  function scheduleReconnect(){
-    if(destroyed||isConnecting||isConnected||reconnectTimer)return;
-    reconnectTimer=setTimeout(()=>{
-      reconnectTimer=null;
-      reconnectDelay=Math.min(reconnectDelay*2,60000);
-      connectBot();
-    },reconnectDelay);
-  }
+
   function connectBot(){
     if(destroyed||isConnecting||isConnected)return;
     isConnecting=true;
@@ -551,30 +418,29 @@ function createBot(nick,defaultTarget,options={}){
       console.error(`${nick} connection error:`,err);
       isConnecting=false;
       reconnectDelay=Math.min(reconnectDelay*2,60000);
-      scheduleReconnect();
+      setTimeout(connectBot,reconnectDelay);
     }
   }
-  const initialDelay=Number(options.delay)||0;
-  if(initialDelay>0)setTimeout(connectBot,initialDelay);
-  else connectBot();
+  connectBot();
+
   client.on('registered',()=>{
     reconnectDelay=9000;
     isConnecting=false;
     isConnected=true;
-    if(reconnectTimer){
-      clearTimeout(reconnectTimer);
-      reconnectTimer=null;
-    }
     if(defaultTarget){try{client.join(defaultTarget)}catch{}}
     if(nickServ?.identifyCommand)client.say('NickServ',nickServ.identifyCommand);
   });
+
   client.on('close',()=>{
     isConnected=false;
     isConnecting=false;
     if(sendQueue.length>2000)sendQueue.length=0;
-    scheduleReconnect();
+    setTimeout(()=>{
+      reconnectDelay=Math.min(reconnectDelay*2,60000);
+      connectBot();
+    },reconnectDelay);
   });
-  
+
   client.on('error',err=>console.error(`Error for ${nick}:`,err?.stack||err));
 
   client.on('message', (event) => {
@@ -583,10 +449,10 @@ function createBot(nick,defaultTarget,options={}){
       const raw = String(event.message).trim();
       if (!raw.startsWith('!')) return;
       const nick = event.nick;
-      
+      const target = event.target || nick;
       const defaultTarget = event.target;
-      const commandsRaw = raw.split(' !').map((c,i) => i>0?'!'+c:c);
-      for (const fullCmd of commandsRaw) {
+      const commands = raw.split(' !').map((c,i) => i>0?'!'+c:c);
+      for (const fullCmd of commands) {
         if (!fullCmd) continue;
         const parts = fullCmd.trim().split(/\s+/);
         const cmd = (parts.shift() || '').toLowerCase();
@@ -594,88 +460,112 @@ function createBot(nick,defaultTarget,options={}){
 
         switch(cmd) {
           case '!set': {
-            if (args[0]?.toLowerCase() !== 'all' || args.length !== PLAYERS.length + 1) { safeSay(defaultTarget, `Usage: !set all <amounts for ${PLAYERS.length} players>`); break; }
-            const result=commands.setAll(args.slice(1));
-            if(!result.ok)safeSay(defaultTarget,result.error);
+            if (args[0]?.toLowerCase() !== 'all' || args.length !== Object.keys(colorMap).length + 1) { safeSay(defaultTarget, `Usage: !set all <amounts for ${Object.keys(colorMap).length} players>`); break; }
+            const amounts = args.slice(1).map(a=>parseInt(a,10));
+            if (amounts.some(a=>isNaN(a))) { safeSay(defaultTarget,'All amounts must be valid numbers.'); break; }
+            Object.keys(colorMap).forEach((p,i)=>updateMoney(p,Math.max(-999,Math.min(9999,amounts[i]))));
             break;
           }
 
           case '!display': {
             if (args.length !== 2 || !/^p[1-6]$/i.test(args[0])) { safeSay(defaultTarget,'Usage: !display p1-p6 <name>'); break; }
-            const result=commands.setDisplayLabel(args[0].toLowerCase(),args[1]);
-            if(!result.ok)safeSay(defaultTarget,result.error);
+            const player = args[0].toLowerCase();
+            if (!/^[A-Za-z]{1,7}$/.test(args[1])) { safeSay(defaultTarget,'Label must be 1-7 letters only.'); break; }
+            updateLabel(player,`${args[1]}${player.replace('p','')}`);
             break;
           }
-
+          
           case '!mv': {
             const [target,...spacesStr] = args;
             if (target?.toLowerCase()!=='all') { safeSay(defaultTarget,'Only !mv all ... allowed'); break; }
-            const result=commands.moveAll(spacesStr);
-            if(!result.ok)safeSay(defaultTarget,result.error);
+            const players = Object.keys(colorMap);
+            if (spacesStr.length!==players.length) { safeSay(defaultTarget,`Must provide exactly ${players.length} spaces`); break; }
+            players.forEach((p,i)=>{ const space=parseInt(spacesStr[i],10); const entry=isNaN(space)?null:boardSpaces.find(s=>s.number===space); if(!entry){ safeSay(defaultTarget,`Invalid space "${spacesStr[i]}"`); return; } updatePiece(p,entry.x,entry.y); });
             break;
           }
           case '!mv2': {
             const [player,xStr,yStr]=args;
-            const result=commands.movePiece(player,xStr,yStr);
-            if(!result.ok)safeSay(defaultTarget,result.error);
+            const x=parseInt(xStr,10),y=parseInt(yStr,10);
+            if(!colorMap[player]||isNaN(x)||isNaN(y)){ safeSay(defaultTarget,'Invalid player or coordinates'); break; }
+            updatePiece(player,x,y);
             break;
           }
-          case '!house1': case '!house2': case '!house3': case '!house4': case '!hotel': {
-            const type=cmd.slice(1);
-            const spaces=args;
-            if(spaces.length===0){safeSay(defaultTarget,`Usage: ${cmd} <space>`);break;}
-            const result=commands.buildBulk(type,spaces);
-            if(!result.ok)safeSay(defaultTarget,result.error);
-            break;
+          case '!house1': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house1 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house1',false);
+              break;
+          }
+
+          case '!house2': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house2 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house2',false);
+              break;
+          }
+
+          case '!house3': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house3 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house3',false);
+              break;
+          }
+
+          case '!house4': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !house4 <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'house4',false);
+              break;
+          }
+          case '!hotel': {
+              const spaces=args.map(a=>parseInt(a,10)).filter(n=>!isNaN(n)&&n>=0&&n<=63);
+              if(spaces.length===0){safeSay(defaultTarget,'Usage: !hotel <space>');break;}
+              const changed=bulkUpdateBuildings(spaces,'hotel',false);
+              break;
           }
 
           case '!clearall': {
-              commands.clearAllBuildings();
+              clearAllBuildings();
               break;
           }
-          case '!d1': {
-            const result=commands.setDisplay1(args.join(' '));
-            if(!result.ok)safeSay(defaultTarget,'Usage: !d1 <text>');
-            break;
-          }
-          case '!d2': {
-            const result=commands.setDisplay2(args.join(' '));
-            if(!result.ok)safeSay(defaultTarget,'Usage: !d2 <text>');
-            break;
-          }
+          case '!d1': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d1 <text>'); break; } updateDisplay1(msgText); break; }
+          case '!d2': { const msgText=args.join(' ').trim().replace(/^"(.*)"$/,'$1'); if(!msgText){ safeSay(defaultTarget,'Usage: !d2 <text>'); break; } updateDisplay2(msgText); break; }
           case '!dot': {
             if(args.length>=1){
               const color=args[args.length-1]||'red';
               const nums=args.slice(0,-1);
-              commands.dot(nums,color);
+              nums.forEach(n=>updateDot(n,color));
             }
             break;
           }
           case '!removedot': {
             if (args.length >= 1) {
-              const result=commands.removeDot(args[0]);
-              if(!result.ok)safeSay(defaultTarget,result.error);
+              const n = args[0];
+              if(!removeDot(n)) safeSay(defaultTarget,`No dot at ${n}`);
             }
             break;
           }
           case '!cleardot': {
-            commands.clearAllDots();
+            clearAllDots();
             break;
           }
           case '!dotlocation': {
-            const result=commands.setDotLocation(args[0]);
-            if(!result.ok)safeSay(defaultTarget,'Usage: !dotlocation <1 or 2>');
+            const num = parseInt(args[0], 10);
+            if (Number.isNaN(num) || (num !== 1 && num !== 2)) { safeSay(defaultTarget, 'Usage: !dotlocation <1 or 2>'); break; }
+            currentMap = num;
+            safeEmit('reload-dots', activeDots);
             break;
           }
           case '!map': {
-            const result=commands.setMap(args[0]);
-            if(!result.ok)safeSay(defaultTarget,'Usage: !map <number>');
+            const num = parseInt(args[0], 10);
+            if(isNaN(num)||num<1){safeSay(defaultTarget,'Usage: !map <number>');break;}
+            safeEmit('map-change',num);
             break;
           }
           case '!sound': {
             const file=args[0];
             if(!file) break;
-            commands.playSound(file);
+            if(target==='player2bot')io.emit('play-sound',{file});
             break;
           }
           default: break;
@@ -686,7 +576,7 @@ function createBot(nick,defaultTarget,options={}){
 
   return {
     client, defaultTarget, say:(t,m)=>safeSay(t,m), connect:connectBot,
-    destroy:()=>{destroyed=true;isConnecting=false;isConnected=false;if(reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null}stopSendLoop();try{client.quit('shutdown',true);}catch{}},
+    destroy:()=>{destroyed=true;isConnecting=false;isConnected=false;stopSendLoop();try{client.quit('shutdown',true);}catch{}},
     getState:()=>({nick,isConnected,reconnectDelay})
   };
 }
@@ -699,6 +589,7 @@ const bots={
   player5bot:createBot('player5bot','##rento',{delay:40000}),
   player6bot:createBot('player6bot','##rento',{delay:50000})
 };
+
 
 
 app.post('/send-irc',(req,res)=>{
@@ -721,16 +612,6 @@ io.on('connection',(socket)=>{
   try{
     const ip=socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
     console.log(`[Socket] Frontend connected: ${ip}`);
-
-    // Helper: run a shared command and optionally ack the caller with the result.
-    function run(fn){
-      return (...args)=>{
-        const result=fn(...args);
-        socket.emit('cmd-ack',result);
-        return result;
-      };
-    }
-
     socket.on('sendMessage',payload=>{
       if(!payload||typeof payload!=='object')return;
       const {bot,msg}=payload;
@@ -745,31 +626,46 @@ io.on('connection',(socket)=>{
     socket.on('getDisplay1',()=>socket.emit('displayUpdate1',{text:display1.text}));
     socket.on('getDisplay2',()=>socket.emit('displayUpdate2',{text:display2.text}));
     socket.on('getLabels',()=>socket.emit('labelsUpdate',labels));
-
-    // ---- existing single-target commands (kept, now backed by shared layer) ----
-    socket.on('updateMoney',run(payload=>commands.setMoney(payload?.player,payload?.amount)));
-    socket.on('updateDisplay1',run(payload=>commands.setDisplay1(payload?.text)));
-    socket.on('updateDisplay2',run(payload=>commands.setDisplay2(payload?.text)));
-    socket.on('updateLabel',run(payload=>commands.setDisplayLabel(payload?.player,payload?.text)));
-    socket.on('cmd-set-all',run(amounts=>commands.setAll(amounts)));
-    socket.on('cmd-mv-all',run(spaces=>commands.moveAll(spaces)));
-    socket.on('cmd-mv2',run(payload=>commands.movePiece(payload?.player,payload?.x,payload?.y)));
-    socket.on('cmd-mv-space',run(payload=>commands.moveToSpace(payload?.player,payload?.space)));
-    socket.on('cmd-house',run(payload=>commands.buildBulk(payload?.type,payload?.spaces)));
-    socket.on('cmd-sound',run(payload=>commands.playSound(payload?.file)));
-    socket.on('cmd-dot',payload=>commands.dot(payload?.num,payload?.color));
-    socket.on('cmd-remove',num=>commands.removeDot(num));
-    socket.on('cmd-cleardot',()=>commands.clearAllDots());
-    socket.on('cmd-map',run(num=>commands.setMap(num)));
-    socket.on('cmd-dotlocation',run(num=>commands.setDotLocation(num)));
-    socket.on('cmd-set-building',run(payload=>commands.setBuilding(payload?.space,payload?.type)));
-    socket.on('cmd-remove-building',space=>commands.removeBuilding(space));
-    socket.on('cmd-clear-buildings',()=>commands.clearAllBuildings());
-
+    socket.on('updateMoney',payload=>{
+      const player=payload.player,amount=parseInt(payload.amount,10);
+      if(colorMap[player]&&!Number.isNaN(amount)&&amount>=-999&&amount<=9999)updateMoney(player,amount);
+    });
+    socket.on('updateDisplay1',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay1(t)});
+    socket.on('updateDisplay2',p=>{const t=String(p?.text||'').trim();if(t)updateDisplay2(t)});
+    socket.on('updateLabel',payload=>{const player=payload?.player,text=String(payload?.text||'').trim();if(colorMap[player]&&text.length>=2&&text.length<=8)updateLabel(player,text);});
     socket.emit('map-change',currentMap);
     socket.emit('buildingPositions',buildingPositions);
     socket.emit('clickableSpacesData', clickableSpaces);
     socket.emit('reload-dots',activeDots);
+    socket.on('cmd-dot',({num,color})=>updateDot(num,color));
+    socket.on('cmd-remove',num=>removeDot(num));
+    socket.on('cmd-cleardot',()=>clearAllDots());
+    socket.on('cmd-map',num=>{
+      const n=Number(num);
+      if(!Number.isNaN(n)&&n>=1){
+        currentMap=n;
+        safeEmit('map-change',currentMap);
+        safeEmit('reload-dots',activeDots);
+      }
+    });
+
+    socket.on('cmd-dotlocation',num=>{
+      const n=Number(num);
+      if(n===1||n===2){
+        currentMap=n;
+        safeEmit('reload-dots',activeDots);
+      }
+    });
+
+    socket.on('cmd-set-building',({space,type})=>{
+      if(typeof space!=='undefined'&&type)setBuilding(space,type,false);
+    });
+
+    socket.on('cmd-remove-building',space=>{
+      if(typeof space!=='undefined')setBuilding(space,null,true);
+    });
+
+    socket.on('cmd-clear-buildings',()=>clearAllBuildings());
 
     socket.on('disconnect',()=>console.log(`[Socket] Frontend disconnected: ${ip}`));
   }catch(err){console.error('[Socket] Error:',err);}
