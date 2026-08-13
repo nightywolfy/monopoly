@@ -91,12 +91,14 @@ fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"applicati
 });
 });
 
-if(!window.SOUND_LISTENER_LOCK){
-window.SOUND_LISTENER_LOCK=true;
-socket.on('play-sound',({file})=>{
-new Audio(file).play();
+document.querySelectorAll('[data-msg]').forEach(el=>{
+el.addEventListener('click',()=>{
+console.log('[ws-btn] sending',{from:el.dataset.from||BOT_NAME,target:el.dataset.target,msg:el.dataset.msg});
+socket.emit('sendMessage',{from:el.dataset.from||BOT_NAME,target:el.dataset.target,msg:el.dataset.msg});
 });
-}
+});
+});
+
 
 function updatePieces(data){
 if(!data||typeof data!=="object"){console.warn("Pieces data invalid:",data);return;}
@@ -123,6 +125,13 @@ el.style.top=(baseY+offsetY)+'px';
 el.style.zIndex=20;
 });
 }
+}
+
+if(!window.SOUND_LISTENER_LOCK){
+window.SOUND_LISTENER_LOCK=true;
+socket.on('play-sound',({file})=>{
+new Audio(file).play();
+});
 }
 
 function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }

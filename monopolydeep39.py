@@ -1,5 +1,4 @@
-import re, random, pickle, os, time, threading, queue
-import socketio
+import re,random,pickle,os,time,threading,queue,socketio
 from irc.bot import SingleServerIRCBot
 from irc.connection import Factory
 CONSECUTIVE_DOUBLES_FOR_TELEPORT = 3

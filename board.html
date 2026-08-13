@@ -19,18 +19,18 @@
 <div id="centralDisplayContainer">
 <div id="topButtons">
 <div class="buttonRow">
-<button type="button" class="ws-btn" data-msg="!dice0-p1"><img src="dice.jpg"></button>
-<button type="button" class="ws-btn" data-msg="!dice4-p1"><img src="jail.jpg"></button>
-<button type="button" class="ws-btn" data-msg="!jailpay p1"><img src="key.jpg"></button>
-<button type="button" class="ws-btn" data-msg="!housestatus"><img src="house.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!dice0-p1"><img src="dice.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!dice4-p1"><img src="jail.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!jailpay p1"><img src="key.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!housestatus"><img src="house.jpg"></button>
 <a href="trade.html?p=1" target="_blank"><button type="button" class="small-button"><img src="p1.jpg"></button></a>
 </div>
 <div class="buttonRow">
-<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 5"><img src="5.jpg"></button>
-<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 10"><img src="10.jpg"></button>
-<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 25"><img src="25.jpg"></button>
-<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!bidadd 50"><img src="50.jpg"></button>
-<button type="button" class="ws-btn" data-from="player1bot" data-target="rentobot" data-msg="!fold"><img src="fold.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 5"><img src="5.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 10"><img src="10.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 25"><img src="25.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 50"><img src="50.jpg"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!fold"><img src="fold.jpg"></button>
 </div>
 </div>
 <div id="displayContainer">
@@ -82,26 +82,47 @@
 <iframe id="chatFrame" src="https://web.libera.chat/#%23rento" style="border:none;"></iframe>
 </div>
 </div>
+
+
 <script>
 (function(){
 const params=new URLSearchParams(window.location.search);
 const playerNum=params.get('p')||'1';
 document.body.dataset.bot=`player${playerNum}bot`;
+
 document.querySelectorAll('input[name="bot"]').forEach(el=>{
 el.value=`player${playerNum}bot`;
 });
+
 document.querySelectorAll('input[name="msg"]').forEach(el=>{
-el.value=el.value.replace(/p1\b/g,`p${playerNum}`);
+el.value=el.value
+.replace(/!dice0-p1\b/g,`!dice0-p${playerNum}`)
+.replace(/!dice4-p1\b/g,`!dice4-p${playerNum}`)
+.replace(/!jailpay p1\b/g,`!jailpay p${playerNum}`);
 });
+
+document.querySelectorAll('[data-from]').forEach(el=>{
+el.dataset.from=el.dataset.from.replace(/player1bot\b/g,`player${playerNum}bot`);
+});
+
+document.querySelectorAll('[data-msg]').forEach(el=>{
+el.dataset.msg=el.dataset.msg
+.replace(/!dice0-p1\b/g,`!dice0-p${playerNum}`)
+.replace(/!dice4-p1\b/g,`!dice4-p${playerNum}`)
+.replace(/!jailpay p1\b/g,`!jailpay p${playerNum}`);
+});
+
 document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
 el.src=el.src.replace('p1.',`p${playerNum}.`);
 });
+
 document.querySelectorAll('a[href^="trade.html"],a[href^="trade-mobile.html"],a[href^="trade-tablet.html"]').forEach(el=>{
 const page=el.href.split('/').pop().split('?')[0];
 el.href=`${page}?p=${playerNum}`;
 });
 })();
 </script>
+
 <script src="/socket.io/socket.io.js"></script>
 <script src="/p.js"></script>
 </body>

@@ -93,6 +93,13 @@ const target=targetInput?.value||undefined;
 fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
 });
 });
+
+document.querySelectorAll('[data-msg]').forEach(el=>{
+el.addEventListener('click',()=>{
+console.log('[ws-btn] sending',{from:el.dataset.from||BOT_NAME,target:el.dataset.target,msg:el.dataset.msg});
+socket.emit('sendMessage',{from:el.dataset.from||BOT_NAME,target:el.dataset.target,msg:el.dataset.msg});
+});
+});
 });
 
 function updatePieces(data){
