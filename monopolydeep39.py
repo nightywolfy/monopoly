@@ -51,7 +51,7 @@ class MonopolyBot(SingleServerIRCBot):
         self.house_cmd_queues = {}
         self.house_cmd_lock = threading.Lock()
 
-        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "https://monopoly-production-f23d.up.railway.app")
+        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "192.168.1.67")
         self.sio = socketio.Client(reconnection=True, reconnection_delay=2, reconnection_delay_max=10)
         self._setup_ws_handlers()
         self.ws_thread = threading.Thread(target=self._run_ws_client, daemon=True)
