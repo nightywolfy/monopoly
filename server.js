@@ -740,11 +740,7 @@ function createBot(nick,defaultTarget,options={}){
 
 const bots={
     player1bot:createBot('player1bot','##rento',{delay:20000}),
-    player2bot:createBot('player2bot','##rento',{delay:30000}),
-    player3bot:createBot('player3bot','##rento',{delay:45000}),
-    player4bot:createBot('player4bot','##rento',{delay:60000}),
-    player5bot:createBot('player5bot','##rento',{delay:75000}),
-    player6bot:createBot('player6bot','##rento',{delay:90000})
+    player2bot:createBot('player2bot','##rento',{delay:30000})
 };
 
 app.post('/send-irc',(req,res)=>{
@@ -776,19 +772,21 @@ io.on('connection',socket=>{
         }
 
         socket.on('sendMessage',payload=>{
-            if(!payload||typeof payload!=='object')return;
-            const{bot,from,msg,target}=payload;
-            const botId=from||bot;
-            if(!bots[botId]||typeof msg!=='string')return;
-            const cleanMsg=msg.trim().slice(0,200).replace(/\n/g,' ');
-            if(!cleanMsg)return;
-            const finalTarget=typeof target==='string'&&target.trim()?target.trim():bots[botId].defaultTarget;
-            if(finalTarget.toLowerCase()==='rentobot'){
-                safeEmit('rentoCommand',{from:botId,msg:cleanMsg});
-            }else{
-                bots[botId].say(finalTarget,cleanMsg);
-            }
+        if(!payload||typeof payload!=='object')return;
+        const{bot,from,msg,target}=payload;
+        const botId=from||bot;
+        if(typeof msg!=='string')return;
+        const cleanMsg=msg.trim().slice(0,200).replace(/\n/g,' ');
+        if(!cleanMsg)return;
+        const finalTarget=typeof target==='string'&&target.trim()?target.trim():'##rento';
+        if(finalTarget.toLowerCase()==='rentobot'){
+            safeEmit('rentoCommand',{from:botId||'web',msg:cleanMsg});
+            return;
+        }
+        if(!bots[botId])return;
+        bots[botId].say(finalTarget,cleanMsg);
         });
+        
         socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
         socket.on('getPieces',()=>socket.emit('piecesUpdate',pieces));
         socket.on('getBuildings',()=>socket.emit('buildingsUpdate',buildings));

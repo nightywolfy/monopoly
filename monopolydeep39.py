@@ -45,8 +45,6 @@ class MonopolyBot(SingleServerIRCBot):
         self.msg_worker = threading.Thread(target=self._process_msg_queue, daemon=True)    
         self.msg_worker.start()
         self.disabled_dice = set()
-        self.up_timer = None
-        self.up_timer_lock = threading.Lock()
         self.admin_users = {u.lower() for u in {"juntao", "crinjal"}}
         self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "https://monopoly-production-ef33.up.railway.app")
         self.sio = socketio.Client(reconnection=True, reconnection_delay=2, reconnection_delay_max=10)
@@ -157,12 +155,6 @@ class MonopolyBot(SingleServerIRCBot):
             try: t,m=self.msg_queue.get(); self.connection.privmsg(t,m); time.sleep(0.4)
             except Exception as e: print(f"IRC send error: {e}")
             finally: self.msg_queue.task_done()
-    def schedule_auto_up(self,delay=2.0):
-        with self.up_timer_lock:
-            if self.up_timer and self.up_timer.is_alive(): return
-            self.up_timer=threading.Timer(delay,self.auto_up)
-            self.up_timer.daemon=True
-            self.up_timer.start()
 
     def auto_up(self):
         if not self.players:return
@@ -452,9 +444,9 @@ class MonopolyBot(SingleServerIRCBot):
                     self.sio.emit("cmd-sound",{"file":"sold.mp3"})
                     self.sio.emit("updateDisplay2",{"text":f"{wname} wins {name} for {amt}"})
                     self.sio.emit("cmd-dot",{"num":pos,"color":color})
-                    self.sio.emit("rentoCommand",{"from":"rentobot","msg":"!up"})
                     if auc.get("bid_timer"):auc["bid_timer"].cancel()
                     self.current_auction=None
+                    self.auto_up()
             auc["bid_timer"]=threading.Timer(12,auto_win)
             auc["bid_timer"].daemon=True
             auc["bid_timer"].start()
@@ -482,11 +474,13 @@ class MonopolyBot(SingleServerIRCBot):
                 prop=prop[2:] if prop.startswith("x-") else prop
                 if auc.get("bid_timer"):auc["bid_timer"].cancel()
                 self.current_auction=None
+                self.auto_up()
                 return True,f"Auction ended. No bids for {prop}"
             if len(auc["active"])==1:
                 winner=next(iter(auc["active"]))
                 if winner not in self.players:
                     self.current_auction=None
+                    self.auto_up()
                     return True,"Auction ended. Winner no longer exists."
                 pos=auc["pos"]
                 if auc.get("bid_timer"):auc["bid_timer"].cancel()
@@ -504,8 +498,10 @@ class MonopolyBot(SingleServerIRCBot):
                     self.sio.emit("updateDisplay2",{"text":f"{wname} wins {name} for {amt}"})
                     self.sio.emit("cmd-dot",{"num":pos,"color":color})
                     self.current_auction=None
+                    self.auto_up()
                     return True,None
                 self.current_auction=None
+                self.auto_up()
                 return True,"Auction ended. No bids."
             return True,f"{self.pname(player_key)} folds"
     
@@ -565,7 +561,7 @@ class MonopolyBot(SingleServerIRCBot):
                 if msg:
                     self.connection.privmsg(self.channel,msg)
                 if success:
-                    self.schedule_auto_up()
+                    self.auto_up()
             return True,None
 
         if m:=re.match(r"!redeem\s+(\d+)",body):
@@ -597,12 +593,13 @@ class MonopolyBot(SingleServerIRCBot):
                             self.active_board[pos]=f"{owner}-{name}"
                             msg=f"redeemed {owner_display} {name} for {cost}"
                             success=True
+                            
                             self.sio.emit("cmd-sound",{"file":"redeem.mp3"})
                             self.sio.emit("cmd-dot",{"num":pos,"color":self.unmortgaged_colors.get(owner,"red")})
                 if msg:
                     self.connection.privmsg(self.channel,msg)
                 if success:
-                    self.schedule_auto_up()
+                    self.auto_up()
             return True,None
             
         m=re.match(r"!addonehouse\s+(\w+)",body)
