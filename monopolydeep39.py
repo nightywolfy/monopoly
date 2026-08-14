@@ -873,12 +873,13 @@ class MonopolyBot(SingleServerIRCBot):
         elif new==20:
             self.handle_command("dicebot",f"!freeloan {p} 100 50")
             msg+=f"{display} received 100 free loan"
+            self.sio.emit("cmd-sound",{"file":"bonus.mp3"})
         elif new==62:
             msg+=f"{display} can auction any unowned property"
         elif new==30:
             self.jailed[p]=True
             self.players[p]["pos"]=10
-            msg+=" goes to jail"
+            msg=f"{display} goes to jail"
             self.sio.emit("cmd-sound",{"file":"jail.mp3"})
             send_msg(f"{display} {msg}")
             return "Jail",msg

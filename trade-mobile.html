@@ -77,22 +77,6 @@
 </div>
 <div id="cmdLog"></div>
 </div>
-<script>
-(function(){
-const params=new URLSearchParams(window.location.search);
-const playerNum=params.get('p')||'1';
-document.body.dataset.bot=`player${playerNum}bot`;
-document.querySelectorAll('input[name="bot"]').forEach(el=>{
-el.value=`player${playerNum}bot`;
-});
-document.querySelectorAll('input[name="msg"]').forEach(el=>{
-el.value=el.value.replace(/p1\b/g,`p${playerNum}`);
-});
-document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
-el.src=el.src.replace('p1.',`p${playerNum}.`);
-});
-})();
-</script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/trade.js"></script>
 </body>

@@ -739,8 +739,8 @@ function createBot(nick,defaultTarget,options={}){
 }
 
 const bots={
-    player1bot:createBot('player1bot','##rento',{delay:20000}),
-    player2bot:createBot('player2bot','##rento',{delay:30000})
+    player1bot:createBot('player3bot','##rento',{delay:20000}),
+    player2bot:createBot('player4bot','##rento',{delay:30000})
 };
 
 app.post('/send-irc',(req,res)=>{

@@ -4,11 +4,11 @@
 <title>Monopoly Board</title>
 <link rel="stylesheet" href="/admin.css">
 </head>
-<body>
+<body data-bot="player1bot">
 <div id="boardWrapper">
 <div id="boardContainer">
 <div id="board">
-<img id="boardImg" src="map2.png" alt="Monopoly Board">
+<img id="boardImg" src="map3.png" alt="Monopoly Board">
 <div id="p1" class="piece red">p1</div>
 <div id="p2" class="piece blue">p2</div>
 <div id="p3" class="piece orange">p3</div>
@@ -84,22 +84,13 @@
 </div>
 <script>
 (function(){
-const params=new URLSearchParams(window.location.search);
-const playerNum=params.get('p')||'1';
-document.body.dataset.bot=`player${playerNum}bot`;
-document.querySelectorAll('input[name="bot"]').forEach(el=>{
-el.value=`player${playerNum}bot`;
-});
-document.querySelectorAll('input[name="msg"]').forEach(el=>{
-el.value=el.value.replace(/p1\b/g,`p${playerNum}`);
-});
-document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
-el.src=el.src.replace('p1.',`p${playerNum}.`);
-});
-document.querySelectorAll('a[href^="trade.html"],a[href^="trade-mobile.html"],a[href^="trade-tablet.html"]').forEach(el=>{
-const page=el.href.split('/').pop().split('?')[0];
-el.href=`${page}?p=${playerNum}`;
-});
+const p=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get("p"))||1)),bot=`player${p}bot`;
+document.body.dataset.bot=bot;
+document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
+document.querySelector('[data-msg="!dice0-p1"]').dataset.msg=`!dice0-p${p}`;
+document.querySelector('[data-msg="!dice4-p1"]').dataset.msg=`!dice4-p${p}`;
+document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
+document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>

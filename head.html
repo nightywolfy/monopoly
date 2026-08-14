@@ -82,56 +82,17 @@
 </div>
 <script>
 (function(){
-const params=new URLSearchParams(window.location.search);
-const playerNum=params.get('p')||'1';
-document.body.dataset.bot=`player${playerNum}bot`;
+const p=parseInt(new URLSearchParams(location.search).get("p"))||1,bot=`player${p}bot`;
+document.body.dataset.bot=bot;
+document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
+document.querySelectorAll('[name="bot"]').forEach(e=>e.value=bot);
+document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
+document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
 
-document.querySelectorAll('input[name="bot"]').forEach(el=>{
-el.value=`player${playerNum}bot`;
-});
-
-document.querySelectorAll('input[name="msg"]').forEach(el=>{
-el.value=el.value
-.replace(/!dice0-p1\b/g,`!dice0-p${playerNum}`)
-.replace(/!dice4-p1\b/g,`!dice4-p${playerNum}`)
-.replace(/!jailpay p1\b/g,`!jailpay p${playerNum}`);
-});
-
-document.querySelectorAll('[data-from]').forEach(el=>{
-el.dataset.from=el.dataset.from.replace(/player1bot\b/g,`player${playerNum}bot`);
-});
-
-document.querySelectorAll('[data-msg]').forEach(el=>{
-el.dataset.msg=el.dataset.msg
-.replace(/!dice0-p1\b/g,`!dice0-p${playerNum}`)
-.replace(/!dice4-p1\b/g,`!dice4-p${playerNum}`)
-.replace(/!jailpay p1\b/g,`!jailpay p${playerNum}`);
-});
-
-document.querySelectorAll('input[name="msg"]').forEach(el=>{
-if(el.value==='!go1'){
-el.value=`!go${playerNum}`;
-}else if(el.value==='!go3'){
-el.value=`!go${Number(playerNum)+2}`;
-}
-});
-
-document.querySelectorAll('[data-msg]').forEach(el=>{
-if(el.dataset.msg==='!go1'){
-el.dataset.msg=`!go${playerNum}`;
-}else if(el.dataset.msg==='!go3'){
-el.dataset.msg=`!go${Number(playerNum)+2}`;
-}
-});
-
-document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
-el.src=el.src.replace('p1.',`p${playerNum}.`);
-});
-
-document.querySelectorAll('a[href^="trade.html"],a[href^="trade-mobile.html"],a[href^="trade-tablet.html"]').forEach(el=>{
-const page=el.href.split('/').pop().split('?')[0];
-el.href=`${page}?p=${playerNum}`;
-});
+const go1=document.querySelector('[data-msg="!go1"]');
+const go3=document.querySelector('[data-msg="!go3"]');
+go1.dataset.msg=`!go${p}`;
+go3.dataset.msg=`!go${p+2}`;
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>

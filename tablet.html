@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/tablet.css">
 </head>
-<body>
+<body data-bot="player1bot">
 <div id="boardWrapper">
 <div id="boardContainer">
 <div id="board">
@@ -87,29 +87,13 @@
 </div>
 <script>
 (function(){
-const params=new URLSearchParams(window.location.search);
-const playerNum=params.get('p')||'1';
-document.body.dataset.bot=`player${playerNum}bot`;
-
-document.querySelectorAll('[data-from]').forEach(el=>{
-el.dataset.from=el.dataset.from.replace(/player1bot\b/g,`player${playerNum}bot`);
-});
-
-document.querySelectorAll('[data-msg]').forEach(el=>{
-el.dataset.msg=el.dataset.msg
-.replace(/!dice0-p1\b/g,`!dice0-p${playerNum}`)
-.replace(/!dice4-p1\b/g,`!dice4-p${playerNum}`)
-.replace(/!jailpay p1\b/g,`!jailpay p${playerNum}`);
-});
-
-document.querySelectorAll('#topButtons img[src^="p1."]').forEach(el=>{
-el.src=el.src.replace('p1.',`p${playerNum}.`);
-});
-
-document.querySelectorAll('a[href^="trade.html"],a[href^="trade-mobile.html"],a[href^="trade-tablet.html"]').forEach(el=>{
-const page=el.href.split('/').pop().split('?')[0];
-el.href=`${page}?p=${playerNum}`;
-});
+const p=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get("p"))||1)),bot=`player${p}bot`;
+document.body.dataset.bot=bot;
+document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
+document.querySelector('[data-msg="!dice0-p1"]').dataset.msg=`!dice0-p${p}`;
+document.querySelector('[data-msg="!dice4-p1"]').dataset.msg=`!dice4-p${p}`;
+document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
+document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>
