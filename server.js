@@ -752,11 +752,12 @@ const bots={
 app.post('/send-irc',(req,res)=>{
     try{
         const{bot,target,msg}=req.body||{};
-        if(!bot||!msg)return res.status(400).send('Missing bot or message');
-        if(!bots[bot])return res.status(400).send('Unknown bot');
+        if(!msg)return res.status(400).send('Missing message');
         const cleanMsg=String(msg).trim();
         if(!cleanMsg)return res.redirect('/');
         if(handleServerCommand(cleanMsg))return res.send('OK');
+        if(!bot)return res.status(400).send('Missing bot');
+        if(!bots[bot])return res.status(400).send('Unknown bot');
         const finalTarget=typeof target==='string'&&target.trim()?target.trim():'##rento';
         bots[bot].say(finalTarget,cleanMsg);
         return res.redirect('/');
