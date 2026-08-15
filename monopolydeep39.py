@@ -255,6 +255,8 @@ class MonopolyBot(SingleServerIRCBot):
                 self.active_board[pos]=f"x-{self.active_board.get(pos,f'Position {pos}').split('-',1)[-1]}"
             try:self.handle_command(caller,"!propertylist");self.handle_command(caller,"!housestatus")
             except Exception:pass
+            try:self.sio.emit("cmd-sound",{"file":"laughter.mp3"})
+            except Exception:pass
             return True,self.pname(f"{rm} has been removed")
 
         if m:=re.match(r"!insert\s+(p[1-6])\s+(-?\d+)$",body):

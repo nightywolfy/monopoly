@@ -1,9 +1,8 @@
 const socket = io();
 const BOT_NAME = document.body.dataset.bot;
-const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
 let currentMap = 3;
+let labels = {p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
 let activeDots = {};
-let labels = {p1:'Player1',p2:'Player2',p3:'Player3',p4:'Player4',p5:'Player5',p6:'Player6'};
 let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
 let buildingPositions = {};
 let lastBuildingsData = null;
@@ -105,17 +104,15 @@ socket.emit('sendMessage',{from:el.dataset.from||BOT_NAME,target:el.dataset.targ
 function updatePieces(data){
 if(!data||typeof data!=="object"){console.warn("Pieces data invalid:",data);return;}
 const posMap={};
-for(const [color,pos] of Object.entries(data)){
-if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number"){console.warn("Invalid position for",color,pos);continue;}
+for(const [id,pos] of Object.entries(data)){
+if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number"){console.warn("Invalid position for",id,pos);continue;}
 const key=`${pos.x},${pos.y}`;
 if(!posMap[key])posMap[key]=[];
-posMap[key].push(color);
+posMap[key].push(id);
 }
-for(const [key,colors] of Object.entries(posMap)){
+for(const [key,ids] of Object.entries(posMap)){
 const [baseX,baseY]=key.split(',').map(Number);
-colors.forEach((color,idx)=>{
-const id=colorMap[color];
-if(!id)return;
+ids.forEach((id,idx)=>{
 const el=document.getElementById(id);
 if(!el)return;
 let offsetX=0,offsetY=0;
@@ -190,13 +187,6 @@ socket.on('labelsUpdate', updateLabels);
 socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
 socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
 socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
-//socket.on('boardClickPositions', data=>{ buildBoardButtons(data); });
 socket.on('piecesUpdate', updatePieces);
 socket.on('displayUpdate1', data=>updateDisplay1(data.text));
 socket.on('displayUpdate2', data=>updateDisplay2(data.text));
-fetch('/money.json').then(res=>res.json()).then(updateMoney);
-fetch('/labels.json').then(res=>res.json()).then(updateLabels).catch(()=>{});
-fetch('/building.json').then(r=>r.json()).then(data=>{ lastBuildingsData=data; renderBuildings(data); });
-fetch('/pieces.json').then(res=>res.json()).then(updatePieces);
-fetch('/display1.json').then(res=>res.json()).then(data=>updateDisplay1(data.text));
-fetch('/display2.json').then(res=>res.json()).then(data=>updateDisplay2(data.text));

@@ -35,7 +35,7 @@ function safeWriteJSON(file,data){
 }
 
 let money=safeReadJSON(moneyFile,{p1:10,p2:10,p3:10,p4:10,p5:10,p6:10});
-let pieces=safeReadJSON(piecesFile,{p1:{x:825,y:755},p2:{x:825,y:755},p3:{x:825,y:755},p4:{x:825,y:755},p5:{x:825,y:755},p6:{x:825,y:755}});
+let pieces=safeReadJSON(piecesFile,{red:{x:825,y:755},blue:{x:825,y:755},orange:{x:825,y:755},green:{x:825,y:755},purple:{x:825,y:755},white:{x:825,y:755}});
 let display1=safeReadJSON(display1File,{text:""});
 let display2=safeReadJSON(display2File,{text:""});
 let activeDots=safeReadJSON(dotsFile,{});
@@ -294,9 +294,9 @@ const HOUSE_TYPES=new Set(['house1','house2','house3','house4','hotel']);
 function initializeDefaults(){
     PLAYERS.forEach(p=>{if(money[p]===undefined)money[p]=10});
     if(!buildings||typeof buildings!=='object')buildings={};
-    PLAYERS.forEach(p=>{
-        if(!pieces[p])pieces[p]={x:825,y:755};
-    });
+    for(const color of Object.values(colorMap)){
+        if(!pieces[color])pieces[color]={x:825,y:755};
+    }
     if(!display1.text)display1.text="";
     if(!display2.text)display2.text="";
     if(!labels||typeof labels!=='object')labels={};
@@ -306,14 +306,7 @@ function initializeDefaults(){
 initializeDefaults();
 
 function safeEmit(event,data){try{io.emit(event,data)}catch(err){console.error(`[Socket] Emit failed (${event}):`,err)}}
-function updatePiece(player,x,y){
-    if(!colorMap[player])return;
-    const current=pieces[player];
-    if(current&&current.x===x&&current.y===y)return;
-    pieces[player]={x,y};
-    savePieces();
-    safeEmit('piecesUpdate',pieces);
-}
+function updatePiece(player,x,y){const color=colorMap[player];if(!color)return;const current=pieces[color];if(current&&current.x===x&&current.y===y)return;pieces[color]={x,y};savePieces();safeEmit('piecesUpdate',pieces)}
 function updateDisplay1(newText){if(display1.text===newText)return;display1.text=newText;saveDisplay1();safeEmit('displayUpdate1',{text:display1.text})}
 function updateDisplay2(newText){if(display2.text===newText)return;display2.text=newText;saveDisplay2();safeEmit('displayUpdate2',{text:display2.text})}
 function updateMoney(player,amount){if(!colorMap[player]||money[player]===amount)return;money[player]=amount;saveMoney();safeEmit('moneyUpdate',money)}
