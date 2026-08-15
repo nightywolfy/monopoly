@@ -12,11 +12,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;transform:translateY(-35px)}
 .displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:35px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
 
-#propertyLink,#rulesLink{position:absolute;z-index:20}
-#propertyLink img,#rulesLink img{width:75px;border-radius:8px;box-shadow:0 0 6px rgba(255,255,255,0.5)}
-#propertyLink{top:40%;left:265px;transform:translateY(-50%)}
-#rulesLink{top:50%;right:560px;transform:translateY(-50%)}
-
 .hotel,.house{width:29px;height:29px;position:absolute}
 
 #topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-50px)}
