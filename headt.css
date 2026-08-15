@@ -19,10 +19,10 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .buttonRow{display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:center;width:100%}
 .buttonRow:first-child .small-button{width:70px;height:70px}
 .buttonRow:nth-child(2) .small-button{width:70px;height:70px}
-.small-button{width:70px;height:70px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer}
-.small-button img{width:100%;height:100%;object-fit:contain}
-.small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}
-.small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}
+.small-button{width:70px;height:70px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4);overflow:hidden}
+.small-button img{width:100%;height:100%;object-fit:contain;transition:transform .15s ease,filter .15s ease}
+.small-button:active{transform:translateY(4px) scale(.92)!important;box-shadow:0 0 12px #00d4ff!important;filter:brightness(.75)!important}
+.small-button:active img{transform:scale(.96)!important;filter:brightness(.75)!important}
 
 .dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 .piece{width:32px;height:32px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid transparent;box-shadow:0 0 6px rgba(0,0,0,0.4);transition:left 0.4s ease,top 0.4s ease;color:white}
