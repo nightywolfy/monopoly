@@ -499,7 +499,7 @@ const commands={
 };
 
 function createBot(nick,defaultTarget,options={}){
-    const client=new IRC.Client();
+    const client=new IRC.Client({enable_echomessage:true});
     const host=options.host||'irc.libera.chat';
     const port=options.port||6667;
     const secure=!!options.secure;
