@@ -29,7 +29,7 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 <button id="startBtn">START</button>
 <div id="error"></div>
 </div>
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
 async function startGame(){
 const input=document.getElementById('nameInput');
@@ -47,9 +47,12 @@ error.style.display='none';
 
 try{
 
-/* SEND !display p1 NAME USING WEBSOCKET */
-if(typeof io!=='undefined'){
+if(typeof io==='function'){
+
 const socket=io();
+socket.on('connect',()=>{
+console.log('WebSocket connected');
+console.log('Sending WebSocket command: !display p1 '+name);
 
 socket.emit('sendMessage',{
 bot:'player1bot',
@@ -57,9 +60,16 @@ from:'player1bot',
 target:'##rento',
 msg:`!display p4 ${name}`
 });
+});
+
+socket.on('connect_error',err=>{
+console.error('WebSocket connection error:',err);
+});
+
+}else{
+throw new Error('Socket.IO is not loaded');
 }
 
-/* SEND display p1 NAME TO IRC */
 const response=await fetch('/send-irc',{
 method:'POST',
 headers:{'Content-Type':'application/json'},
@@ -99,7 +109,6 @@ window.location.href='computer.html?p=4';
 }
 
 document.getElementById('startBtn').addEventListener('click',startGame);
-
 document.getElementById('nameInput').addEventListener('keydown',e=>{
 if(e.key==='Enter')startGame();
 });
