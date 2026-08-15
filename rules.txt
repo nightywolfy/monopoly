@@ -46,7 +46,7 @@ Trading:
 !reject
 
 set Display-name
-Example: !display p1 owner | Example: !display p2 king
+Example: !display p1 Crinjal | Example: !display p2 Jackson
 
 rename to custom name (2 letters + 1 number only)
 Example: !rename p1 AL1 | !rename p2 ED2
