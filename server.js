@@ -746,7 +746,7 @@ function createBot(nick,defaultTarget,options={}){
 }
 
 const bots={
-    player1bot:createBot('player1bot','##rento',{delay:35000})
+    player1bot:createBot('player1bot','##rento',{delay:30000})
 };
 
 app.post('/send-irc',(req,res)=>{
@@ -755,12 +755,11 @@ app.post('/send-irc',(req,res)=>{
         if(!msg)return res.status(400).send('Missing message');
         const cleanMsg=String(msg).trim();
         if(!cleanMsg)return res.redirect('/');
-        if(handleServerCommand(cleanMsg))return res.send('OK');
         if(!bot)return res.status(400).send('Missing bot');
         if(!bots[bot])return res.status(400).send('Unknown bot');
         const finalTarget=typeof target==='string'&&target.trim()?target.trim():'##rento';
         bots[bot].say(finalTarget,cleanMsg);
-        return res.redirect('/');
+        return res.send('OK');
     }catch(err){
         console.error('/send-irc error:',err);
         return res.status(500).send('Server error');
