@@ -46,22 +46,37 @@ return;
 error.style.display='none';
 
 try{
+
+/* SEND !display p1 NAME USING WEBSOCKET */
+if(typeof io!=='undefined'){
+const socket=io();
+
+socket.emit('sendMessage',{
+bot:'player1bot',
+from:'player1bot',
+target:'##rento',
+msg:`!display p3 ${name}`
+});
+}
+
+/* SEND display p1 NAME TO IRC */
 const response=await fetch('/send-irc',{
 method:'POST',
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
 bot:'player1bot',
 target:'##rento',
-msg:`!display p3 ${name}`
+msg:`display p3 ${name}`
 })
 });
 
 if(!response.ok){
 const text=await response.text();
-throw new Error(text||'Failed to send command');
+throw new Error(text||'Failed to send IRC message');
 }
 
 detectDevice();
+
 }catch(e){
 console.error('Start game error:',e);
 error.textContent=e.message||'Unable to start the game.';
@@ -84,6 +99,7 @@ window.location.href='computer.html?p=3';
 }
 
 document.getElementById('startBtn').addEventListener('click',startGame);
+
 document.getElementById('nameInput').addEventListener('keydown',e=>{
 if(e.key==='Enter')startGame();
 });
