@@ -51,15 +51,20 @@ method:'POST',
 headers:{'Content-Type':'application/json'},
 body:JSON.stringify({
 bot:'player1bot',
+target:'##rento',
 msg:`!display p3 ${name}`
 })
 });
 
-if(!response.ok)throw new Error('Failed to send command');
+if(!response.ok){
+const text=await response.text();
+throw new Error(text||'Failed to send command');
+}
 
 detectDevice();
 }catch(e){
-error.textContent='Unable to start the game.';
+console.error('Start game error:',e);
+error.textContent=e.message||'Unable to start the game.';
 error.style.display='block';
 }
 }
