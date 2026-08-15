@@ -1069,6 +1069,7 @@ class MonopolyBot(SingleServerIRCBot):
     def handle_go_command(self,c,msg,nick):
         m=re.match(r"!go([1-4])(?:\s+(\d+))?",msg)
         if not m:return
+        if self.current_auction:c.privmsg(self.channel,"GO disabled during an active auction.");return
         if self.players and self.any_player_negative():c.privmsg(self.channel,"GO disabled: negative balance.");return
         if not self.go_enabled:c.privmsg(self.channel,f"{nick}, use !gostart first");return
         cmd=m.group(1)

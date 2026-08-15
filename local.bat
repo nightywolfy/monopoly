@@ -6,7 +6,6 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command ^
 "$f='server.js'; ^
 $s=[IO.File]::ReadAllText($f); ^
 $s=[regex]::Replace($s,'player1bot:createBot\(''player[0-9]+bot''','player1bot:createBot(''player3bot'''); ^
-$s=[regex]::Replace($s,'player2bot:createBot\(''player[0-9]+bot''','player2bot:createBot(''player4bot'''); ^
 [IO.File]::WriteAllText($f,$s)"
 
 echo Done.

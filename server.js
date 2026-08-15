@@ -746,8 +746,7 @@ function createBot(nick,defaultTarget,options={}){
 }
 
 const bots={
-    player1bot:createBot('player1bot','##rento',{delay:25000}),
-    player2bot:createBot('player2bot','##rento',{delay:50000})
+    player1bot:createBot('player1bot','##rento',{delay:35000})
 };
 
 
