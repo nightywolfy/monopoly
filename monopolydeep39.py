@@ -13,9 +13,7 @@ class MonopolyBot(SingleServerIRCBot):
         self.house_costs = {"red":200,"orange":180,"yellow":150,"green":100,"blue":100,"pink":150,"brown":60,"dblue":60,"white":60,"purple":80,"aqua":100,"black":130}
         self.house_rents = {1:[5,20,30,90,160,250],3:[10,30,60,180,320,450],6:[10,40,90,270,400,550],8:[10,40,90,270,400,550],9:[15,50,100,300,450,600],11:[15,50,150,450,625,750],12:[15,50,150,450,625,750],14:[20,60,180,500,700,900],16:[20,70,200,550,750,950],17:[20,70,200,550,750,950],19:[30,80,220,600,800,1000],21:[30,90,250,700,875,1050],22:[30,90,250,700,875,1050],24:[40,100,300,750,925,1100],26:[40,110,330,800,975,1150],28:[40,110,330,800,975,1150],29:[50,120,360,850,1025,1200],31:[50,130,390,900,1100,1275],33:[50,150,450,1000,1200,1400],34:[60,150,450,1000,1200,1400],37:[60,175,500,1100,1300,1500],39:[80,200,600,1400,1700,2000],41:[15,50,100,300,450,600],42:[15,50,100,300,450,600],44:[30,80,220,600,800,1000],45:[30,80,220,600,800,1000],47:[30,90,250,700,875,1050],50:[25,70,180,450,650,800],51:[25,70,180,450,650,800],53:[25,75,200,500,700,850],56:[50,120,360,850,1025,1200],57:[50,120,360,850,1025,1200],59:[50,130,390,900,1100,1275],63:[15,50,150,450,625,750]}
         self.mortgage_table = {1:30,3:40,4:100,5:100,6:50,8:50,9:60,11:75,12:75,13:100,14:90,15:100,16:100,17:100,19:110,21:110,22:110,24:120,25:100,26:140,27:100,28:140,29:150,31:150,33:150,34:160,35:100,37:180,38:100,39:200,40:100,41:60,42:60,44:110,45:110,46:100,47:120,50:90,51:90,52:100,53:100,56:150,57:150,58:100,59:160,63:70}
-        self.color_sets = {"red":[37,39],"orange":[34,33,31],"pink":[26,28,29],"yellow":[24,22,21],"green":[19,17,16],"blue":[14,12,11],"brown":[6,8,9],"dblue":[1,3],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
         self.house_numbers = {"red":(2,4,6,8),"dblue":(2,4,6,8),"orange":(3,6,9,12),"yellow":(3,6,9,12),"green":(3,6,9,12),"blue":(3,6,9,12),"pink":(3,6,9,12),"brown":(3,6,9,12),"white":(3,6,9,12),"aqua":(3,6,9,12),"purple":(3,6,9,12),"black":(3,6,9,12)}
-        self.hotel_numbers = {"red":10,"dblue":10,"orange":15,"yellow":15,"green":15,"blue":15,"pink":15,"brown":15,"white":15,"aqua":15,"purple":15,"black":15}
         self.color_sets={"dblue":[1,3],"brown":[6,8,9],"blue":[11,12,14],"green":[16,17,19],"yellow":[21,22,24],"pink":[26,28,29],"orange":[31,33,34],"red":[37,39],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
         self.unmortgaged_colors = {"p1":"red","p2":"blue","p3":"orange","p4":"green","p5":"purple","p6":"white"}
         self.mortgaged_colors = {"p1":"lightpink","p2":"lightblue","p3":"#FFFD01","p4":"lightgreen","p5":"plum","p6":"black"}
@@ -37,10 +35,7 @@ class MonopolyBot(SingleServerIRCBot):
         self.expected_player_index = 0
         self.dice_override = False
         self.dice_lock = threading.Lock()
-        self.cmd_queue = queue.Queue()
         self.state_lock = threading.Lock()
-        self.worker_thread = threading.Thread(target=self._process_queue, daemon=True)
-        self.worker_thread.start()
         self.msg_queue = queue.Queue()
         self.msg_worker = threading.Thread(target=self._process_msg_queue, daemon=True)    
         self.msg_worker.start()
@@ -57,7 +52,6 @@ class MonopolyBot(SingleServerIRCBot):
         return any(p["money"] < 0 for p in self.players.values())
     def on_pubmsg(self,c,e): self.handle_channel_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
     def on_privmsg(self,c,e): self.handle_private_message(c,e.source.nick.lower(),e.arguments[0].strip().lower())
-
     # -------- WebSocket input path (Option 1) --------
     def _setup_ws_handlers(self):
         @self.sio.event
@@ -69,7 +63,6 @@ class MonopolyBot(SingleServerIRCBot):
         @self.sio.on('rentoCommand')
         def on_rento_command(data):
             self._handle_ws_command(data)
-
     def _run_ws_client(self):
         while True:
             try:
@@ -78,7 +71,6 @@ class MonopolyBot(SingleServerIRCBot):
             except Exception as e:
                 print(f"[WS] Connection error: {e}")
             time.sleep(5)
-
     def _handle_ws_command(self,data):
         if not isinstance(data,dict):return
         nick=str(data.get('from','')).strip().lower()
@@ -88,7 +80,6 @@ class MonopolyBot(SingleServerIRCBot):
             self.handle_private_message(self.connection,nick,msg)
         except Exception as e:
             print(f"[WS] Command error: {e}")
-
     def handle_private_message(self,c,nick,msg):
         low=msg.lower()
         if low.startswith(("!add","!freeloan","!gobonus")) and not low.startswith(("!addonehouse","!removeonehouse")):
@@ -101,7 +92,6 @@ class MonopolyBot(SingleServerIRCBot):
             else:c.privmsg(nick,r)
         if success and low.startswith(("!addonehouse","!removeonehouse")):self.auto_up()
         self.handle_go_privmsg(c,nick,msg)
-        
     def handle_channel_message(self,c,nick,msg):
         success,r=self.handle_command(nick,msg)
         if r:
@@ -132,30 +122,21 @@ class MonopolyBot(SingleServerIRCBot):
         self.free_loans={}
         self.go_jail_attempts={'p1':0,'p2':0}
         self.custom_names={}
-
     def pname(self,msg):
         if not msg:return msg
         for p,name in self.custom_names.items():msg=re.sub(rf"\b{p}\b",name,msg)
         return msg
-
     def resolve_player(self,token):
         token=token.lower()
         if token in self.players:return token
         for p,name in self.custom_names.items():
             if token==name.lower():return p
         return None
-
-    def _process_queue(self):
-        while True:
-            try: self.cmd_queue.get()()
-            except Exception as e: print(f"Queue worker error: {e}")
-            finally: self.cmd_queue.task_done(); time.sleep(0.1)
     def _process_msg_queue(self):
         while True:
             try: t,m=self.msg_queue.get(); self.connection.privmsg(t,m); time.sleep(0.4)
             except Exception as e: print(f"IRC send error: {e}")
             finally: self.msg_queue.task_done()
-
     def auto_up(self):
         if not self.players:return
         pos=[];money=[];props=[];houses=[]
@@ -223,6 +204,7 @@ class MonopolyBot(SingleServerIRCBot):
                 return True,f"{target} renamed back to {new.lower()}"
             if any(n.lower()==new.lower() and p!=target for p,n in self.custom_names.items()):
                 return False,f"Name {new} is already taken"
+            new=new[:-1].upper()+new[-1]
             self.custom_names[target]=new
             return True,f"{target} is now known as {new}"
        
@@ -528,7 +510,9 @@ class MonopolyBot(SingleServerIRCBot):
                 msg=None
                 success=False
                 pos=int(m.group(1))
-                if self.current_auction:
+                if any(self.players[p].get("pos")==62 for p in self.players):
+                    msg="Cannot mortgage while a player is on space 62"
+                elif self.current_auction:
                     msg="Cannot mortgage during an auction"
                 elif pos not in self.properties:
                     msg=f"Position {pos} is not owned"
@@ -569,7 +553,9 @@ class MonopolyBot(SingleServerIRCBot):
                 msg=None
                 success=False
                 pos=int(m.group(1))
-                if self.current_auction:
+                if any(self.players[p].get("pos")==62 for p in self.players):
+                    msg="Cannot redeem/unmortgage while a player is on space 62"
+                elif self.current_auction:
                     msg="Cannot redeem/unmortgage during an auction"
                 elif pos not in self.properties:
                     msg=f"Position {pos} is not owned."
@@ -593,7 +579,6 @@ class MonopolyBot(SingleServerIRCBot):
                             self.active_board[pos]=f"{owner}-{name}"
                             msg=f"redeemed {owner_display} {name} for {cost}"
                             success=True
-                            
                             self.sio.emit("cmd-sound",{"file":"redeem.mp3"})
                             self.sio.emit("cmd-dot",{"num":pos,"color":self.unmortgaged_colors.get(owner,"red")})
                 if msg:
@@ -832,7 +817,7 @@ class MonopolyBot(SingleServerIRCBot):
         def send_msg(m):
             if m:
                 self.connection.privmsg(self.channel,msg+bonus_msg+loan_msg)
-                self.connection.privmsg("player1bot",f"!d2 {msg}{bonus_msg}{loan_msg}")
+                self.sio.emit("updateDisplay2",{"text":f"{msg}{bonus_msg}{loan_msg}"})
         rails={5:43,15:49,25:55,35:61,43:5,49:15,55:25,61:35}
         if new in rails:
             if new in (5,15,25,35):
@@ -914,7 +899,7 @@ class MonopolyBot(SingleServerIRCBot):
             return name,""
         if msg:
             self.connection.privmsg(self.channel,msg+bonus_msg+loan_msg)
-            self.connection.privmsg("player1bot",f"!d2 {self.pname(msg)}{bonus_msg}{loan_msg}")
+            self.sio.emit("updateDisplay2",{"text":f"{self.pname(msg)}{bonus_msg}{loan_msg}"})
         return name,self.pname(msg)
     # -------- Dice0-4 --------
     def _handle_dice_pub(self,c,nick,msg):
@@ -1031,7 +1016,7 @@ class MonopolyBot(SingleServerIRCBot):
             except:pass
             try:self.sio.emit("cmd-sound",{"file":"jail.mp3"})
             except:pass
-            threading.Timer(0.1,lambda:c.privmsg("player1bot",f'!d1 "{self._next_turn_label()}"')).start()
+            threading.Timer(0.1,lambda:self.sio.emit("updateDisplay1",{"text":self._next_turn_label()})).start()
             threading.Timer(0.2,lambda:self.handle_command("dicebot","!up")).start()
             with self.dice_lock:
                 if self.dice_mode and self.dice_order:self.expected_player_index=(self.expected_player_index+1)%len(self.dice_order)
@@ -1043,10 +1028,10 @@ class MonopolyBot(SingleServerIRCBot):
             except:pass
             try:self.handle_command("dicebot",f"!move {pl} {t}")
             except:pass
-            threading.Timer(0.1,lambda:c.privmsg("player1bot",f'!d1 "Double for {display}: Go Again"' if dbl else f'!d1 "{self._next_turn_label()}"')).start()
+            threading.Timer(0.1,lambda:self.sio.emit("updateDisplay1",{"text":f"Double for {display}: Go Again" if dbl else self._next_turn_label()})).start()
             threading.Timer(0.2,lambda:self.handle_command("dicebot","!up")).start()
         else:
-            threading.Timer(0.3,lambda:c.privmsg("player1bot",f'!d1 "{self._next_turn_label()}"')).start()
+            threading.Timer(0.3,lambda:self.sio.emit("updateDisplay1",{"text":self._next_turn_label()})).start()
             try:self.sio.emit("cmd-sound",{"file":sound})
             except:pass
     # --- GO SYSTEM ---
@@ -1073,8 +1058,8 @@ class MonopolyBot(SingleServerIRCBot):
             self.override_next_turn=True
             c.privmsg(self.channel,f"{nick} used GO override Next turn open")
     def announce_go_turn(self,c,player):
-        label=f'!d1 "Player - {1 if player=="p1" else 2} - Turn"'
-        c.privmsg("player1bot",label)
+        text=f"Player - {1 if player=='p1' else 2} - Turn"
+        self.sio.emit("updateDisplay1",{"text":text})
     def handle_go_command(self,c,msg,nick):
         m=re.match(r"!go([1-4])(?:\s+(\d+))?",msg)
         if not m:return
@@ -1141,7 +1126,7 @@ class MonopolyBot(SingleServerIRCBot):
                 self.handle_command("dicebot",f"!move {p} {total}")
                 c.privmsg(self.channel,f"Dice results: {nums[0]} and {nums[1]}")
                 if double:
-                    c.privmsg("player1bot",f'!d1 "Double for (P{1 if p=="p1" else 2}): go again"')
+                    self.sio.emit("updateDisplay1",{"text":f"Double for (P{1 if p=='p1' else 2}): go again"})
                 else:
                     next_player='p2' if p=='p1' else 'p1'
                     self.announce_go_turn(c,next_player)

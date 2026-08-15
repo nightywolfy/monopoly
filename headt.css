@@ -9,7 +9,10 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 
 #centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10}
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;transform:translateY(-35px)}
-.displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:28px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
+
+.displayBox{padding:12px 20px;border-radius:14px;width:400px;text-align:center;font-weight:bold;font-size:34px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
+
+
 
 #propertyLink,#rulesLink{position:absolute;z-index:20}
 #propertyLink img,#rulesLink img{width:75px;border-radius:8px;box-shadow:0 0 6px rgba(255,255,255,0.5)}
@@ -18,19 +21,15 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 
 .hotel,.house{width:29px;height:29px;position:absolute}
 
-#topButtons{display:flex;flex-direction:column;gap:15px;align-items:center;justify-content:center;transform:translateY(3px)}
 #topButtons+#modeToggle{border-top:3px solid #00d4ff;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}
-
+#topButtons{display:flex;flex-direction:column;gap:15px;align-items:center;justify-content:center;transform:translateY(-40px)}
 .buttonRow{display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:center;width:100%}
-.buttonRow:first-child .small-button{width:110px;height:110px}
-.buttonRow:nth-child(2) .small-button{width:110px;height:110px}
-
-.small-button{width:50px;height:50px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer;transform:translateY(-5px)}
+.buttonRow:first-child .small-button{width:70px;height:70px}
+.buttonRow:nth-child(2) .small-button{width:70px;height:70px}
+.small-button{width:70px;height:70px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer}
 .small-button img{width:100%;height:100%;object-fit:contain}
 .small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}
 .small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}
-
-.dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
 
 .piece{width:32px;height:32px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid transparent;box-shadow:0 0 6px rgba(0,0,0,0.4);transition:left 0.4s ease,top 0.4s ease;color:white}
 .red{background:#ff4d4d;border-color:#ff8080}
@@ -74,7 +73,7 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .white-btn.clr-white{background-color:#DCE6F0!important;border-color:#a9b8c9!important;color:black!important}
 .white-btn.clr-yellow{background-color:#FFEF03!important;border-color:#c9bc00!important;color:black!important}
 
-#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;justify-content:center;width:100%;max-width:450px;padding:10px 0;box-sizing:border-box;transform:translateY(-10px)}
+#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;justify-content:center;width:100%;max-width:450px;padding:10px 0;box-sizing:border-box;transform:translateY(-40px)}
 .moneyBox{width:100%;min-height:56px;padding:10px 14px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:bold;box-shadow:0 0 14px rgba(0,212,255,.7),0 0 20px rgba(106,13,173,.5);border:2px solid rgba(255,255,255,.55);color:black;box-sizing:border-box;overflow:visible}
 .moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
 .moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}

@@ -7,7 +7,6 @@ For example, if you choose 6 and your opponent chooses 2, the two dice are added
 The player then moves 8 spaces, following the normal game rules.
 Because both players choose their dice simultaneously, neither player can use the other player's selection as information when making their own choice.
 
-
 For 3-6 Player Game:
 
 1. Log in to the chat using a username of your choice. Leave the password field empty.
@@ -53,7 +52,7 @@ rename to custom name (2 letters + 1 number only)
 Example: !rename p1 AL1 | !rename p2 ED2
 
 Rarely used commands:
-!diceoverride (use this command to override someone's turn)
+!diceoverride (use this command to override someone's turn once)
 !gobonus p2 50 250 (bank owes you total of $250 which will be paid everytime you pass go of 50 x 5)
 !save (save game)
-!status (example:  !status p1)  
+!status ( example: !status p1 | !status p3 )  
