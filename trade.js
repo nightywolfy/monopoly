@@ -1,5 +1,5 @@
 const socket = io();
-const BOT_NAME = document.body.dataset.bot;
+const BOT_NAME = 'player1bot';
 const colorMap = {red:"p1", blue:"p2", orange:"p3", green:"p4", purple:"p5", white:"p6"};
 let currentMap = 3;
 let activeDots = {};
@@ -348,6 +348,7 @@ if(!cmd)return;
 
 socket.emit('sendMessage',{
 bot:BOT_NAME,
+target:'##rento',
 msg:cmd
 });
 
@@ -438,6 +439,7 @@ if(!cmd)return;
 
 socket.emit('sendMessage',{
 bot:BOT_NAME,
+target:'##rento',
 msg:cmd
 });
 
@@ -501,6 +503,7 @@ if(!cmd)return;
 
 socket.emit('sendMessage',{
 bot:BOT_NAME,
+target:'##rento',
 msg:cmd
 });
 
@@ -570,6 +573,7 @@ if(!cmd)return;
 
 socket.emit('sendMessage',{
 bot:BOT_NAME,
+target:'##rento',
 msg:cmd
 });
 

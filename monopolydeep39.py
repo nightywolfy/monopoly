@@ -609,6 +609,8 @@ class MonopolyBot(SingleServerIRCBot):
             self.players[owner]['money']-=cost
             self.houses[target]=self.houses.get(target,0)+1
             self.sio.emit("cmd-sound",{"file":"build1.mp3"})
+            try:self.handle_command(caller,"!housestatus")
+            except Exception:pass
             return True,self.pname(f"Added 1 house to property {target} in {color} set. {owner} charged {cost}")
 
         m=re.match(r"!removeonehouse\s+(\w+)",body)
@@ -630,6 +632,8 @@ class MonopolyBot(SingleServerIRCBot):
             self.players[owner]['money']+=refund
             self.houses[target]=max(0,self.houses.get(target,0)-1)
             self.sio.emit("cmd-sound",{"file":"destroy1.mp3"})
+            try:self.handle_command(caller,"!housestatus")
+            except Exception:pass
             return True,self.pname(f"Removed 1 house from property {target} in {color} set. {owner} refunded {refund}")
 
         m=re.match(r"!save\s*(\S+)?",body)
@@ -756,8 +760,8 @@ class MonopolyBot(SingleServerIRCBot):
         if body.lower()=="!accept":
             if not self.current_trade:return False,"No active trade."
             t=self.current_trade
-            if self.players[t["offerer"]]["money"]<t["left_money"]:return False,f"{self.pname(t['offerer'])} does not have enough money."
-            if self.players[t["other"]]["money"]<t["right_money"]:return False,f"{self.pname(t['other'])} does not have enough money."
+            if t["left_money"]>0 and self.players[t["offerer"]]["money"]<t["left_money"]:return False,f"{self.pname(t['offerer'])} does not have enough money."
+            if t["right_money"]>0 and self.players[t["other"]]["money"]<t["right_money"]:return False,f"{self.pname(t['other'])} does not have enough money."
             self.players[t["offerer"]]["money"]-=t["left_money"]
             self.players[t["other"]]["money"]+=t["left_money"]
             self.players[t["other"]]["money"]-=t["right_money"]
