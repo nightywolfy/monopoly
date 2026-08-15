@@ -1,6 +1,6 @@
 const socket = io();
 const BOT_NAME = 'player1bot';
-let currentMap = 3;
+let currentMap = 2;
 let labels = {p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
 let activeDots = {};
 let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};

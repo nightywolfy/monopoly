@@ -1,5 +1,5 @@
 const socket = io();
-let currentMap = 3;
+let currentMap = 2;
 let activeDots = {};
 let labels = {p1:'Player1',p2:'Player2',p3:'Player3',p4:'Player4',p5:'Player5',p6:'Player6'};
 let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
