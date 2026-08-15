@@ -749,8 +749,6 @@ const bots={
     player1bot:createBot('player1bot','##rento',{delay:35000})
 };
 
-
-
 app.post('/send-irc',(req,res)=>{
     try{
         const{bot,target,msg}=req.body||{};
@@ -758,6 +756,7 @@ app.post('/send-irc',(req,res)=>{
         if(!bots[bot])return res.status(400).send('Unknown bot');
         const cleanMsg=String(msg).trim();
         if(!cleanMsg)return res.redirect('/');
+        if(handleServerCommand(cleanMsg))return res.send('OK');
         const finalTarget=typeof target==='string'&&target.trim()?target.trim():'##rento';
         bots[bot].say(finalTarget,cleanMsg);
         return res.redirect('/');
