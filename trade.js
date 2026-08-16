@@ -203,7 +203,13 @@ b.type='button';
 b.className=`opt ${p}`;
 b.textContent=p.toUpperCase();
 if(entry.players.includes(p))b.classList.add('selected');
+const pickedElsewhere=entries.some(other=>other.id!==entry.id&&other.players.includes(p));
+if(pickedElsewhere){
+b.disabled=true;
+b.classList.add('disabled');
+}
 b.addEventListener('click',()=>{
+if(pickedElsewhere)return;
 entry.players=[p];
 renderEntries();
 cbUpdatePreview();
@@ -288,6 +294,7 @@ if(entries.length<2)return null;
 const e1=entries[0],e2=entries[1];
 
 if(!e1.players.length||!e2.players.length)return null;
+if(e1.players[0]===e2.players[0])return null;
 if(e1.amount===''||e1.amount==null)return null;
 if(e2.amount===''||e2.amount==null)return null;
 
