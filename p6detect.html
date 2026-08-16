@@ -10,9 +10,6 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 .logo{font-size:48px;margin-bottom:10px;text-shadow:0 0 15px #00d4ff}
 .title{font-size:28px;font-weight:bold;color:#00d4ff;margin-bottom:10px}
 .message{font-size:16px;color:#aaa;margin-bottom:25px}
-.loader{width:45px;height:45px;margin:0 auto;border:5px solid #333;border-top:5px solid #00d4ff;border-radius:50%;animation:spin 1s linear infinite}
-@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.error{display:none;color:#ff5555;margin-top:20px}
 #nameInput{width:100%;box-sizing:border-box;padding:12px;border-radius:8px;border:1px solid #555;background:#111;color:white;font-size:16px;text-align:center;margin-bottom:12px}
 #nameInput::placeholder{color:#777}
 #startBtn{width:100%;padding:12px;border:0;border-radius:8px;background:#00d4ff;color:#000;font-weight:bold;font-size:16px;cursor:pointer}
@@ -29,9 +26,11 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 <button id="startBtn">START</button>
 <div id="error"></div>
 </div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
-async function startGame(){
+const socket=io();
+function startGame(){
 const input=document.getElementById('nameInput');
 const error=document.getElementById('error');
 const name=input.value.trim();
@@ -45,53 +44,14 @@ return;
 
 error.style.display='none';
 
-try{
-
-if(typeof io==='function'){
-
-const socket=io();
-socket.on('connect',()=>{
-console.log('WebSocket connected');
-console.log('Sending WebSocket command: !display p1 '+name);
-
 socket.emit('sendMessage',{
 bot:'player1bot',
 from:'player1bot',
 target:'##rento',
 msg:`!display p6 ${name}`
 });
-});
-
-socket.on('connect_error',err=>{
-console.error('WebSocket connection error:',err);
-});
-
-}else{
-throw new Error('Socket.IO is not loaded');
-}
-
-const response=await fetch('/send-irc',{
-method:'POST',
-headers:{'Content-Type':'application/json'},
-body:JSON.stringify({
-bot:'player1bot',
-target:'##rento',
-msg:`display p6 ${name}`
-})
-});
-
-if(!response.ok){
-const text=await response.text();
-throw new Error(text||'Failed to send IRC message');
-}
 
 detectDevice();
-
-}catch(e){
-console.error('Start game error:',e);
-error.textContent=e.message||'Unable to start the game.';
-error.style.display='block';
-}
 }
 
 function detectDevice(){
@@ -109,6 +69,7 @@ window.location.href='computer.html?p=6';
 }
 
 document.getElementById('startBtn').addEventListener('click',startGame);
+
 document.getElementById('nameInput').addEventListener('keydown',e=>{
 if(e.key==='Enter')startGame();
 });

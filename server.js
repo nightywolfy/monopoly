@@ -572,16 +572,13 @@ function createBot(nick,defaultTarget,options={}){
         reconnectDelay=9000;
         isConnecting=false;
         isConnected=true;
-
         if(reconnectTimer){
             clearTimeout(reconnectTimer);
             reconnectTimer=null;
         }
-
         if(defaultTarget){
             try{client.join(defaultTarget)}catch{}
         }
-
         if(nickServ?.identifyCommand){
             client.say('NickServ',nickServ.identifyCommand);
         }
@@ -779,19 +776,28 @@ io.on('connection',socket=>{
         }
 
         socket.on('sendMessage',payload=>{
-        if(!payload||typeof payload!=='object')return;
-        const{bot,from,msg,target}=payload;
-        const botId=from||bot;
-        if(typeof msg!=='string')return;
-        const cleanMsg=msg.trim().slice(0,200).replace(/\n/g,' ');
-        if(!cleanMsg)return;
-        const finalTarget=typeof target==='string'&&target.trim()?target.trim():'##rento';
-        if(finalTarget.toLowerCase()==='rentobot'){
-            safeEmit('rentoCommand',{from:botId||'web',msg:cleanMsg});
-            return;
-        }
-        if(!bots[botId])return;
-        bots[botId].say(finalTarget,cleanMsg);
+            if(!payload||typeof payload!=='object')return;
+            const{bot,from,msg,target}=payload;
+            const botId=from||bot;
+            if(typeof msg!=='string')return;
+            const cleanMsg=msg.trim().slice(0,200).replace(/\n/g,' ');
+            if(!cleanMsg)return;
+            const finalTarget=typeof target==='string'&&target.trim()?target.trim():'##rento';
+            if(finalTarget.toLowerCase()==='rentobot'){
+                safeEmit('rentoCommand',{from:botId||'web',msg:cleanMsg});
+                return;
+            }
+            if(!bots[botId])return;
+            bots[botId].say(finalTarget,cleanMsg);
+            if(cleanMsg.toLowerCase().startsWith('!display ')){
+                const parts=cleanMsg.split(/\s+/);
+                if(parts.length===3&&/^p[1-6]$/i.test(parts[1])){
+                    const result=commands.setDisplayLabel(parts[1].toLowerCase(),parts[2]);
+                    if(!result.ok){
+                        console.error(`[Socket] !display error: ${result.error}`);
+                    }
+                }
+            }
         });
         
         socket.on('getMoney',()=>socket.emit('moneyUpdate',money));
