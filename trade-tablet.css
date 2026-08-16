@@ -17,9 +17,9 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:black;font-fa
 .white{background:#ffffff;border-color:#cccccc;color:black}
 
 /* ==================== CENTRAL DISPLAY ==================== */
-#centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:20px;z-index:10}
-#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;width:360px}
-.moneyBox{padding:5px 9px;border-radius:11px;width:100%;height:50px;box-sizing:border-box;text-align:center;font-weight:bold;font-size:17px;display:flex;align-items:center;justify-content:center;word-wrap:break-word;box-shadow:0 0 10px rgba(0,212,255,.8),0 0 15px rgba(106,13,173,.6);border:2px solid rgba(255,255,255,.5);color:black}
+#centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:14px;z-index:10}
+#moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:600px}
+.moneyBox{padding:14px 18px;border-radius:16px;width:100%;height:90px;box-sizing:border-box;text-align:center;font-weight:bold;font-size:28px;display:flex;align-items:center;justify-content:center;word-wrap:break-word;box-shadow:0 0 10px rgba(0,212,255,.8),0 0 15px rgba(106,13,173,.6);border:2px solid rgba(255,255,255,.5);color:black}
 .moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
 .moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
 .moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
@@ -28,29 +28,42 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:black;font-fa
 .moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
 
 /* ==================== PLAYER / BUILDER PANEL ==================== */
-#playerContainer{width:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:10px;box-shadow:inset 0 0 35px rgba(0,212,255,.3);padding:10px;box-sizing:border-box}
+#playerContainer{width:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:8px;box-shadow:inset 0 0 30px rgba(0,212,255,.3);padding:8px;box-sizing:border-box}
 
 /* ==================== MODE BUTTONS ==================== */
-.mode-btn{padding:6px 12px;font-size:.85em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
+.mode-btn{padding:5px 10px;font-size:.78em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
 .mode-btn.active{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
 .mode-btn:hover{background:#333}
 .mode-btn.active:hover{background:#0077ff!important}
 
 /* ==================== COMMAND BUILDER BOXES (small, stacked) ==================== */
-#buildersRow{display:flex;flex-direction:column;gap:10px;width:100%;align-items:center}
-#quickAuctionColumn{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px}
+#buildersRow{display:flex;flex-direction:column;gap:8px;width:100%;align-items:center}
+#quickAuctionColumn{display:flex;flex-direction:column;gap:8px;width:100%;max-width:420px}
 
-#builder,#quickBuilder,#auctionBuilder,#switchBuilder{width:100%;max-width:320px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:10px;padding:8px;box-shadow:0 0 14px rgba(0,0,0,.4);box-sizing:border-box}
-#builder h2,#quickBuilder h2,#auctionBuilder h2,#switchBuilder h2{margin:0 0 8px;text-align:center;color:#FFD700;text-shadow:0 0 7px black;font-size:13px}
+#builder,#quickBuilder,#auctionBuilder,#switchBuilder{width:100%;max-width:420px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:10px;padding:8px;box-shadow:0 0 14px rgba(0,0,0,.4);box-sizing:border-box}
+#builder h2,#quickBuilder h2,#auctionBuilder h2,#switchBuilder h2{margin:0 0 6px;text-align:center;color:#FFD700;text-shadow:0 0 7px black;font-size:12px}
 
-.section{margin-bottom:8px}
-.section-label{font-size:10px;color:#aaa;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
-.btn-row{display:grid;gap:5px}
+/* #builder (trade offer menu) — shorter vertically, wider horizontally */
+#builder{max-width:none;width:100%;padding:6px 10px}
+#builder .section{margin-bottom:4px}
+#builder .btn-row{gap:4px}
+#builder .player-row{grid-template-columns:repeat(6,1fr)}
+#builder .amountInput{margin-top:3px;padding:5px 7px}
+#builder #preview{margin-bottom:4px;padding:5px 7px}
+#builder #pickSpaceBtn{margin-top:3px}
+
+/* ACCEPT / REJECT buttons — wider horizontally, not square anymore */
+#builder form{flex:1}
+#builder form button.small-button{width:100%;height:52px;font-size:15px;letter-spacing:.5px}
+
+.section{margin-bottom:6px}
+.section-label{font-size:9px;color:#aaa;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.btn-row{display:grid;gap:4px}
 .cmd-row{grid-template-columns:repeat(2,1fr)}
 .player-row{grid-template-columns:repeat(3,1fr)}
-#qcCmdRow{grid-template-columns:repeat(3,1fr);margin-bottom:8px}
+#qcCmdRow{grid-template-columns:repeat(3,1fr);margin-bottom:6px}
 
-button.opt{padding:6px 4px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-weight:bold;font-size:11px;cursor:pointer;transition:.15s}
+button.opt{padding:5px 3px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-weight:bold;font-size:10px;cursor:pointer;transition:.15s}
 button.opt:hover{filter:brightness(1.2)}
 button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-color:#00d4ff;box-shadow:0 0 8px #6a0dad}
 .player-row button.p1.selected{background:linear-gradient(135deg,#ff4d4d,#ff8080);color:black}
@@ -60,22 +73,22 @@ button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-co
 .player-row button.p5.selected{background:linear-gradient(135deg,#9933ff,#cc99ff)}
 .player-row button.p6.selected{background:#fff;color:black}
 
-.small-button{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer}
+.small-button{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:#222;cursor:pointer}
 .small-button img{width:100%;height:100%;object-fit:contain}
 
-.amountInput,#qcAmount{width:100%;box-sizing:border-box;padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-size:12px;margin-top:5px}
+.amountInput,#qcAmount{width:100%;box-sizing:border-box;padding:5px 7px;border-radius:6px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-size:11px;margin-top:4px}
 .amountInput::placeholder,#qcAmount::placeholder{color:#777}
 
-#preview,#qcPreview,#auctionPreview,#switchPreview{background:#000;border:1px solid #6a0dad;border-radius:6px;padding:6px 8px;font-family:monospace;font-size:11px;color:#00ffae;min-height:13px;margin-bottom:6px;word-break:break-all}
+#preview,#qcPreview,#auctionPreview,#switchPreview{background:#000;border:1px solid #6a0dad;border-radius:6px;padding:5px 7px;font-family:monospace;font-size:10px;color:#00ffae;min-height:12px;margin-bottom:5px;word-break:break-all}
 
-#enterBtn,#qcSendBtn,#auctionSendBtn,#switchSendBtn{width:100%;padding:8px;border:none;border-radius:7px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:12px;cursor:pointer;transition:.15s}
+#enterBtn,#qcSendBtn,#auctionSendBtn,#switchSendBtn{width:100%;padding:7px;border:none;border-radius:7px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:11px;cursor:pointer;transition:.15s}
 #enterBtn:hover,#qcSendBtn:hover,#auctionSendBtn:hover,#switchSendBtn:hover{filter:brightness(1.1)}
 #enterBtn:disabled,#qcSendBtn:disabled,#auctionSendBtn:disabled,#switchSendBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}
 
-#pickSpaceBtn,#auctionPickBtn{width:100%;margin-top:5px;background:#1a1a1a;font-size:11px}
+#pickSpaceBtn,#auctionPickBtn{width:100%;margin-top:4px;background:#1a1a1a;font-size:10px}
 #auctionPickBtn.selected{background:linear-gradient(135deg,#00c853,#69f0ae)!important;color:black;box-shadow:0 0 8px #00c853}
 
-#cmdLog{margin-top:8px;max-height:70px;overflow-y:auto;font-family:monospace;font-size:9px;color:#888;border-top:1px solid rgba(255,255,255,.1);padding-top:5px;width:100%;max-width:320px;box-sizing:border-box}
+#cmdLog{margin-top:6px;max-height:60px;overflow-y:auto;font-family:monospace;font-size:8px;color:#888;border-top:1px solid rgba(255,255,255,.1);padding-top:4px;width:100%;max-width:420px;box-sizing:border-box}
 #cmdLog div{padding:2px 0}
 
 /* ==================== ENTRIES ==================== */
@@ -86,9 +99,9 @@ button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-co
 .spacePicked.entryColor4{outline-color:limegreen!important}
 .spacePicked.entryColor5{outline-color:#9933ff!important}
 .spacePicked.entryColor6{outline-color:#ffffff!important}
-.entryCard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:6px;margin-bottom:6px}
-.entryCard .entryTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.entryCard .entryTop span{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.4px}
-.removeEntryBtn{background:#3a1010;color:#ff8080;border:1px solid #661a1a;border-radius:5px;padding:2px 5px;font-size:9px;cursor:pointer}
-.entryCard .spacesLabel,.spacesLabel{font-size:9px;color:#00ffae;margin-top:5px;min-height:11px;word-break:break-all}
+.entryCard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:5px;margin-bottom:5px}
+.entryCard .entryTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.entryCard .entryTop span{font-size:8px;color:#aaa;text-transform:uppercase;letter-spacing:.4px}
+.removeEntryBtn{background:#3a1010;color:#ff8080;border:1px solid #661a1a;border-radius:5px;padding:2px 4px;font-size:8px;cursor:pointer}
+.entryCard .spacesLabel,.spacesLabel{font-size:8px;color:#00ffae;margin-top:4px;min-height:10px;word-break:break-all}
 }

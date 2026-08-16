@@ -13,11 +13,10 @@ class MonopolyBot(SingleServerIRCBot):
         self.house_costs = {"red":200,"orange":180,"yellow":150,"green":100,"blue":100,"pink":150,"brown":60,"dblue":60,"white":60,"purple":80,"aqua":100,"black":130}
         self.house_rents = {1:[5,20,30,90,160,250],3:[10,30,60,180,320,450],6:[10,40,90,270,400,550],8:[10,40,90,270,400,550],9:[15,50,100,300,450,600],11:[15,50,150,450,625,750],12:[15,50,150,450,625,750],14:[20,60,180,500,700,900],16:[20,70,200,550,750,950],17:[20,70,200,550,750,950],19:[30,80,220,600,800,1000],21:[30,90,250,700,875,1050],22:[30,90,250,700,875,1050],24:[40,100,300,750,925,1100],26:[40,110,330,800,975,1150],28:[40,110,330,800,975,1150],29:[50,120,360,850,1025,1200],31:[50,130,390,900,1100,1275],33:[50,150,450,1000,1200,1400],34:[60,150,450,1000,1200,1400],37:[60,175,500,1100,1300,1500],39:[80,200,600,1400,1700,2000],41:[15,50,100,300,450,600],42:[15,50,100,300,450,600],44:[30,80,220,600,800,1000],45:[30,80,220,600,800,1000],47:[30,90,250,700,875,1050],50:[25,70,180,450,650,800],51:[25,70,180,450,650,800],53:[25,75,200,500,700,850],56:[50,120,360,850,1025,1200],57:[50,120,360,850,1025,1200],59:[50,130,390,900,1100,1275],63:[15,50,150,450,625,750]}
         self.mortgage_table = {1:30,3:40,4:100,5:100,6:50,8:50,9:60,11:75,12:75,13:100,14:90,15:100,16:100,17:100,19:110,21:110,22:110,24:120,25:100,26:140,27:100,28:140,29:150,31:150,33:150,34:160,35:100,37:180,38:100,39:200,40:100,41:60,42:60,44:110,45:110,46:100,47:120,50:90,51:90,52:100,53:100,56:150,57:150,58:100,59:160,63:70}
-        self.house_numbers = {"red":(2,4,6,8),"dblue":(2,4,6,8),"orange":(3,6,9,12),"yellow":(3,6,9,12),"green":(3,6,9,12),"blue":(3,6,9,12),"pink":(3,6,9,12),"brown":(3,6,9,12),"white":(3,6,9,12),"aqua":(3,6,9,12),"purple":(3,6,9,12),"black":(3,6,9,12)}
         self.color_sets={"dblue":[1,3],"brown":[6,8,9],"blue":[11,12,14],"green":[16,17,19],"yellow":[21,22,24],"pink":[26,28,29],"orange":[31,33,34],"red":[37,39],"white":[41,42,63],"aqua":[44,45,47],"purple":[50,51,53],"black":[56,57,59]}
         self.unmortgaged_colors = {"p1":"red","p2":"blue","p3":"orange","p4":"green","p5":"purple","p6":"white"}
-        self.mortgaged_colors = {"p1":"lightpink","p2":"lightblue","p3":"#FFFD01","p4":"lightgreen","p5":"plum","p6":"black"}
-        self.mortgaged2_colors = {"m1":"lightpink","m2":"lightblue","m3":"#FFFD01","m4":"lightgreen","m5":"plum","m6":"black"}
+        self.mortgaged_colors = {"p1":"#FD829A","p2":"lightblue","p3":"#FFFD01","p4":"lightgreen","p5":"#D669FA","p6":"black"}
+        self.mortgaged2_colors = {"m1":"#FD829A","m2":"lightblue","m3":"#FFFD01","m4":"lightgreen","m5":"#D669FA","m6":"black"}
         self.default_board = self.board_regular.copy()
         self.reset_state()
         self.go_enabled = False
@@ -41,6 +40,8 @@ class MonopolyBot(SingleServerIRCBot):
         self.msg_worker.start()
         self.disabled_dice = set()
         self.admin_users = {u.lower() for u in {"juntao", "crinjal"}}
+        self.space62_mortgage_block=False
+        self.space62_mortgage_unlock_on_roll=False
         self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "https://monopoly-production-ef33.up.railway.app")
         self.sio = socketio.Client(reconnection=True, reconnection_delay=2, reconnection_delay_max=10)
         self._setup_ws_handlers()
@@ -122,6 +123,8 @@ class MonopolyBot(SingleServerIRCBot):
         self.free_loans={}
         self.go_jail_attempts={'p1':0,'p2':0}
         self.custom_names={}
+        self.space62_mortgage_block=False
+        self.space62_mortgage_unlock_on_roll=False
     def pname(self,msg):
         if not msg:return msg
         for p,name in self.custom_names.items():msg=re.sub(rf"\b{p}\b",name,msg)
@@ -512,7 +515,7 @@ class MonopolyBot(SingleServerIRCBot):
                 msg=None
                 success=False
                 pos=int(m.group(1))
-                if any(self.players[p].get("pos")==62 for p in self.players):
+                if self.space62_mortgage_block:
                     msg="Cannot mortgage while a player is on space 62"
                 elif self.current_auction:
                     msg="Cannot mortgage during an auction"
@@ -555,9 +558,7 @@ class MonopolyBot(SingleServerIRCBot):
                 msg=None
                 success=False
                 pos=int(m.group(1))
-                if any(self.players[p].get("pos")==62 for p in self.players):
-                    msg="Cannot redeem/unmortgage while a player is on space 62"
-                elif self.current_auction:
+                if self.current_auction:
                     msg="Cannot redeem/unmortgage during an auction"
                 elif pos not in self.properties:
                     msg=f"Position {pos} is not owned."
@@ -866,6 +867,8 @@ class MonopolyBot(SingleServerIRCBot):
             msg+=f"{display} received 100 free loan"
             self.sio.emit("cmd-sound",{"file":"bonus.mp3"})
         elif new==62:
+            self.space62_mortgage_block=True
+            self.space62_mortgage_unlock_on_roll=True
             msg+=f"{display} can auction any unowned property"
         elif new==30:
             self.jailed[p]=True
@@ -996,6 +999,9 @@ class MonopolyBot(SingleServerIRCBot):
                 if not self.jailed.get(pl_key,False):c.privmsg(self.channel,f"{display} cannot use !dice4. Not in jail.");return
             elif self.jailed.get(pl_key,False):c.privmsg(self.channel,f"{display} is in jail! Only !dice4 can be used.");return
             self.dice4_streak[pl_key]=self.dice4_streak.get(pl_key,0)+1 if d=="dice4" else 0
+            if self.space62_mortgage_unlock_on_roll:
+                self.space62_mortgage_block=False
+                self.space62_mortgage_unlock_on_roll=False
         getattr(self,f"_handle_{d}",lambda*a:None)(c,p)
         if d=="dice4" and self.dice4_streak.get(pl_key,0)>=3 and self.jailed.get(pl_key,False):
             self.dice4_streak[pl_key]=0;self.jailed[pl_key]=False
@@ -1004,7 +1010,9 @@ class MonopolyBot(SingleServerIRCBot):
             except:pass
         with self.dice_lock:
             r=self.dice_rolls.get(p)
-            if r and r[0]!=r[1]:self.expected_player_index=(self.expected_player_index+1)%len(self.dice_order)
+            if r and r[0]!=r[1]:
+                self.expected_player_index=(self.expected_player_index+1)%len(self.dice_order)
+                
     def _handle_dice0(self,c,p):self._roll_and_handle(c,p,[1,2,3,4,5,6],[1,2,3,4,5,6],"dice0",True)
     def _handle_dice1(self,c,p):self._roll_and_handle(c,p,[1,1,2,2,3,3],[1,1,2,2,3,3],"dice1",True)
     def _handle_dice2(self,c,p):self._roll_and_handle(c,p,[1,1,2,2,3,3],[4,4,5,5,6,6],"dice2",True)

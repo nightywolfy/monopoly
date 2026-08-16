@@ -1,16 +1,16 @@
 Update Changelog:
 
-1. Prevented dice rolls while an auction is active to maintain proper game flow and prevent conflicts between auctions and player turns.
-2. Fixed an issue where houses were not displaying correctly on the inner board (Spaces 40–63).
+1. Prevented dice rolls while an auction is active.
+2. Fixed an issue where houses were not displaying correctly on the inner board.
 3. Updated the auction system from a traditional player-turn-based format to a Richup-style auction system.
 4. Added an automatic fold feature that activates after 12 seconds of auction inactivity.
 5. Added automatic update execution to reduce the need for manual updates.
 6. Implemented automatic jail release after three turns if a player fails to roll a double.
 7. Added the jailpay command with an adjusted bail system based on the number of turns spent in jail.
-8. Added the freeloan command for Free Parking (Space 20).
+8. Added the freeloan command for Parking (Space 20).
 9. Added the insert command, allowing additional players to join an active game session.
 10. Added the gobonus command for managing GO bonus features.
-11. Added administrative controls for forcing trades between players.
+11. Added administrative controls allowing administrators to trade on behalf of other players.
 12. Converted Space 62 (Go To Jail) into an auction space.
 13. Added full compatibility for mobile phones.
 14. Redesigned and repositioned map buttons toward the center of the board with improved visual styling.
@@ -21,24 +21,24 @@ Update Changelog:
 19. Improved command response performance by reducing propertylist execution time from approximately 60 seconds to 20 seconds.
 20. Fixed an issue where jailpay could be used outside of the player's active turn.
 21. Updated house management controls to allow adding or removing one house at a time instead of modifying three houses simultaneously.
-22. Added property house-count display support, showing the number of houses built on each property (1–4 houses).
+22. Added property house-count display support, showing the number of houses built on each property.
 23. Added a restriction preventing switch from being used with players currently in jail.
 24. Updated turn-ending messages to correctly display the next player's turn (for example, "Player 3 turn" instead of "Player 2 turn ended").
 25. Added smoother button transitions when switching between Mortgage and Redeem modes.
 26. Added button-press visual effects to improve user interaction.
 27. Added housestatus to the All Players page, making house and property monitoring easier.
-28. Added rename support, allowing players to replace default player names (p1–p6) with custom names.
-29. Improved status with a cleaner layout, property names, and individual player lookup support (for example, status p1).
-30. Added the display command to allow customization of the player names shown on the MoneyBox display (p1-name through p6-name).
+28. Improved status with a cleaner layout, property names, and individual player lookup support (for example, !status p1).
+29. Added rename support, allowing players to replace default player names with custom names.
+30. Added the display command to allow customization of the player names shown on the MoneyBox display.
 31. Added a Trade Menu to improve trade management.
-32. Reduced the bidding sound volume for a more comfortable user experience.
+32. Reduced the bidding sound volume.
 33. Increased the size of board dots to improve visibility.
 34. Added full compatibility for iPad and Android tablets.
 35. Removed the separate mobile page section and integrated mobile device support directly into the main page.
 36. Updated the dice sound effect used when rolling the jail dice.
 37. Enhanced the Trade Menu with additional commands.
 38. Added a name input section for each player, requiring players to enter their name before proceeding.
-39. Replaced separate HTML files for p1–p6 with a unified page using the /?p=X URL parameter to dynamically identify the player.
+39. Replaced separate HTML files for all players with a unified page using the /?p=X URL parameter to dynamically identify the player.
 40. Implemented WebSocket communication for approximately 90% of game inputs, significantly reducing latency and improving overall responsiveness. Property and house updates are now processed in under one second.
 41. Prevented mortgage and unmortgage actions after any player lands on Space 62.
 42. Fixed an issue preventing players with a negative balance from trading.
