@@ -238,7 +238,7 @@ pickBtn.type='button';
 pickBtn.className='opt';
 pickBtn.style.width='100%';
 pickBtn.style.marginTop='6px';
-pickBtn.textContent=entry.picking?'? Done picking spaces':'?? Pick space(s) for this entry';
+pickBtn.textContent=entry.picking?'Done picking':'Pick space for this entry';
 if(entry.picking)pickBtn.classList.add('selected');
 
 pickBtn.addEventListener('click',()=>{
@@ -517,15 +517,32 @@ const switchSendBtn=document.getElementById('switchSendBtn');
 
 let switchPlayer1=null,switchPlayer2=null;
 
+function switchRefreshDisabled(){
+switchPlayerRow1.querySelectorAll('button').forEach(btn=>{
+const p=['p1','p2','p3','p4','p5','p6'].find(x=>btn.classList.contains(x));
+const disabled=p===switchPlayer2;
+btn.disabled=disabled;
+btn.classList.toggle('disabled',disabled);
+});
+switchPlayerRow2.querySelectorAll('button').forEach(btn=>{
+const p=['p1','p2','p3','p4','p5','p6'].find(x=>btn.classList.contains(x));
+const disabled=p===switchPlayer1;
+btn.disabled=disabled;
+btn.classList.toggle('disabled',disabled);
+});
+}
+
 ['p1','p2','p3','p4','p5','p6'].forEach(p=>{
 const b=document.createElement('button');
 b.type='button';
 b.className=`opt ${p}`;
 b.textContent=p.toUpperCase();
 b.addEventListener('click',()=>{
+if(p===switchPlayer2)return;
 switchPlayer1=p;
 switchPlayerRow1.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
 b.classList.add('selected');
+switchRefreshDisabled();
 switchUpdatePreview();
 });
 switchPlayerRow1.appendChild(b);
@@ -537,9 +554,11 @@ b.type='button';
 b.className=`opt ${p}`;
 b.textContent=p.toUpperCase();
 b.addEventListener('click',()=>{
+if(p===switchPlayer1)return;
 switchPlayer2=p;
 switchPlayerRow2.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
 b.classList.add('selected');
+switchRefreshDisabled();
 switchUpdatePreview();
 });
 switchPlayerRow2.appendChild(b);
@@ -547,6 +566,7 @@ switchPlayerRow2.appendChild(b);
 
 function switchBuildCommand(){
 if(!switchPlayer1||!switchPlayer2)return null;
+if(switchPlayer1===switchPlayer2)return null;
 return `!switch ${switchPlayer1} ${switchPlayer2}`;
 }
 

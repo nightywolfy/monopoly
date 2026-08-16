@@ -84,7 +84,6 @@
 const p=parseInt(new URLSearchParams(location.search).get("p"))||1,bot=`player${p}bot`;
 document.body.dataset.bot=bot;
 document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
-document.querySelectorAll('[name="bot"]').forEach(e=>e.value=bot);
 document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
 document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
 
