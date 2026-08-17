@@ -31,8 +31,8 @@ For 3-6 Player Game:
 16. Landing on space 62 in the inner board gives the player the option to start an auction for any unowned property of their choice.
 
 Start Game:
-!start <number of players> <deep/regular> <amount>
-Examples:  !start 6 deep 1400 | !start 4 regular 1200
+!start <number of players> <deep/regular> <amount> (autofold timer in seconds/default is 12 seconds)
+Examples:  !start 6 deep 1400 15 | !start 4 regular 1200 10
 
 Commands that needs to run during a game:
 !auction 39 (manually start auction on china)

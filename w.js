@@ -143,6 +143,7 @@ const group2 = [11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
 const boardButtonsContainer = document.getElementById('boardButtons');
 const modeButtons=document.querySelectorAll('.mode-btn');
 let currentMode='mortgage';
+const modeLabels={mortgage:'Mortgage',redeem:'Redeem',addhouse:'AddHouse',removehouse:'RemoveHouse'};
 modeButtons.forEach(btn=>{
 btn.addEventListener('click',()=>{
 modeButtons.forEach(b=>b.classList.remove('active'));

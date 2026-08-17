@@ -4,7 +4,7 @@ Update Changelog:
 2. Fixed an issue where houses were not displaying correctly on the inner board.
 3. Updated the auction system from a traditional player-turn-based format to a Richup-style auction system.
 4. Added an automatic fold feature that activates after 12 seconds of auction inactivity.
-5. Added automatic update execution to reduce the need for manual updates.
+5. Added automatic update execution to reduce the need of any manual updates.
 6. Implemented automatic jail release after three turns if a player fails to roll a double.
 7. Added the jailpay command with an adjusted bail system based on the number of turns spent in jail.
 8. Added the freeloan command for Parking (Space 20).
@@ -40,8 +40,11 @@ Update Changelog:
 38. Added a name input section for each player, requiring players to enter their name before proceeding.
 39. Replaced separate HTML files for all players with a unified page using the /?p=X URL parameter to dynamically identify the player.
 40. Implemented WebSocket communication for approximately 90% of game inputs, significantly reducing latency and improving overall responsiveness. Property and house updates are now processed in under one second.
-41. Prevented mortgage and unmortgage actions after any player lands on Space 62.
+41. Prevented mortgage actions after any player lands on Space 62.
 42. Fixed an issue preventing players with a negative balance from trading.
 43. Added automatic housestatus updates after successful addhouse or removehouse actions, eliminating the need to use the House button.
 44. Resolved an issue that caused the Trade Menu to malfunction following the WebSocket update.
-45. Removed player2bot through player6bot, which were no longer needed after the implementation of WebSocket communication.
+45. Removed player2bot through player6bot, which were no longer needed following the implementation of WebSocket communication.
+46. Added a configurable autofold timer in seconds to the !start command, with a maximum setting of 30 seconds.
+47. Updated the mortgage system to apply the 10% penalty when unmortgaging, in accordance with the official Monopoly rules, rather than when mortgaging.
+48. Removed the plus/minus house buttons and replaced them with AddHouse/RemoveHouse mode toggles.

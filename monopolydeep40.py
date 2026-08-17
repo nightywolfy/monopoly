@@ -539,14 +539,13 @@ class MonopolyBot(SingleServerIRCBot):
                         if val<=0:
                             msg=f"Property {pos} cannot be mortgaged"
                         else:
-                            pen=int(val*0.10)
-                            self.players[owner]['money']+=val-pen
+                            self.players[owner]['money']+=val
                             self.mortgaged.add(pos)
                             old=self.active_board.get(pos,f"Position {pos}")
                             name=old.split('-',1)[-1] if '-' in old else old
                             pref=f"m{owner[-1]}" if owner.startswith("p") else f"m-{owner}"
                             self.active_board[pos]=f"{pref}-{name}"
-                            msg=f"mortgaged {owner_display} {name} for {val-pen} (10% penalty)"
+                            msg=f"mortgaged {owner_display} {name} for {val}"
                             success=True
                             self.sio.emit("cmd-sound",{"file":"mortgage.mp3"})
                             self.sio.emit("cmd-dot",{"num":pos,"color":self.mortgaged_colors.get(owner,"black")})
@@ -575,15 +574,17 @@ class MonopolyBot(SingleServerIRCBot):
                         msg=f"Property {pos} is not mortgaged."
                     else:
                         cost=self.mortgage_table.get(pos,0)
-                        if self.players[owner]['money']<cost:
-                            msg=f"{owner_display} does not have enough money to unmortgage {pos} ({cost})"
+                        interest=int(cost*0.10)
+                        total=cost+interest
+                        if self.players[owner]['money']<total:
+                            msg=f"{owner_display} does not have enough money to unmortgage {pos} ({total})"
                         else:
-                            self.players[owner]['money']-=cost
+                            self.players[owner]['money']-=total
                             self.mortgaged.remove(pos)
                             old=self.active_board.get(pos,f"Position {pos}")
                             name=old.split('-',1)[-1] if '-' in old else old
                             self.active_board[pos]=f"{owner}-{name}"
-                            msg=f"redeemed {owner_display} {name} for {cost}"
+                            msg=f"redeemed {owner_display} {name} for {total} ({cost} + 10% interest)"
                             success=True
                             self.sio.emit("cmd-sound",{"file":"redeem.mp3"})
                             self.sio.emit("cmd-dot",{"num":pos,"color":self.unmortgaged_colors.get(owner,"red")})
@@ -593,11 +594,12 @@ class MonopolyBot(SingleServerIRCBot):
                     self.auto_up()
             return True,None
             
-        m=re.match(r"!addonehouse\s+(\w+)",body)
+        m=re.match(r"!addonehouse\s+(\d+)",body)
         if m:
             if self.current_auction:return False,"Cannot add houses during an auction"
-            color=m.group(1)
-            if color not in self.color_sets:return False,f"Color {color} does not exist"
+            pos=int(m.group(1))
+            color=next((c for c,props in self.color_sets.items() if pos in props),None)
+            if color is None:return False,f"Position {pos} is not part of a color set"
             props=self.color_sets[color];owners=[self.properties.get(x) for x in props]
             if None in owners or any(isinstance(o,str) and o.startswith("x-") for o in owners if o):
                 missing=[str(x) for x,o in zip(props,owners) if o is None or (isinstance(o,str) and o.startswith("x-"))]
@@ -607,23 +609,26 @@ class MonopolyBot(SingleServerIRCBot):
             if caller_key!=owner:return False,f"Only the owner ({self.pname(owner)}) or their alias can add houses to this set"
             mort=[str(x) for x in props if x in self.mortgaged]
             if mort:return False,f"Cannot add houses: these properties are mortgaged: {', '.join(mort)}"
-            candidates=[x for x in props if self.houses.get(x,0)<5]
-            if not candidates:return False,f"Cannot add houses: {color} set already at max (5 each)"
-            candidates.sort(key=lambda x:(self.houses.get(x,0),x))
-            target=candidates[0];cost=self.house_costs.get(color,0)
+            if self.houses.get(pos,0)>=5:return False,f"Cannot add house: property {pos} already at max (5)"
+            min_houses=min(self.houses.get(x,0) for x in props)
+            if self.houses.get(pos,0)>min_houses:
+                lowest=[str(x) for x in props if self.houses.get(x,0)==min_houses]
+                return False,f"Must build evenly: add to {', '.join(lowest)} first (fewest houses in {color} set)"
+            cost=self.house_costs.get(color,0)
             if self.players[owner]['money']<cost:return False,f"{self.pname(owner)} does not have enough money to buy a house ({cost} required)"
             self.players[owner]['money']-=cost
-            self.houses[target]=self.houses.get(target,0)+1
+            self.houses[pos]=self.houses.get(pos,0)+1
             self.sio.emit("cmd-sound",{"file":"build1.mp3"})
             try:self.handle_command(caller,"!housestatus")
             except Exception:pass
-            return True,self.pname(f"Added 1 house to property {target} in {color} set. {owner} charged {cost}")
+            return True,self.pname(f"Added 1 house to property {pos} in {color} set. {owner} charged {cost}")
 
-        m=re.match(r"!removeonehouse\s+(\w+)",body)
+        m=re.match(r"!removeonehouse\s+(\d+)",body)
         if m:
             if self.current_auction:return False,"Cannot remove houses during an auction"
-            color=m.group(1)
-            if color not in self.color_sets:return False,f"Color {color} does not exist"
+            pos=int(m.group(1))
+            color=next((c for c,props in self.color_sets.items() if pos in props),None)
+            if color is None:return False,f"Position {pos} is not part of a color set"
             props=self.color_sets[color];owners=[self.properties.get(x) for x in props]
             if None in owners or any(isinstance(o,str) and o.startswith("x-") for o in owners if o):
                 missing=[str(x) for x,o in zip(props,owners) if o is None or (isinstance(o,str) and o.startswith("x-"))]
@@ -631,16 +636,18 @@ class MonopolyBot(SingleServerIRCBot):
             if len(set(owners))!=1:return False,f"Cannot remove houses: not all properties in {color} set are owned by the same player"
             owner=owners[0];caller_key=next((k for k,s in self.aliases.items() if caller in s or caller==k),caller)
             if caller_key!=owner:return False,f"Only the owner ({self.pname(owner)}) or their alias can remove houses from this set"
-            candidates=[x for x in props if self.houses.get(x,0)>0]
-            if not candidates:return False,f"Cannot remove house: {color} set already has 0 houses"
-            candidates.sort(key=lambda x:(-self.houses.get(x,0),-x))
-            target=candidates[0];refund=self.house_costs.get(color,0)//2
+            if self.houses.get(pos,0)<=0:return False,f"Cannot remove house: property {pos} already has 0 houses"
+            max_houses=max(self.houses.get(x,0) for x in props)
+            if self.houses.get(pos,0)<max_houses:
+                highest=[str(x) for x in props if self.houses.get(x,0)==max_houses]
+                return False,f"Must remove evenly: remove from {', '.join(highest)} first (most houses in {color} set)"
+            refund=self.house_costs.get(color,0)//2
             self.players[owner]['money']+=refund
-            self.houses[target]=max(0,self.houses.get(target,0)-1)
+            self.houses[pos]=max(0,self.houses.get(pos,0)-1)
             self.sio.emit("cmd-sound",{"file":"destroy1.mp3"})
             try:self.handle_command(caller,"!housestatus")
             except Exception:pass
-            return True,self.pname(f"Removed 1 house from property {target} in {color} set. {owner} refunded {refund}")
+            return True,self.pname(f"Removed 1 house from property {pos} in {color} set. {owner} refunded {refund}")
 
         m=re.match(r"!save\s*(\S+)?",body)
         if m:
