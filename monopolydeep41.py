@@ -1,13 +1,10 @@
 import re,random,pickle,os,time,threading,queue,socketio
 CONSECUTIVE_DOUBLES_FOR_TELEPORT=3
 class ChatConnection:
-    """Socket.IO replacement for the old IRC ServerConnection."""
     def __init__(self,bot):
         self._bot=bot
-
     def privmsg(self,target,text):
         self._bot.send_chat(target,text)
-
 class MonopolyBot:
     def __init__(self, ch='##rento', nick='player1bot', users=None, num_players=6, ws_url=None):
         self.channel = ch.lower()
@@ -53,10 +50,8 @@ class MonopolyBot:
         self._setup_ws_handlers()
         self.ws_thread = threading.Thread(target=self._run_ws_client, daemon=True)
         self.ws_thread.start()
-
     def any_player_negative(self):
         return any(p["money"]<0 for p in self.players.values())
-
     def send_chat(self,target,text):
         if not text:return
         try:
@@ -68,7 +63,6 @@ class MonopolyBot:
                 self.sio.emit('chat-message',{'msg':f'@{target} {text}'})
         except Exception as e:
             print(f'[WS] send_chat error: {e}')
-
     def _setup_ws_handlers(self):
         @self.sio.event
         def connect():
@@ -82,7 +76,7 @@ class MonopolyBot:
     def _run_ws_client(self):
         while True:
             try:
-                self.sio.connect(self.ws_url, wait_timeout=10)
+                self.sio.connect(self.ws_url,wait_timeout=10)
                 self.sio.wait()
             except Exception as e:
                 print(f"[WS] Connection error: {e}")

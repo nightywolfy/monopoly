@@ -1,9 +1,5 @@
 const socket = io();
-// The trade panel is a GM/admin console, not tied to any one player, but the
-// server only forwards chat commands to the game bot when they come from a
-// p1-p6 identity. 'p1' here is just a pass-through label to satisfy that
-// check — it doesn't mean these commands are attributed to the real p1.
-const GM_IDENTITY = 'p1';
+const BOT_NAME = 'player1bot';
 let currentMap = 2;
 let labels = {p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
 let activeDots = {};
@@ -89,13 +85,14 @@ window.addEventListener('resize',scaleBoard);
 scaleBoard();
 
 document.addEventListener("DOMContentLoaded",()=>{
-document.querySelectorAll('#builder button[data-cmd]').forEach(btn=>{
-btn.addEventListener("click",()=>{
-const cmd=btn.dataset.cmd;
-socket.emit('sendMessage',{from:GM_IDENTITY,target:'##rento',msg:cmd});
-const line=document.createElement('div');
-line.textContent=`Sent: ${cmd}`;
-cmdLog.prepend(line);
+document.querySelectorAll('form[target="hiddenFrame"]').forEach(form=>{
+form.addEventListener("submit",function(e){
+e.preventDefault();
+const bot=form.querySelector('[name="bot"]').value;
+const msg=form.querySelector('[name="msg"]').value;
+const targetInput=form.querySelector('[name="target"]');
+const target=targetInput?.value||undefined;
+fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
 });
 });
 });
@@ -346,7 +343,7 @@ const cmd=cbBuildCommand();
 if(!cmd)return;
 
 socket.emit('sendMessage',{
-from:GM_IDENTITY,
+bot:BOT_NAME,
 target:'##rento',
 msg:cmd
 });
@@ -437,7 +434,7 @@ const cmd=qcBuildCommand();
 if(!cmd)return;
 
 socket.emit('sendMessage',{
-from:GM_IDENTITY,
+bot:BOT_NAME,
 target:'##rento',
 msg:cmd
 });
@@ -501,7 +498,7 @@ const cmd=auctionBuildCommand();
 if(!cmd)return;
 
 socket.emit('sendMessage',{
-from:GM_IDENTITY,
+bot:BOT_NAME,
 target:'##rento',
 msg:cmd
 });
@@ -591,7 +588,7 @@ const cmd=switchBuildCommand();
 if(!cmd)return;
 
 socket.emit('sendMessage',{
-from:GM_IDENTITY,
+bot:BOT_NAME,
 target:'##rento',
 msg:cmd
 });

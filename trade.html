@@ -38,9 +38,9 @@
 <h2>Trade Menu</h2>
 <button id="resetBtn" class="small-button" style="width:100%;margin-bottom:8px">RESET</button>
 <div style="display:flex;gap:8px;margin-bottom:8px;">
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!accept"><button type="submit" class="small-button">Accept</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!reject"><button type="submit" class="small-button">Reject</button></form>
-<form action="/send-irc" method="POST" target="hiddenFrame"><input type="hidden" name="bot" value="player1bot"><input type="hidden" name="msg" value="!save"><button type="submit" class="small-button">Save</button></form>
+<button type="button" class="small-button" data-cmd="!accept">Accept</button>
+<button type="button" class="small-button" data-cmd="!reject">Reject</button>
+<button type="button" class="small-button" data-cmd="!save">Save</button>
 </div>
 <div class="section">
 <div class="section-label">Entries</div>
