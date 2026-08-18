@@ -571,7 +571,7 @@ timestamp:Date.now()
 });
 }
 
-function processChatCommand(player,raw,socket,viaPrivate=false){
+function processChatCommand(player,raw,socket){
 const message=cleanChatMessage(raw);
 if(!message.startsWith('!')&&!message.startsWith('/'))return{handled:false,ok:true};
 
@@ -705,11 +705,6 @@ result=commands.playSound(args[0]);
 break;
 
 default:
-if(/^p[1-6]$/i.test(String(player||''))){
-safeEmit('rentoCommand',{from:player,msg:fullCmd.trim(),via:viaPrivate?'private':'public'});
-result={ok:true};
-break;
-}
 return{handled:true,ok:false,error:`Unknown command: ${cmd}`};
 }
 
@@ -806,7 +801,7 @@ const target=typeof payload.to==='string'?payload.to.toLowerCase():'';
 const msg=cleanChatMessage(payload.msg);
 if(target!==BOT_NAME.toLowerCase()||!msg)return;
 if(msg.startsWith('!')||msg.startsWith('/')){
-const result=processChatCommand(player,msg,socket,true);
+const result=processChatCommand(player,msg,socket);
 socket.emit('cmd-ack',result);
 sendPrivateResponse(socket,player,result);
 }
