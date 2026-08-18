@@ -1,17 +1,18 @@
 {
-  "name": "monopolybot",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
+  "name":"monopolybot",
+  "version":"1.0.0",
+  "private":true,
+  "type":"module",
+  "main":"server.js",
+  "scripts":{
+    "start":"node server.js"
   },
-  "engines": {
-    "node": ">=18"
+  "engines":{
+    "node":">=20"
   },
-  "dependencies": {
-    "express": "^4.22.2",
-    "irc-framework": "^4.14.0",
-    "socket.io": "^4.8.3"
+  "dependencies":{
+    "express":"^4.22.2",
+    "socket.io":"^4.8.3"
   }
 }
+
