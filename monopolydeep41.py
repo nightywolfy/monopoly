@@ -41,7 +41,7 @@ class MonopolyBot:
         self.msg_worker = threading.Thread(target=self._process_msg_queue, daemon=True)    
         self.msg_worker.start()
         self.disabled_dice = set()
-        self.admin_users = {u.lower() for u in {"juntao", "crinjal"}}
+        self.admin_users={f'{n}{i}' for n in ('ford','Ford','FORD','crinjal','Crinjal','CRINJAL') for i in range(1,10)}
         self.space62_mortgage_block=False
         self.space62_mortgage_unlock_on_roll=False
         self.connection = ChatConnection(self)
