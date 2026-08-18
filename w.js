@@ -1,11 +1,11 @@
-const socket = io();
-const BOT_NAME = document.body.dataset.bot;
-let currentMap = 2;
-let labels = {p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
-let activeDots = {};
-let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
-let buildingPositions = {};
-let lastBuildingsData = null;
+const socket=io();
+const BOT_NAME=document.body.dataset.bot;
+let currentMap=2;
+let labels={p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
+let activeDots={};
+let lastMoney={p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
+let buildingPositions={};
+let lastBuildingsData=null;
 
 function renderDotsFromServer(data){
 const board=document.getElementById('board');
@@ -31,21 +31,21 @@ activeDots[num]=el;
 }
 
 function renderMoneyBoxes(){
-document.getElementById('money-p1-overlay').textContent = labels.p1 + ': $' + lastMoney.p1;
-document.getElementById('money-p2-overlay').textContent = labels.p2 + ': $' + lastMoney.p2;
-document.getElementById('money-p3-overlay').textContent = labels.p3 + ': $' + lastMoney.p3;
-document.getElementById('money-p4-overlay').textContent = labels.p4 + ': $' + lastMoney.p4;
-document.getElementById('money-p5-overlay').textContent = labels.p5 + ': $' + lastMoney.p5;
-document.getElementById('money-p6-overlay').textContent = labels.p6 + ': $' + lastMoney.p6;
+document.getElementById('money-p1-overlay').textContent=labels.p1+': $'+lastMoney.p1;
+document.getElementById('money-p2-overlay').textContent=labels.p2+': $'+lastMoney.p2;
+document.getElementById('money-p3-overlay').textContent=labels.p3+': $'+lastMoney.p3;
+document.getElementById('money-p4-overlay').textContent=labels.p4+': $'+lastMoney.p4;
+document.getElementById('money-p5-overlay').textContent=labels.p5+': $'+lastMoney.p5;
+document.getElementById('money-p6-overlay').textContent=labels.p6+': $'+lastMoney.p6;
 }
 
 function updateMoney(data){
-lastMoney = {...lastMoney, ...data};
+lastMoney={...lastMoney,...data};
 renderMoneyBoxes();
 }
 
 function updateLabels(data){
-labels = {...labels, ...data};
+labels={...labels,...data};
 renderMoneyBoxes();
 }
 
@@ -78,18 +78,19 @@ const scaleY=wrapper.clientHeight/930;
 const scale=Math.min(scaleX,scaleY);
 container.style.transform=`scale(${scale})`;
 }
+
 window.addEventListener('resize',scaleBoard);
 scaleBoard();
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener('DOMContentLoaded',()=>{
 document.querySelectorAll('form[target="hiddenFrame"]').forEach(form=>{
-form.addEventListener("submit",function(e){
+form.addEventListener('submit',function(e){
 e.preventDefault();
 const bot=form.querySelector('[name="bot"]').value;
 const msg=form.querySelector('[name="msg"]').value;
 const targetInput=form.querySelector('[name="target"]');
 const target=targetInput?.value||undefined;
-fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
+fetch(form.action,{method:form.method||'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
 });
 });
 
@@ -102,10 +103,10 @@ socket.emit('sendMessage',{from:el.dataset.from||BOT_NAME,target:el.dataset.targ
 });
 
 function updatePieces(data){
-if(!data||typeof data!=="object"){console.warn("Pieces data invalid:",data);return;}
+if(!data||typeof data!=='object'){console.warn('Pieces data invalid:',data);return;}
 const posMap={};
 for(const [id,pos] of Object.entries(data)){
-if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number"){console.warn("Invalid position for",id,pos);continue;}
+if(!pos||typeof pos.x!=='number'||typeof pos.y!=='number'){console.warn('Invalid position for',id,pos);continue;}
 const key=`${pos.x},${pos.y}`;
 if(!posMap[key])posMap[key]=[];
 posMap[key].push(id);
@@ -116,10 +117,10 @@ ids.forEach((id,idx)=>{
 const el=document.getElementById(id);
 if(!el)return;
 let offsetX=0,offsetY=0;
-if(idx===1){offsetX=10;}
-if(idx===2){offsetY=10;}
+if(idx===1)offsetX=10;
+if(idx===2)offsetY=10;
 if(idx===3){offsetX=10;offsetY=10;}
-if(idx===4){offsetX=20;}
+if(idx===4)offsetX=20;
 if(idx===5){offsetX=20;offsetY=10;}
 el.style.left=(baseX+offsetX)+'px';
 el.style.top=(baseY+offsetY)+'px';
@@ -135,15 +136,21 @@ new Audio(file).play();
 });
 }
 
-function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }
-function updateDisplay2(text){ document.getElementById('display2').innerText = text || ''; }
+function updateDisplay1(text){
+document.getElementById('display1').innerText=text||'';
+}
 
-const group1 = [1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
-const group2 = [11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
-const boardButtonsContainer = document.getElementById('boardButtons');
+function updateDisplay2(text){
+document.getElementById('display2').innerText=text||'';
+}
+
+const group1=[1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
+const group2=[11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
+const boardButtonsContainer=document.getElementById('boardButtons');
 const modeButtons=document.querySelectorAll('.mode-btn');
 let currentMode='mortgage';
 const modeLabels={mortgage:'Mortgage',redeem:'Redeem',addhouse:'AddHouse',removehouse:'RemoveHouse'};
+
 modeButtons.forEach(btn=>{
 btn.addEventListener('click',()=>{
 modeButtons.forEach(b=>b.classList.remove('active'));
@@ -164,9 +171,19 @@ btn.textContent=spaceNum;
 btn.style.position='absolute';
 btn.style.left=`${coords.x}px`;
 btn.style.top=`${coords.y}px`;
-if(group1.includes(spaceNum)){btn.style.width='50px';btn.style.height='105px';btn.style.fontSize='0.85em';}
-else if(group2.includes(spaceNum)){btn.style.width='105px';btn.style.height='50px';btn.style.fontSize='0.75em';}
-else{btn.style.width='110px';btn.style.height='110px';btn.style.fontSize='0.8em';}
+if(group1.includes(spaceNum)){
+btn.style.width='50px';
+btn.style.height='105px';
+btn.style.fontSize='0.85em';
+}else if(group2.includes(spaceNum)){
+btn.style.width='105px';
+btn.style.height='50px';
+btn.style.fontSize='0.75em';
+}else{
+btn.style.width='110px';
+btn.style.height='110px';
+btn.style.fontSize='0.8em';
+}
 btn.style.backgroundColor='transparent';
 btn.style.border='none';
 btn.style.color='transparent';
@@ -178,16 +195,58 @@ boardButtonsContainer.appendChild(btn);
 });
 }
 
-socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
-socket.on('reload-dots', data => { renderDotsFromServer(data); });
+socket.on('draw-dot',info=>{renderDotsFromServer({[info.num]:info});});
+socket.on('reload-dots',data=>{renderDotsFromServer(data);});
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
-socket.on('map-change', n => document.getElementById('boardImg').src = `map${n}.png`);
-socket.on('moneyUpdate', updateMoney);
-socket.on('labelsUpdate', updateLabels);
-socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
-socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
-socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
-socket.on('piecesUpdate', updatePieces);
-socket.on('displayUpdate1', data=>updateDisplay1(data.text));
-socket.on('displayUpdate2', data=>updateDisplay2(data.text));
+socket.on('map-change',n=>document.getElementById('boardImg').src=`map${n}.png`);
+socket.on('moneyUpdate',updateMoney);
+socket.on('labelsUpdate',updateLabels);
+socket.on('buildingsUpdate',data=>{lastBuildingsData=data;renderBuildings(data);});
+socket.on('buildingPositions',data=>{buildingPositions=data;renderBuildings(lastBuildingsData);});
+socket.on('clickableSpacesData',data=>{buildBoardButtons(data);});
+socket.on('piecesUpdate',updatePieces);
+socket.on('displayUpdate1',data=>updateDisplay1(data.text));
+socket.on('displayUpdate2',data=>updateDisplay2(data.text));
+
+/* ==================== SOCKET.IO CHAT ==================== */
+
+const playerNum=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get('p'))||1)),CHAT_PLAYER=`p${playerNum}`,chatMessages=document.getElementById('chatMessages'),chatInput=document.getElementById('chatInput'),chatSend=document.getElementById('chatSend');
+
+socket.emit('set-player',CHAT_PLAYER);
+
+socket.on('player-set',data=>{
+if(data?.player)console.log('[Chat] Joined as',data.player);
+});
+
+function addChatMessage(data){
+if(!chatMessages)return;
+const row=document.createElement('div'),name=document.createElement('strong'),message=document.createElement('span');
+row.className=`chat-message ${data.type||'chat'}`;
+name.textContent=(data.name||data.player||'Monopoly')+': ';
+message.textContent=(data.message||'').slice(0,100);
+row.append(name,message);
+chatMessages.appendChild(row);
+while(chatMessages.children.length>1000)chatMessages.removeChild(chatMessages.firstChild);
+chatMessages.scrollTop=chatMessages.scrollHeight;
+}
+
+socket.on('chat-message',addChatMessage);
+
+function sendChatMessage(){
+if(!chatInput)return;
+const msg=chatInput.value.trim().slice(0,100);
+if(!msg)return;
+socket.emit('chat-message',{player:CHAT_PLAYER,msg});
+chatInput.value='';
+chatInput.focus();
+}
+
+chatInput&&(chatInput.maxLength=100,chatInput.addEventListener('keydown',e=>{
+if(e.key==='Enter'){e.preventDefault();sendChatMessage()}
+}));
+chatSend&&chatSend.addEventListener('click',sendChatMessage);
+
+socket.on('cmd-ack',result=>{
+if(result&&!result.ok)addChatMessage({player:'system',name:'Monopoly',message:(result.error||'Command failed').slice(0,100),type:'error'});
+});

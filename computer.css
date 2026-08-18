@@ -1,14 +1,11 @@
 html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family:sans-serif;display:flex}
-
 #board{position:relative;height:900px;width:900px}
 #boardContainer{width:50%;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
 #boardImg{width:100%;height:100%}
 #boardWrapper{width:50%;height:100%;display:flex;justify-content:center;align-items:center;background:black;overflow:hidden}
-
 #centralDisplayContainer{position:absolute;top:53%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px}
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;transform:translateY(-35px)}
 .displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
-
 #moneyContainer{display:grid;grid-template-columns:repeat(3,250px);gap:10px;justify-content:center;width:100%;padding:10px;box-sizing:border-box}
 .moneyBox{width:250px;height:35px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:bold;box-shadow:0 0 10px #00d4ff;color:white;box-sizing:border-box}
 .moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
@@ -17,7 +14,6 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .moneyBox.purple{background:linear-gradient(135deg,#8a2be2,#d9a7ff);color:black}
 .moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
 .moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
-
 .piece{width:32px;height:32px;border-radius:50%;position:absolute;display:flex;align-items:center;justify-content:center;font-weight:bold;border:3px solid transparent;box-shadow:0 0 6px rgba(0,0,0,0.4);transition:left 0.4s ease,top 0.4s ease;color:white}
 .blue{background:#3399ff;border-color:#66a3ff}
 .green{background:limegreen;border-color:#aaffaa;color:black}
@@ -25,29 +21,34 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .purple{background:#9933ff;border-color:#cc99ff}
 .red{background:#ff4d4d;border-color:#ff8080}
 .white{background:#ffffff;border-color:#cccccc;color:black}
-
 .hotel,.house{width:29px;height:29px;position:absolute}
 .dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
-
-
 #modeToggle{position:absolute;left:50%;top:440px;transform:translateX(-50%);width:900px;height:auto;display:flex;justify-content:center;align-items:center;gap:2px;margin:0;padding-top:10px;box-sizing:border-box;z-index:60}
-
-
 .mode-btn{padding:6px 12px;font-size:.9em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
 .mode-btn.active{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
 .mode-btn.active:hover{background:#0077ff!important}
 .mode-btn:hover{background:#333}
-
 #topButtons{display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;transform:translateY(-80px)}
 #topButtons button:not(.small-button){padding:8px 10px;font-size:1em;font-weight:bold;cursor:pointer;border:none;border-radius:8px;color:#fff}
 .buttonRow{display:flex;flex-direction:row;gap:6px;align-items:center;justify-content:center}
-
 .small-button{transition:.15s ease;box-shadow:0 3px 6px rgba(0,0,0,.4)}
 .small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}
 .small-button{width:60px;height:60px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#222;cursor:pointer;transform:translateY(-5px)}
 .small-button img{width:100%;height:100%;object-fit:contain}
-
-
 #controlsContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column}
 #controlsInner{display:flex;flex-direction:column;height:100%;padding:10px;box-sizing:border-box}
-#chatFrame{flex-grow:1;width:100%;margin-top:15px;border:none;min-height:0}
+
+/* CHAT */
+#chatBox{flex-grow:1;width:100%;margin-top:15px;min-height:0;background:#050505;border:1px solid #333;border-radius:8px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
+#chatMessages{flex:1;overflow-y:auto;padding:10px;color:#eee;font-size:15px;line-height:1.4;word-wrap:break-word}
+.chat-message{padding:3px 5px;margin-bottom:3px;border-radius:4px}
+.chat-message strong{color:#00d4ff}
+.chat-message.error{color:#ff7777}
+.chat-message.error strong{color:#ff4444}
+#chatInputRow{display:flex;width:100%;padding:8px;background:#111;border-top:1px solid #333;box-sizing:border-box;gap:6px}
+#chatInput{flex:1;min-width:0;height:38px;padding:0 10px;background:#222;color:#fff;border:1px solid #555;border-radius:6px;outline:none;font-size:15px;box-sizing:border-box}
+#chatInput:focus{border-color:#00aaff;box-shadow:0 0 5px #00aaff}
+#chatInput::placeholder{color:#888}
+#chatSend{height:38px;padding:0 18px;background:#0077ff;color:#fff;border:1px solid #00aaff;border-radius:6px;font-weight:bold;cursor:pointer}
+#chatSend:hover{background:#0088ff}
+#chatSend:active{transform:translateY(1px)}

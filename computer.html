@@ -56,20 +56,15 @@
 <div id="money-p4-overlay" class="moneyBox green">Player4: $0</div>
 <div id="money-p6-overlay" class="moneyBox white">Player6: $0</div>
 </div>
-<iframe id="chatFrame" src="https://web.libera.chat/#%23rento" style="border:none;"></iframe>
+<div id="chatBox">
+<div id="chatMessages"></div>
+<div id="chatInputRow">
+<input id="chatInput" type="text" placeholder="Type a message..." maxlength="100" autocomplete="off">
+<button id="chatSend" type="button">Send</button>
 </div>
 </div>
-<script>
-(function(){
-const p=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get("p"))||1)),bot=`player${p}bot`;
-document.body.dataset.bot=bot;
-document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
-document.querySelector('[data-msg="!dice0-p1"]').dataset.msg=`!dice0-p${p}`;
-document.querySelector('[data-msg="!dice4-p1"]').dataset.msg=`!dice4-p${p}`;
-document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
-document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
-})();
-</script>
+</div>
+</div>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/w.js"></script>
 </body>

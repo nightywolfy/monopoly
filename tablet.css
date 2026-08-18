@@ -13,50 +13,77 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;background:black;font-fa
 .green{background:limegreen;border-color:#aaffaa;color:black}
 .purple{background:#9933ff;border-color:#cc99ff}
 .white{background:#fff;border-color:#ccc;color:black}
-#centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10;pointer-events:none}
 
+#centralDisplayContainer{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:25px;z-index:10;pointer-events:none}
 #moneyContainer{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;justify-content:center;width:360px;padding:5px 0;box-sizing:border-box;transform:translateY(-35px)}
 .moneyBox{width:100%;min-height:44px;padding:6px 9px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;box-shadow:0 0 8px rgba(0,212,255,.7),0 0 12px rgba(106,13,173,.5);border:2px solid rgba(255,255,255,.55);color:black;box-sizing:border-box;overflow:visible}
-
 .moneyBox.red{background:linear-gradient(135deg,#ff4b4b,#ff9999);color:black}
 .moneyBox.blue{background:linear-gradient(135deg,#3399ff,#99ddff);color:black}
 .moneyBox.orange{background:linear-gradient(135deg,#ff8c00,#ffd27f);color:black}
 .moneyBox.green{background:linear-gradient(135deg,#32cd32,#b6ffb6);color:black}
 .moneyBox.purple{background:linear-gradient(135deg,#8a2be2,#d9a7ff);color:black}
 .moneyBox.white{background:linear-gradient(135deg,#fff,#ccc);color:black}
+
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center;transform:translateY(-35px)}
 .displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:28px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word;box-sizing:border-box}
+
 #topButtons{width:900px;display:flex;flex-direction:column;gap:15px;align-items:center;justify-content:center;margin-top:10px;box-sizing:border-box}
 .buttonRow{display:flex;flex-direction:row;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:center;width:100%}
 .small-button{width:110px;height:110px;display:flex;align-items:center;justify-content:center;padding:0;border-radius:6px;background:#222;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,.4);transition:.15s ease;border:none}
 .small-button img{width:100%;height:100%;object-fit:contain;border-radius:6px}
 .small-button:active{transform:translateY(4px) scale(.96);box-shadow:0 0 12px #00d4ff;background-color:#555}
+
 #modeToggle{width:900px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-top:20px;margin-bottom:20px;z-index:60;position:relative;box-sizing:border-box}
 .modeRow{display:flex;justify-content:center;gap:14px;flex-wrap:nowrap}
 .mode-btn{padding:6px 40px;font-size:.9em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s;white-space:nowrap}
 .mode-btn.active,.mode-btn:focus{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
 .mode-btn:hover{background:#333}
 .mode-btn.active:hover{background:#0077ff!important}
+
 .colorRow{display:flex;gap:4px;justify-content:center;flex-wrap:nowrap}
 .modeRow+.colorRow{border-top:3px solid #00d4ff;margin-top:12px;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}
 .colorRow+.colorRow{border-top:3px solid #00d4ff;margin-top:12px;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}
 
 #controlsContainer{width:100%;background:#111;display:flex;flex-direction:column;box-sizing:border-box}
 #controlsInner{width:100%;display:flex;flex-direction:column;box-sizing:border-box;padding:10px 0}
-#chatFrame{width:100%;height:600px;min-height:600px;border:none;display:block}
+
+#chatBox{width:100%;background:#111;display:flex;flex-direction:column;box-sizing:border-box;border-top:2px solid #00d4ff}
+#chatMessages{width:100%;height:600px;min-height:600px;overflow-y:auto;overflow-x:hidden;background:#000;color:#fff;padding:10px;box-sizing:border-box;font-size:18px;line-height:1.35}
+.chat-message{display:block;padding:3px 6px;word-wrap:break-word;overflow-wrap:anywhere}
+.chat-message strong{font-weight:bold}
+.chat-message.chat strong{color:#00d4ff}
+.chat-message.error{color:#ff5555}
+.chat-message.private{color:#ffff00}
+
+#chatInputRow{width:100%;display:flex;gap:6px;padding:8px;box-sizing:border-box;background:#111;border-top:2px solid #00d4ff}
+#chatInput{flex:1;min-width:0;height:42px;padding:6px 10px;border:1px solid #555;border-radius:6px;background:#222;color:#fff;font-size:18px;outline:none;box-sizing:border-box}
+#chatInput:focus{border-color:#00d4ff;box-shadow:0 0 6px #00d4ff}
+#chatSend{height:42px;padding:0 20px;border:1px solid #00aaff;border-radius:6px;background:#0077ff;color:#fff;font-size:18px;font-weight:bold;cursor:pointer}
+#chatSend:active{transform:translateY(2px);background:#005fcc}
+
 .modeDivider{width:100vw;height:3px;min-height:3px;background:#00d4ff;box-shadow:0 0 10px #00d4ff;margin:10px 0;display:block;box-sizing:border-box}
 
-
-@media (min-width:701px) and (max-width:1024px){html,body{width:100%;height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
+@media (min-width:701px) and (max-width:1024px){
+html,body{width:100%;height:auto;min-height:100%;overflow-x:hidden;overflow-y:auto}
 #boardWrapper{width:100%;height:auto;overflow:hidden;display:flex;justify-content:center;align-items:flex-start}
 #boardContainer{width:900px;height:auto;transform-origin:top center;transform:scale(calc(100vw / 900));margin-bottom:calc((900px * (100vw / 900)) - 900px)}
 #topButtons{width:900px}
 #modeToggle{width:900px}
 #controlsContainer{width:100%;height:auto}
 #controlsInner{height:auto}
-#chatFrame{width:100%;height:600px;min-height:600px}}
-@media (min-width:701px) and (800px){#boardContainer{transform:scale(calc(100vw / 900))}}
-@media (min-width:801px) and (1024px){#boardContainer{transform:scale(calc(100vw / 900))}}
-@media (hover:none) and (pointer:coarse){.small-button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.mode-btn,
-.white-btn{-webkit-tap-highlight-color:transparent;touch-action:manipulation}.boardButton{touch-action:manipulation}}
+#chatBox{width:100%}
+#chatMessages{width:100%;height:600px;min-height:600px}
+}
+
+@media (min-width:701px) and (800px){
+#boardContainer{transform:scale(calc(100vw / 900))}
+}
+
+@media (min-width:801px) and (1024px){
+#boardContainer{transform:scale(calc(100vw / 900))}
+}
+
+@media (hover:none) and (pointer:coarse){
+.small-button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.mode-btn{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+}

@@ -38,7 +38,6 @@
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!dice4-p1"><img src="jail.jpg"></button>
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!jailpay p1"><img src="key.jpg"></button>
 <a href="trade-tablet.html" target="_blank"><button type="button" class="small-button"><img src="p1.jpg"></button></a>
-
 </div>
 <div class="buttonRow">
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!bidadd 5"><img src="5.jpg"></button>
@@ -57,7 +56,15 @@
 <button type="button" class="mode-btn" data-mode="removeonehouse">RemoveHouse</button>
 </div>
 <div class="modeDivider"></div>
-<iframe id="chatFrame" src="https://web.libera.chat/#%23rento" style="border:none;"></iframe>
+<div id="chatBox">
+<div id="chatMessages"></div>
+<div id="chatInputRow">
+<input id="chatInput" type="text" placeholder="Type a message..." maxlength="100" autocomplete="off">
+<button id="chatSend" type="button">Send</button>
+</div>
+</div>
+</div>
+</div>
 </div>
 <script>
 (function(){

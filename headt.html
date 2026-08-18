@@ -42,7 +42,6 @@
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!fold"><img src="fold.jpg"></button>
 </div>
 </div>
-
 <div id="displayContainer">
 <div id="display1" class="displayBox">Display 1</div>
 <div id="display2" class="displayBox">Display 2</div>
@@ -57,7 +56,13 @@
 <button type="button" class="mode-btn" data-mode="removeonehouse">RemoveHouse</button>
 </div>
 </div>
-<iframe id="chatFrame" src="https://web.libera.chat/#%23rento" style="border:none;"></iframe>
+<div id="chatBox">
+<div id="chatMessages"></div>
+<div id="chatInputRow">
+<input id="chatInput" type="text" placeholder="Type a message..." maxlength="100" autocomplete="off">
+<button id="chatSend" type="button">Send</button>
+</div>
+</div>
 </div>
 </div>
 <script>
@@ -67,7 +72,6 @@ document.body.dataset.bot=bot;
 document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
 document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
 document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
-
 const go1=document.querySelector('[data-msg="!go1"]');
 const go3=document.querySelector('[data-msg="!go3"]');
 go1.dataset.msg=`!go${p}`;
@@ -78,4 +82,3 @@ go3.dataset.msg=`!go${p+2}`;
 <script src="/head.js"></script>
 </body>
 </html>
-
