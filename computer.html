@@ -65,6 +65,17 @@
 </div>
 </div>
 </div>
+<script>
+(function(){
+const p=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get("p"))||1)),bot=`player${p}bot`;
+document.body.dataset.bot=bot;
+document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
+document.querySelector('[data-msg="!dice0-p1"]').dataset.msg=`!dice0-p${p}`;
+document.querySelector('[data-msg="!dice4-p1"]').dataset.msg=`!dice4-p${p}`;
+document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
+document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
+})();
+</script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/w.js"></script>
 </body>
