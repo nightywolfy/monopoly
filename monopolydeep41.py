@@ -28,7 +28,7 @@ class MonopolyBot:
         self.go_lock = threading.Lock()
         self.turn = 'p1'
         self.override_next_turn = False
-        self.go_input_users = users or ['player1bot','player2bot']
+        self.go_input_users = users or ['p1','p2']
         self.num_players = num_players
         self.dice_mode = False
         self.dice_players = None
@@ -114,6 +114,7 @@ class MonopolyBot:
         self.handle_go_session_command(c,nick,msg)
         self.override_turn(c,nick,msg)
         self.handle_go_command(c,msg,nick)
+        self.handle_go_privmsg(c,nick,msg)
         self._handle_dice_pub(c,nick,msg)
     def reset_state(self):
         self.players={}
@@ -246,6 +247,10 @@ class MonopolyBot:
             pl_token,amount=m.groups();amount=int(amount)
             pl_key=self.resolve_player(pl_token)
             if not pl_key or pl_key not in self.players:return False,f"Player {pl_token} does not exist"
+            caller_nick = caller.split("!")[0].lower()
+            print("DEBUG caller raw:", caller)
+            print("DEBUG caller nick:", caller_nick)
+            print("DEBUG admin_users:", self.admin_users)
             if caller not in self.admin_users:return False,"Only admins can use !add"
             if abs(amount)>5000:return False,"Amount too large"
             self.players[pl_key]["money"]+=amount
@@ -352,8 +357,8 @@ class MonopolyBot:
                 loan=self.free_loans.get(p)
                 loan_txt=f"|Loan:{loan.get('owed',0)}" if loan and loan.get("owed",0)>0 else ""
                 lines.append(self.pname(f"{p}|{props}{go}{loan_txt}"))
-            for i,line in enumerate(lines):
-                threading.Timer(i*2,lambda l=line:self.connection.privmsg(self.channel,l)).start()
+            for line in lines:
+                self.connection.privmsg(self.channel,line)
             return True,""
         
         if m:=re.match(r"!jailpay\s+(\w+)",body):
@@ -1010,7 +1015,7 @@ class MonopolyBot:
         return f"{self.pname(f'p{player_id}')}'s Turn to Roll"
     def _handle_dice_command(self,c,d,p,nick):
         pl_key=f"p{p}";display=self.pname(pl_key)
-        if self.switch_required:c.privmsg(self.channel,"!switch is required before next dice roll.");return
+        if self.switch_required:c.privmsg(self.channel,"Must use !switch before next dice roll.");return
         with self.dice_lock:
             if not self.dice_mode:c.privmsg(self.channel,"Dice commands disabled. Use !dicestart <number of players>");return
             if d in self.disabled_dice:c.privmsg(self.channel,f"{d} is currently disabled.");return
@@ -1020,7 +1025,7 @@ class MonopolyBot:
             if self.dice_override:self.dice_override=False;self.expected_player_index=self.dice_order.index(p)
             if d=="dice4":
                 if not self.jailed.get(pl_key,False):c.privmsg(self.channel,f"{display} cannot use !dice4. Not in jail.");return
-            elif self.jailed.get(pl_key,False):c.privmsg(self.channel,f"{display} is in jail! Only !dice4 can be used.");return
+            elif self.jailed.get(pl_key,False):c.privmsg(self.channel,f"{display} is in jail. Only !dice4 can be used.");return
             self.dice4_streak[pl_key]=self.dice4_streak.get(pl_key,0)+1 if d=="dice4" else 0
             if self.space62_mortgage_unlock_on_roll:
                 self.space62_mortgage_block=False
@@ -1028,7 +1033,7 @@ class MonopolyBot:
         getattr(self,f"_handle_{d}",lambda*a:None)(c,p)
         if d=="dice4" and self.dice4_streak.get(pl_key,0)>=3 and self.jailed.get(pl_key,False):
             self.dice4_streak[pl_key]=0;self.jailed[pl_key]=False
-            c.privmsg(self.channel,f"{display} rolled dice4 three times in a row! Released from jail for free.")
+            c.privmsg(self.channel,f"{display} rolled dice4 three times in a row. Released from jail for free.")
             try:self.sio.emit("cmd-sound",{"file":"key.mp3"})
             except:pass
         with self.dice_lock:
@@ -1119,25 +1124,29 @@ class MonopolyBot:
         if not self.override_next_turn and self.turn!=p:
             c.privmsg(self.channel,f"{nick}, not your turn. Use !gooverride");return
         self.override_next_turn=False;self.go_owner=p;self.start_go(c,m)
+
     def handle_go_privmsg(self,c,user,msg):
         if not self.go_active or user not in self.go_input_users:return
+        if msg.lower().startswith("!go"):return
+        if msg.startswith("!") and msg[1:].isdigit():msg=msg[1:]
         if not msg.isdigit() or not 0<=int(msg)<=7:c.privmsg(user,"number must be 0-7");return
         self.go_numbers[user]=int(msg)
-        c.privmsg(user,f"number {msg} received for !go{self.go_active}")
-        if user.lower() in ("player1bot","player2bot"):
-            try:self.sio.emit("cmd-sound",{"file":"click.mp3" if user.lower()=="player1bot" else "dice.mp3"})
+        c.privmsg(user,f"number received for !go{self.go_active}")
+        if user.lower() in ("p1","p2"):
+            try:self.sio.emit("cmd-sound",{"file":"click.mp3" if user.lower()=="p1" else "dice.mp3"})
             except:pass
         if len(self.go_numbers)==len(self.go_input_users):self.end_go(c,"completed")
+
     def start_go(self,c,m):
         if not self.go_lock.acquire(blocking=False):c.privmsg(self.channel,"Another GO is active");return
         self.go_active=m.group(1);self.go_numbers={}
         t=int(m.group(2)) if m.group(2) else 60
-        c.privmsg(self.channel,f"!go{self.go_active} started. Waiting for numbers. Timeout: {t}s")
+        c.privmsg(self.channel,f"Command !go{self.go_active} started. Waiting for numbers. Timeout: {t}s")
         if self.go_timer:self.go_timer.cancel()
         self.go_timer=threading.Timer(t,self.timeout,[c]);self.go_timer.start()
     def timeout(self,c):
         x=[u for u in self.go_input_users if u not in self.go_numbers]
-        if x:c.privmsg(self.channel,f"!go{self.go_active} timed out. Missing: {', '.join(x)}")
+        if x:c.privmsg(self.channel,f"Command !go{self.go_active} timed out. Missing: {', '.join(x)}")
         self.end_go(c,"timeout")
     def end_go(self,c,reason):
         nums=[self.go_numbers.get(u,0) for u in self.go_input_users]
@@ -1156,7 +1165,7 @@ class MonopolyBot:
                     except:pass
             else:self.go_jail_attempts[p]=0
             if jail and not double:
-                c.privmsg(self.channel,f"!go{self.go_active} requires doubles. Dice: {nums[0]} and {nums[1]}")
+                c.privmsg(self.channel,f"Command !go{self.go_active} requires doubles. Dice: {nums[0]} and {nums[1]}")
                 self.turn='p2' if p=='p1' else 'p1'
                 c.privmsg(self.channel,f"Turn switched to {self.turn}")
                 self.announce_go_turn(c,self.turn)

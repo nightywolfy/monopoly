@@ -58,9 +58,28 @@ const saveDisplay2=()=>safeWriteJSON(display2File,display2);
 const saveDots=()=>safeWriteJSON(dotsFile,activeDots);
 const saveLabels=()=>safeWriteJSON(labelsFile,labels);
 const connectedIPs={};
+const clientInfo={};
 const colorMap={p1:'red',p2:'blue',p3:'orange',p4:'green',p5:'purple',p6:'white'};
 const PLAYERS=Object.keys(colorMap);
 const HOUSE_TYPES=new Set(['house1','house2','house3','house4','hotel']);
+
+function parseUserAgent(ua){
+if(!ua)return{os:'Unknown',browser:'Unknown'};
+let os='Unknown';
+if(/Windows NT 10/.test(ua))os='Windows 10/11';
+else if(/Windows NT/.test(ua))os='Windows';
+else if(/Mac OS X/.test(ua))os='macOS';
+else if(/Android/.test(ua))os='Android';
+else if(/iPhone|iPad|iPod/.test(ua))os='iOS';
+else if(/Linux/.test(ua))os='Linux';
+let browser='Unknown';
+if(/Edg\//.test(ua))browser='Edge';
+else if(/OPR\/|Opera/.test(ua))browser='Opera';
+else if(/Chrome\//.test(ua)&&!/Chromium/.test(ua))browser='Chrome';
+else if(/Firefox\//.test(ua))browser='Firefox';
+else if(/Safari\//.test(ua)&&/Version\//.test(ua))browser='Safari';
+return{os,browser};
+}
 
 const buildingPositions={
 1:{x:740,y:795},
@@ -582,23 +601,24 @@ const p=message.trim().split(/\s+/);
 if(p.length!==3)return{handled:true,ok:false,private:true,error:'Usage: /login admin <password>'};
 if(p[1]!==ADMIN_USERNAME||!checkAdminPassword(p[2]))return{handled:true,ok:false,private:true,error:'Invalid admin username or password.'};
 socket.adminAuthenticated=true;
-return{handled:true,ok:true,private:true,message:'Admin authentication successful.'};
+return{handled:true,ok:true,private:true,message:'Authentication successful.'};
 }
 
 if(lower==='/logout'){
 socket.adminAuthenticated=false;
-return{handled:true,ok:true,private:true,message:'Admin session ended.'};
+return{handled:true,ok:true,private:true,message:'Session ended.'};
 }
 
 if(lower.startsWith('/whois')){
-if(!isAdmin(socket))return{handled:true,ok:false,private:true,error:'Only the authenticated admin can use /whois.'};
+if(!isAdmin(socket))return{handled:true,ok:false,private:true,error:'Only the authenticated can use /whois.'};
 const target=(message.trim().split(/\s+/)[1]||'').toLowerCase();
 if(!/^p[1-6]$/.test(target))return{handled:true,ok:false,private:true,error:'Usage: /whois p1-p6'};
+const info=clientInfo[target]||{};
 return{
 handled:true,
 ok:true,
 private:true,
-message:`${target} (${labels[target]||target}) IP: ${connectedIPs[target]||'Not connected'}`
+message:`${target} (${labels[target]||target}) IP: ${connectedIPs[target]||'Not connected'} | OS: ${info.os||'Unknown'} | Browser: ${info.browser||'Unknown'} | Res: ${info.resolution||'Unknown'}`
 };
 }
 
@@ -743,11 +763,20 @@ socket.on('set-player',player=>{
 if(typeof player!=='string'||!/^p[1-6]$/i.test(player))return;
 socketPlayer=player.toLowerCase();
 connectedIPs[socketPlayer]=ip;
+const{os,browser}=parseUserAgent(socket.handshake.headers['user-agent']);
+clientInfo[socketPlayer]={...clientInfo[socketPlayer],os,browser};
 
 socket.emit('player-set',{
 player:socketPlayer,
 name:labels[socketPlayer]||socketPlayer
 });
+});
+
+socket.on('screen-info',payload=>{
+if(!socketPlayer||!payload||typeof payload!=='object')return;
+const w=parseInt(payload.width,10),h=parseInt(payload.height,10);
+if(!w||!h)return;
+clientInfo[socketPlayer]={...clientInfo[socketPlayer],resolution:`${w}x${h}`};
 });
 
 socket.on('chat-message',payload=>{

@@ -59,7 +59,7 @@
 <div id="chatBox">
 <div id="chatMessages"></div>
 <div id="chatInputRow">
-<input id="chatInput" type="text" placeholder="Type a message..." maxlength="100" autocomplete="off">
+<input id="chatInput" type="text" placeholder="Type a message..." maxlength="250" autocomplete="off">
 <button id="chatSend" type="button">Send</button>
 </div>
 </div>
@@ -70,11 +70,18 @@
 const p=parseInt(new URLSearchParams(location.search).get("p"))||1,bot=`player${p}bot`;
 document.body.dataset.bot=bot;
 document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
-document.querySelector('[data-msg="!jailpay p1"]').dataset.msg=`!jailpay p${p}`;
-document.querySelector('img[src="p1.jpg"]').src=`p${p}.jpg`;
-const go1=document.querySelector('[data-msg="!go1"]'),go3=document.querySelector('[data-msg="!go3"]');
-go1.dataset.msg=`!go${p}`;
-go3.dataset.msg=`!go${p+2}`;
+
+const jail=document.querySelector('[data-msg="!jailpay p1"]');
+if(jail) jail.dataset.msg=`!jailpay p${p}`;
+
+const img=document.querySelector('img[src="p1.jpg"]');
+if(img) img.src=`p${p}.jpg`;
+
+const go1=document.querySelector('[data-msg="!go1"]');
+const go3=document.querySelector('[data-msg="!go3"]');
+
+if(go1) go1.dataset.msg=`!go${p}`;
+if(go3) go3.dataset.msg=`!go${p+2}`;
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>

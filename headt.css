@@ -32,26 +32,11 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #controlsContainer{width:100%;height:100%;background:#111;display:flex;flex-direction:column}
 #controlsInner{display:flex;flex-direction:column;height:100%;padding:10px 0;box-sizing:border-box}
 
-/* CHAT */
-#chatBox{width:100%;height:100vh;min-height:100vh;background:#111;color:#fff;display:flex;flex-direction:column;box-sizing:border-box;border-top:2px solid #00d4ff}
-#chatMessages{flex:1;overflow-y:auto;overflow-x:hidden;padding:10px;box-sizing:border-box;font-size:16px;line-height:1.4;word-break:break-word}
-.chat-message{padding:4px 6px;margin-bottom:3px;border-radius:4px}
-.chat-message strong{color:#00d4ff}
-.chat-message.error{color:#ff6666}
-.chat-message.error strong{color:#ff4444}
-#chatInputRow{display:flex;width:100%;padding:8px;gap:6px;background:#181818;border-top:1px solid #444;box-sizing:border-box}
-#chatInput{flex:1;min-width:0;height:40px;padding:6px 10px;border:1px solid #555;border-radius:6px;background:#222;color:#fff;font-size:16px;outline:none;box-sizing:border-box}
-#chatInput:focus{border-color:#00d4ff;box-shadow:0 0 6px rgba(0,212,255,.5)}
-#chatSend{height:40px;padding:0 18px;border:1px solid #00aaff;border-radius:6px;background:#0077ff;color:#fff;font-weight:bold;cursor:pointer}
-#chatSend:hover{background:#0099ff}
-#chatSend:active{transform:translateY(2px)}
-
 #modeToggle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-top:20px;z-index:60;position:relative}
 .modeRow{display:flex;justify-content:center;gap:14px}
 .modeRow+.colorRow{border-top:3px solid #00d4ff;margin-top:12px;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}
 .colorRow{display:flex;gap:4px;justify-content:center;flex-wrap:nowrap}
 .colorRow+.colorRow{border-top:3px solid #00d4ff;margin-top:12px;padding-top:12px;box-shadow:0 -3px 10px rgba(0,212,255,.6)}
-
 .mode-btn{padding:6px 40px;font-size:.9em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
 .mode-btn.active,.mode-btn:focus{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
 .mode-btn:hover{background:#333}
@@ -65,6 +50,24 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .moneyBox.green{background:linear-gradient(135deg,#32cd32,#b6ffb6);color:black}
 .moneyBox.purple{background:linear-gradient(135deg,#8a2be2,#d9a7ff);color:black}
 .moneyBox.white{background:linear-gradient(135deg,#ffffff,#cccccc);color:black}
+
+/* CHAT */
+#chatBox{flex-grow:1;width:100%;margin-top:15px;min-height:0;display:flex;flex-direction:column;border-radius:14px;background:linear-gradient(135deg,#fff3e6,#fffaf4);border:1px solid #e5ba8b;box-shadow:0 6px 18px rgba(0,0,0,0.08);overflow:hidden;box-sizing:border-box;font-family:"Poppins","Segoe UI",sans-serif}
+#chatMessages{flex:1;overflow-y:auto;padding:12px;color:#000;font-size:14px;line-height:1.5;word-break:break-word;scrollbar-width:thin;scrollbar-color:#e5ba8b transparent;font-weight:700}
+#chatMessages::-webkit-scrollbar{width:6px}
+#chatMessages::-webkit-scrollbar-thumb{background:#e5ba8b;border-radius:10px}
+.chat-message{padding:5px 7px;margin-bottom:5px;border-radius:8px;transition:0.15s;color:#000;font-weight:700}
+.chat-message:hover{background:rgba(229,186,139,0.25)}
+.chat-message strong{color:#777;font-weight:800}
+.chat-message.error{color:#000}
+.chat-message.error strong{color:#ff1f4b}
+#chatInputRow{display:flex;width:100%;padding:10px;gap:8px;background:#fff0df;border-top:1px solid #e5ba8b;box-sizing:border-box}
+#chatInput{flex:1;min-width:0;height:40px;padding:0 12px;background:#fffaf4;color:#000;border:1px solid #e5ba8b;border-radius:10px;outline:none;font-size:14px;transition:0.2s;font-family:"Poppins","Segoe UI",sans-serif;font-weight:600}
+#chatInput:focus{border-color:#ff4fa3;box-shadow:0 0 0 3px rgba(255,79,163,0.25)}
+#chatInput::placeholder{color:#8a7a70}
+#chatSend{height:40px;padding:0 16px;background:linear-gradient(135deg,#ff4fa3,#ff7abf);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer;transition:0.2s;font-family:"Poppins","Segoe UI",sans-serif}
+#chatSend:hover{background:linear-gradient(135deg,#ff2f91,#ff5fa8)}
+#chatSend:active{transform:translateY(1px)}
 
 @media (min-width:701px) and (max-width:1024px){
 html,body{flex-direction:column;height:auto;min-height:100%;overflow-y:auto}

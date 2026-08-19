@@ -209,44 +209,80 @@ socket.on('piecesUpdate',updatePieces);
 socket.on('displayUpdate1',data=>updateDisplay1(data.text));
 socket.on('displayUpdate2',data=>updateDisplay2(data.text));
 
-/* ==================== SOCKET.IO CHAT ==================== */
-
-const playerNum=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get('p'))||1)),CHAT_PLAYER=`p${playerNum}`,chatMessages=document.getElementById('chatMessages'),chatInput=document.getElementById('chatInput'),chatSend=document.getElementById('chatSend');
+const playerNum=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get('p'))||1));
+const CHAT_PLAYER=`p${playerNum}`;
+const chatMessages=document.getElementById('chatMessages');
+const chatInput=document.getElementById('chatInput');
+const chatSend=document.getElementById('chatSend');
 
 socket.emit('set-player',CHAT_PLAYER);
+socket.emit('screen-info',{width:screen.width,height:screen.height});
 
 socket.on('player-set',data=>{
 if(data?.player)console.log('[Chat] Joined as',data.player);
 });
 
+/* ===== MESSAGE DISPLAY ===== */
 function addChatMessage(data){
 if(!chatMessages)return;
-const row=document.createElement('div'),name=document.createElement('strong'),message=document.createElement('span');
+
+const row=document.createElement('div');
+const name=document.createElement('strong');
+const message=document.createElement('span');
+
 row.className=`chat-message ${data.type||'chat'}`;
 name.textContent=(data.name||data.player||'Monopoly')+': ';
-message.textContent=(data.message||'').slice(0,100);
+message.textContent=(data.message||'').slice(0,250);
+
 row.append(name,message);
 chatMessages.appendChild(row);
-while(chatMessages.children.length>1000)chatMessages.removeChild(chatMessages.firstChild);
+
+while(chatMessages.children.length>1000){
+chatMessages.removeChild(chatMessages.firstChild);
+}
+
 chatMessages.scrollTop=chatMessages.scrollHeight;
 }
 
 socket.on('chat-message',addChatMessage);
 
+/* ===== SEND MESSAGE ===== */
 function sendChatMessage(){
 if(!chatInput)return;
-const msg=chatInput.value.trim().slice(0,100);
+
+const msg=chatInput.value.trim().slice(0,250);
 if(!msg)return;
-socket.emit('chat-message',{player:CHAT_PLAYER,msg});
+
+socket.emit('chat-message',{
+player:CHAT_PLAYER,
+msg
+});
+
 chatInput.value='';
 chatInput.focus();
 }
 
-chatInput&&(chatInput.maxLength=100,chatInput.addEventListener('keydown',e=>{
-if(e.key==='Enter'){e.preventDefault();sendChatMessage()}
-}));
+/* ===== INPUT (NO HISTORY, NO ARROWS) ===== */
+if(chatInput){
+chatInput.maxLength=250;
+
+chatInput.addEventListener('keydown',e=>{
+if(e.key==='Enter'){
+e.preventDefault();
+sendChatMessage();
+}
+});
+}
+
 chatSend&&chatSend.addEventListener('click',sendChatMessage);
 
 socket.on('cmd-ack',result=>{
-if(result&&!result.ok)addChatMessage({player:'system',name:'Monopoly',message:(result.error||'Command failed').slice(0,100),type:'error'});
+if(result&&!result.ok){
+addChatMessage({
+player:'system',
+name:'Monopoly',
+message:(result.error||'Command failed').slice(0,250),
+type:'error'
+});
+}
 });
