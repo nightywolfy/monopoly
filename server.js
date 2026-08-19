@@ -625,12 +625,9 @@ message:`${target} (${labels[target]||target}) IP: ${connectedIPs[target]||'Not 
 if(lower.startsWith('/nick')){
 const p=message.trim().split(/\s+/);
 if(p.length<2)return{handled:true,ok:false,private:true,error:'Usage: /nick <name> or /nick p1-p6 <name>'};
+if(!isAdmin(socket))return{handled:true,ok:false,private:true,error:'Only the authenticated admin can use /nick.'};
 let target=player,nick='';
-if(/^p[1-6]$/i.test(p[1])){
-if(!isAdmin(socket))return{handled:true,ok:false,private:true,error:"Only the authenticated admin can change another player's nickname."};
-target=p[1].toLowerCase();
-nick=p.slice(2).join(' ');
-}else nick=p.slice(1).join(' ');
+if(/^p[1-6]$/i.test(p[1])){target=p[1].toLowerCase();nick=p.slice(2).join(' ');}else nick=p.slice(1).join(' ');
 nick=nick.trim();
 if(!/^[A-Za-z0-9_]{1,8}$/.test(nick))return{handled:true,ok:false,private:true,error:'Nickname must be 1-8 letters, numbers, or underscores.'};
 if(!colorMap[target])return{handled:true,ok:false,private:true,error:'Invalid player.'};

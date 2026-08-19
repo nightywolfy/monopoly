@@ -41,7 +41,6 @@ class MonopolyBot:
         self.msg_worker = threading.Thread(target=self._process_msg_queue, daemon=True)    
         self.msg_worker.start()
         self.disabled_dice = set()
-        self.admin_users={f'{n}{i}' for n in ('ford','crinjal') for i in range(1,10)}
         self.space62_mortgage_block=False
         self.space62_mortgage_unlock_on_roll=False
         self.connection = ChatConnection(self)
@@ -247,12 +246,7 @@ class MonopolyBot:
             pl_token,amount=m.groups();amount=int(amount)
             pl_key=self.resolve_player(pl_token)
             if not pl_key or pl_key not in self.players:return False,f"Player {pl_token} does not exist"
-            caller_nick = caller.split("!")[0].lower()
-            print("DEBUG caller raw:", caller)
-            print("DEBUG caller nick:", caller_nick)
-            print("DEBUG admin_users:", self.admin_users)
-            if caller not in self.admin_users:return False,"Only admins can use !add"
-            if abs(amount)>5000:return False,"Amount too large"
+            if abs(amount)>500:return False,"Amount too large"
             self.players[pl_key]["money"]+=amount
             return True,self.pname(f"{pl_key} balance: {self.players[pl_key]['money']}")
 
