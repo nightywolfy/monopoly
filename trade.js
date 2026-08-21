@@ -86,16 +86,15 @@ container.style.transform=`scale(${scale})`;
 window.addEventListener('resize',scaleBoard);
 scaleBoard();
 
-document.addEventListener("DOMContentLoaded",()=>{
-document.querySelectorAll('button[data-cmd],button[data-msg]').forEach(btn=>{
-btn.onclick=()=>{
+document.addEventListener("click",e=>{
+const btn=e.target.closest("button[data-cmd],button[data-msg]");
+if(!btn)return;
+e.preventDefault();
 const msg=btn.dataset.cmd||btn.dataset.msg;
-socket.emit('sendMessage',{from:btn.dataset.from||GM_IDENTITY,target:btn.dataset.target||'##rento',msg:msg});
-const line=document.createElement('div');
+socket.emit("sendMessage",{from:btn.dataset.from||GM_IDENTITY,target:btn.dataset.target||"##rento",msg});
+const line=document.createElement("div");
 line.textContent=`Sent: ${msg}`;
 cmdLog.prepend(line);
-};
-});
 });
 
 function updatePieces(data){
