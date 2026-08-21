@@ -38,9 +38,8 @@
 <h2>Trade Menu</h2>
 <button id="resetBtn" class="small-button" style="width:100%;margin-bottom:8px">RESET</button>
 <div style="display:flex;gap:8px;margin-bottom:8px;">
-<button type="button" class="small-button" data-cmd="!accept">Accept</button>
-<button type="button" class="small-button" data-cmd="!reject">Reject</button>
-<button type="button" class="small-button" data-cmd="!save">Save</button>
+<button type="button" class="small-button iconBtn" data-target="rentobot" data-from="player1bot" data-msg="!accept"><img src="accept.png"></button>
+<button type="button" class="small-button iconBtn" data-target="rentobot" data-from="player1bot" data-msg="!reject"><img src="reject.png"></button>
 </div>
 <div class="section">
 <div class="section-label">Entries</div>
@@ -55,9 +54,7 @@
 <div id="qcCmdRow" class="btn-row"></div>
 <div id="qcPlayerRow" class="btn-row player-row"></div>
 <div id="qcAmountRow" style="display:none;margin-top:6px">
-
 <input type="number" id="qcAmount" class="amountInput" placeholder="Enter amount..." step="100" min="0">
-
 </div>
 <div id="qcPreview" style="margin-top:6px">(select a command and player)</div>
 <button id="qcSendBtn" disabled style="width:100%;margin-top:6px">Send</button>
@@ -80,6 +77,10 @@
 </div>
 <div id="cmdLog"></div>
 </div>
+<script>
+p=Math.min(6,Math.max(1,+(new URLSearchParams(location.search).get("p")||1)));
+document.querySelectorAll(".iconBtn").forEach(b=>b.dataset.from=`player${p}bot`);
+</script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/trade.js"></script>
 </body>

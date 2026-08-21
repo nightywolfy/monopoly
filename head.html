@@ -38,7 +38,7 @@
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!go1"><img src="dice.jpg"></button>
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!go3"><img src="jail.jpg"></button>
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!jailpay p1"><img src="key.jpg"></button>
-<a href="trade.html" target="_blank"><button type="button" class="small-button"><img src="p1.jpg"></button></a>
+<a id="tradeLink" href="trade.html?p=1" target="_blank"><button type="button" class="small-button"><img src="p1.jpg"></button></a>
 <div style="width:1px;background:#888;margin:0 1px;"></div>
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!1"><img src="g1.jpg"></button>
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!2"><img src="g2.jpg"></button>
@@ -65,7 +65,9 @@
 </div>
 <script>
 (function(){
-const p=parseInt(new URLSearchParams(location.search).get("p"))||1,bot=`player${p}bot`;
+const p=parseInt(new URLSearchParams(location.search).get("p"))||1,
+bot=`player${p}bot`;
+
 document.body.dataset.bot=bot;
 document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
 
@@ -75,11 +77,14 @@ if(jail) jail.dataset.msg=`!jailpay p${p}`;
 const img=document.querySelector('img[src="p1.jpg"]');
 if(img) img.src=`p${p}.jpg`;
 
+const t=document.getElementById("tradeLink");
+if(t)t.href=`trade.html?p=${p}`;
+
 const go1=document.querySelector('[data-msg="!go1"]');
 const go3=document.querySelector('[data-msg="!go3"]');
 
-if(go1) go1.dataset.msg=`!go${p}`;
-if(go3) go3.dataset.msg=`!go${p+2}`;
+if(go1)go1.dataset.msg=`!go${p}`;
+if(go3)go3.dataset.msg=`!go${p+2}`;
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>

@@ -781,11 +781,14 @@ class MonopolyBot:
             for pos in right_props:
                 if self.properties.get(pos)!=other:return False,f"{self.pname(other)} does not own property {pos}"
             self.current_trade={"offerer":offerer,"other":other,"left_props":left_props,"left_money":left_money,"right_props":right_props,"right_money":right_money}
-            return True,self.pname(f"Trade offer created: {offerer} gives {left_props} + ${left_money} for {other}'s {right_props} + ${right_money}. {other} must !accept or !reject.")
+            return True,self.pname(f"Trade offer created: {offerer} gives {[((self.board_regular.get(p) or self.board_deep.get(p) or str(p)).replace('x-','')) for p in left_props]} + ${left_money} for {other}'s {[((self.board_regular.get(p) or self.board_deep.get(p) or str(p)).replace('x-','')) for p in right_props]} + ${right_money}. {other} must !accept or !reject.")
 
         if body.lower()=="!accept":
             if not self.current_trade:return False,"No active trade."
             t=self.current_trade
+            acceptor=self.resolve_player(caller)
+            if acceptor!=t["other"]:
+                return False, f"Only {t['other']} can accept this trade."
             if t["left_money"]>0 and self.players[t["offerer"]]["money"]<t["left_money"]:return False,f"{self.pname(t['offerer'])} does not have enough money."
             if t["right_money"]>0 and self.players[t["other"]]["money"]<t["right_money"]:return False,f"{self.pname(t['other'])} does not have enough money."
             self.players[t["offerer"]]["money"]-=t["left_money"]
@@ -810,6 +813,10 @@ class MonopolyBot:
 
         if body.lower()=="!reject":
             if not self.current_trade:return False,"No active trade."
+            t=self.current_trade
+            rejector=self.resolve_player(caller)
+            if rejector!=t["other"]:
+                return False, f"Only {t['other']} can reject this trade."
             self.current_trade=None
             return True,"Trade rejected."
 

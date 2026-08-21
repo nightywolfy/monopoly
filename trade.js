@@ -1,12 +1,14 @@
-const socket = io();
+const socket=io();
 const GM_IDENTITY = 'p1';
-let currentMap = 2;
-let labels = {p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
-let activeDots = {};
-let lastMoney = {p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
-let buildingPositions = {};
-let lastBuildingsData = null;
-
+const urlParams=new URLSearchParams(window.location.search);
+const pParam=urlParams.get('p');
+const restrictedPlayer=(pParam&&/^[1-6]$/.test(pParam))?`p${pParam}`:null;
+let currentMap=2;
+let labels={p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
+let activeDots={};
+let lastMoney={p1:0,p2:0,p3:0,p4:0,p5:0,p6:0};
+let buildingPositions={};
+let lastBuildingsData=null;
 
 function renderDotsFromServer(data){
 const board=document.getElementById('board');
@@ -32,21 +34,21 @@ activeDots[num]=el;
 }
 
 function renderMoneyBoxes(){
-document.getElementById('money-p1-overlay').textContent = labels.p1 + ': $' + lastMoney.p1;
-document.getElementById('money-p2-overlay').textContent = labels.p2 + ': $' + lastMoney.p2;
-document.getElementById('money-p3-overlay').textContent = labels.p3 + ': $' + lastMoney.p3;
-document.getElementById('money-p4-overlay').textContent = labels.p4 + ': $' + lastMoney.p4;
-document.getElementById('money-p5-overlay').textContent = labels.p5 + ': $' + lastMoney.p5;
-document.getElementById('money-p6-overlay').textContent = labels.p6 + ': $' + lastMoney.p6;
+document.getElementById('money-p1-overlay').textContent=labels.p1+': $'+lastMoney.p1;
+document.getElementById('money-p2-overlay').textContent=labels.p2+': $'+lastMoney.p2;
+document.getElementById('money-p3-overlay').textContent=labels.p3+': $'+lastMoney.p3;
+document.getElementById('money-p4-overlay').textContent=labels.p4+': $'+lastMoney.p4;
+document.getElementById('money-p5-overlay').textContent=labels.p5+': $'+lastMoney.p5;
+document.getElementById('money-p6-overlay').textContent=labels.p6+': $'+lastMoney.p6;
 }
 
 function updateMoney(data){
-lastMoney = {...lastMoney, ...data};
+lastMoney={...lastMoney,...data};
 renderMoneyBoxes();
 }
 
 function updateLabels(data){
-labels = {...labels, ...data};
+labels={...labels,...data};
 renderMoneyBoxes();
 }
 
@@ -97,10 +99,10 @@ cmdLog.prepend(line);
 });
 
 function updatePieces(data){
-if(!data||typeof data!=="object"){console.warn("Pieces data invalid:",data);return;}
+if(!data||typeof data!=='object'){console.warn('Pieces data invalid:',data);return;}
 const posMap={};
 for(const [id,pos] of Object.entries(data)){
-if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number"){console.warn("Invalid position for",id,pos);continue;}
+if(!pos||typeof pos.x!=='number'||typeof pos.y!=='number'){console.warn('Invalid position for',id,pos);continue;}
 const key=`${pos.x},${pos.y}`;
 if(!posMap[key])posMap[key]=[];
 posMap[key].push(id);
@@ -111,10 +113,10 @@ ids.forEach((id,idx)=>{
 const el=document.getElementById(id);
 if(!el)return;
 let offsetX=0,offsetY=0;
-if(idx===1){offsetX=10;}
-if(idx===2){offsetY=10;}
+if(idx===1)offsetX=10;
+if(idx===2)offsetY=10;
 if(idx===3){offsetX=10;offsetY=10;}
-if(idx===4){offsetX=20;}
+if(idx===4)offsetX=20;
 if(idx===5){offsetX=20;offsetY=10;}
 el.style.left=(baseX+offsetX)+'px';
 el.style.top=(baseY+offsetY)+'px';
@@ -153,17 +155,17 @@ boardButtonsContainer.appendChild(btn);
 });
 }
 
-socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
-socket.on('reload-dots', data => { renderDotsFromServer(data); });
+socket.on('draw-dot',info=>{renderDotsFromServer({[info.num]:info});});
+socket.on('reload-dots',data=>{renderDotsFromServer(data);});
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
-socket.on('map-change', n => document.getElementById('boardImg').src = `map${n}.png`);
-socket.on('moneyUpdate', updateMoney);
-socket.on('labelsUpdate', updateLabels);
-socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
-socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
-socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
-socket.on('piecesUpdate', updatePieces);
+socket.on('map-change',n=>document.getElementById('boardImg').src=`map${n}.png`);
+socket.on('moneyUpdate',updateMoney);
+socket.on('labelsUpdate',updateLabels);
+socket.on('buildingsUpdate',data=>{lastBuildingsData=data;renderBuildings(data);});
+socket.on('buildingPositions',data=>{buildingPositions=data;renderBuildings(lastBuildingsData);});
+socket.on('clickableSpacesData',data=>{buildBoardButtons(data);});
+socket.on('piecesUpdate',updatePieces);
 
 /* ==================== COMMAND BUILDER ==================== */
 let cbCmd='!offer',entries=[],nextEntryId=1;
@@ -196,7 +198,11 @@ card.appendChild(playerLabel);
 const playerRow=document.createElement('div');
 playerRow.className='btn-row player-row';
 
+const isFirstEntry=idx===0;
+const lockedToOther=isFirstEntry&&restrictedPlayer;
+
 ['p1','p2','p3','p4','p5','p6'].forEach(p=>{
+if(lockedToOther&&p!==restrictedPlayer)return;
 const b=document.createElement('button');
 b.type='button';
 b.className=`opt ${p}`;
@@ -325,8 +331,8 @@ if(b)b.classList.remove('spacePicked',`entryColor${(entry.id%6)||6}`);
 });
 
 entries=[
-{id:1,players:['p1'],amount:'0',spaces:[],picking:false},
-{id:2,players:['p2'],amount:'0',spaces:[],picking:false}
+{id:1,players:[restrictedPlayer||'p1'],amount:'0',spaces:[],picking:false},
+{id:2,players:[restrictedPlayer==='p2'?'p1':'p2'],amount:'0',spaces:[],picking:false}
 ];
 nextEntryId=3;
 renderEntries();

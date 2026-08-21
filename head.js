@@ -1,11 +1,11 @@
-const socket = io();
-const BOT_NAME = document.body.dataset.bot;
-let currentMap = 1;
-let activeDots = {};
-let labels = {p1:'Player1',p2:'Player2'};
-let lastMoney = {p1:0,p2:0};
-let buildingPositions = {};
-let lastBuildingsData = null;
+const socket=io();
+const BOT_NAME=document.body.dataset.bot;
+let currentMap=1;
+let labels={p1:'P1',p2:'P2'};
+let activeDots={};
+let lastMoney={p1:0,p2:0};
+let buildingPositions={};
+let lastBuildingsData=null;
 
 function renderDotsFromServer(data){
 const board=document.getElementById('board');
@@ -31,17 +31,21 @@ activeDots[num]=el;
 }
 
 function renderMoneyBoxes(){
-document.getElementById('money-p1-overlay').textContent = labels.p1 + ': $' + lastMoney.p1;
-document.getElementById('money-p2-overlay').textContent = labels.p2 + ': $' + lastMoney.p2;
+document.getElementById('money-p1-overlay').textContent=labels.p1+': $'+lastMoney.p1;
+document.getElementById('money-p2-overlay').textContent=labels.p2+': $'+lastMoney.p2;
+document.getElementById('money-p3-overlay').textContent=labels.p3+': $'+lastMoney.p3;
+document.getElementById('money-p4-overlay').textContent=labels.p4+': $'+lastMoney.p4;
+document.getElementById('money-p5-overlay').textContent=labels.p5+': $'+lastMoney.p5;
+document.getElementById('money-p6-overlay').textContent=labels.p6+': $'+lastMoney.p6;
 }
 
 function updateMoney(data){
-lastMoney = {...lastMoney, ...data};
+lastMoney={...lastMoney,...data};
 renderMoneyBoxes();
 }
 
 function updateLabels(data){
-labels = {...labels, ...data};
+labels={...labels,...data};
 renderMoneyBoxes();
 }
 
@@ -74,18 +78,19 @@ const scaleY=wrapper.clientHeight/930;
 const scale=Math.min(scaleX,scaleY);
 container.style.transform=`scale(${scale})`;
 }
+
 window.addEventListener('resize',scaleBoard);
 scaleBoard();
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener('DOMContentLoaded',()=>{
 document.querySelectorAll('form[target="hiddenFrame"]').forEach(form=>{
-form.addEventListener("submit",function(e){
+form.addEventListener('submit',function(e){
 e.preventDefault();
 const bot=form.querySelector('[name="bot"]').value;
 const msg=form.querySelector('[name="msg"]').value;
 const targetInput=form.querySelector('[name="target"]');
 const target=targetInput?.value||undefined;
-fetch(form.action,{method:form.method||"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
+fetch(form.action,{method:form.method||'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bot,target,msg})}).catch(err=>console.error(err));
 });
 });
 
@@ -101,21 +106,22 @@ function updatePieces(data){
 if(!data||typeof data!=="object"){console.warn("Pieces data invalid:",data);return;}
 const posMap={};
 for(const [id,pos] of Object.entries(data)){
+if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number")continue;
 if(id!=="p1"&&id!=="p2")continue;
-if(!pos||typeof pos.x!=="number"||typeof pos.y!=="number"){console.warn("Invalid position for",id,pos);continue;}
 const key=`${pos.x},${pos.y}`;
 if(!posMap[key])posMap[key]=[];
 posMap[key].push(id);
 }
 for(const [key,ids] of Object.entries(posMap)){
-const [baseX,baseY]=key.split(',').map(Number);
+const [baseX,baseY]=key.split(",").map(Number);
 ids.forEach((id,idx)=>{
 const el=document.getElementById(id);
 if(!el)return;
 let offsetX=0,offsetY=0;
-if(idx===1){offsetX=10;}
-el.style.left=(baseX+offsetX)+'px';
-el.style.top=(baseY+offsetY)+'px';
+if(idx===1)offsetX=10;
+if(idx===2)offsetY=10;
+el.style.left=(baseX+offsetX)+"px";
+el.style.top=(baseY+offsetY)+"px";
 el.style.zIndex=20;
 });
 }
@@ -128,15 +134,21 @@ new Audio(file).play();
 });
 }
 
-function updateDisplay1(text){ document.getElementById('display1').innerText = text || ''; }
-function updateDisplay2(text){ document.getElementById('display2').innerText = text || ''; }
+function updateDisplay1(text){
+document.getElementById('display1').innerText=text||'';
+}
 
-const group1 = [1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
-const group2 = [11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
-const boardButtonsContainer = document.getElementById('boardButtons');
+function updateDisplay2(text){
+document.getElementById('display2').innerText=text||'';
+}
+
+const group1=[1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
+const group2=[11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
+const boardButtonsContainer=document.getElementById('boardButtons');
 const modeButtons=document.querySelectorAll('.mode-btn');
 let currentMode='mortgage';
 const modeLabels={mortgage:'Mortgage',redeem:'Redeem',addhouse:'AddHouse',removehouse:'RemoveHouse'};
+
 modeButtons.forEach(btn=>{
 btn.addEventListener('click',()=>{
 modeButtons.forEach(b=>b.classList.remove('active'));
@@ -157,9 +169,19 @@ btn.textContent=spaceNum;
 btn.style.position='absolute';
 btn.style.left=`${coords.x}px`;
 btn.style.top=`${coords.y}px`;
-if(group1.includes(spaceNum)){btn.style.width='50px';btn.style.height='105px';btn.style.fontSize='0.85em';}
-else if(group2.includes(spaceNum)){btn.style.width='105px';btn.style.height='50px';btn.style.fontSize='0.75em';}
-else{btn.style.width='110px';btn.style.height='110px';btn.style.fontSize='0.8em';}
+if(group1.includes(spaceNum)){
+btn.style.width='50px';
+btn.style.height='105px';
+btn.style.fontSize='0.85em';
+}else if(group2.includes(spaceNum)){
+btn.style.width='105px';
+btn.style.height='50px';
+btn.style.fontSize='0.75em';
+}else{
+btn.style.width='110px';
+btn.style.height='110px';
+btn.style.fontSize='0.8em';
+}
 btn.style.backgroundColor='transparent';
 btn.style.border='none';
 btn.style.color='transparent';
@@ -171,21 +193,20 @@ boardButtonsContainer.appendChild(btn);
 });
 }
 
-socket.on('draw-dot', info => { renderDotsFromServer({[info.num]: info}); });
-socket.on('reload-dots', data => { renderDotsFromServer(data); });
+socket.on('draw-dot',info=>{renderDotsFromServer({[info.num]:info});});
+socket.on('reload-dots',data=>{renderDotsFromServer(data);});
 socket.on('remove-dot',n=>{if(activeDots[n]){activeDots[n].remove();delete activeDots[n];}});
 socket.on('clear-all-dots',()=>{Object.values(activeDots).forEach(e=>e.remove());activeDots={};});
-socket.on('map-change', n => document.getElementById('boardImg').src = `map${n}.png`);
-socket.on('moneyUpdate', updateMoney);
-socket.on('labelsUpdate', updateLabels);
-socket.on('buildingsUpdate', data=>{ lastBuildingsData=data; renderBuildings(data); });
-socket.on('buildingPositions', data=>{ buildingPositions=data; renderBuildings(lastBuildingsData); });
-socket.on('clickableSpacesData', data => { buildBoardButtons(data); });
-socket.on('piecesUpdate', updatePieces);
-socket.on('displayUpdate1', data=>updateDisplay1(data.text));
-socket.on('displayUpdate2', data=>updateDisplay2(data.text));
+socket.on('map-change',n=>document.getElementById('boardImg').src=`map${n}.png`);
+socket.on('moneyUpdate',updateMoney);
+socket.on('labelsUpdate',updateLabels);
+socket.on('buildingsUpdate',data=>{lastBuildingsData=data;renderBuildings(data);});
+socket.on('buildingPositions',data=>{buildingPositions=data;renderBuildings(lastBuildingsData);});
+socket.on('clickableSpacesData',data=>{buildBoardButtons(data);});
+socket.on('piecesUpdate',updatePieces);
+socket.on('displayUpdate1',data=>updateDisplay1(data.text));
+socket.on('displayUpdate2',data=>updateDisplay2(data.text));
 
-/* ==================== SOCKET.IO CHAT ==================== */
 const playerNum=Math.min(6,Math.max(1,parseInt(new URLSearchParams(location.search).get('p'))||1));
 const CHAT_PLAYER=`p${playerNum}`;
 const chatMessages=document.getElementById('chatMessages');
@@ -193,13 +214,22 @@ const chatInput=document.getElementById('chatInput');
 const chatSend=document.getElementById('chatSend');
 
 socket.emit('set-player',CHAT_PLAYER);
-socket.emit('screen-info',{width:screen.width,height:screen.height});
+
+(async function sendScreenInfo(){
+const payload={width:screen.width,height:screen.height};
+if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues){
+try{
+const hints=await navigator.userAgentData.getHighEntropyValues(['platformVersion']);
+payload.platformVersion=hints.platformVersion;
+}catch(err){}
+}
+socket.emit('screen-info',payload);
+})();
 
 socket.on('player-set',data=>{
 if(data?.player)console.log('[Chat] Joined as',data.player);
 });
 
-/* ===== MESSAGE DISPLAY ===== */
 function addChatMessage(data){
 if(!chatMessages)return;
 
@@ -223,7 +253,6 @@ chatMessages.scrollTop=chatMessages.scrollHeight;
 
 socket.on('chat-message',addChatMessage);
 
-/* ===== SEND MESSAGE ===== */
 function sendChatMessage(){
 if(!chatInput)return;
 
@@ -239,7 +268,6 @@ chatInput.value='';
 chatInput.focus();
 }
 
-/* ===== INPUT (NO HISTORY, NO ARROWS) ===== */
 if(chatInput){
 chatInput.maxLength=250;
 

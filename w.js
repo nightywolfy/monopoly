@@ -219,13 +219,11 @@ socket.emit('set-player',CHAT_PLAYER);
 
 (async function sendScreenInfo(){
 const payload={width:screen.width,height:screen.height};
-// Chromium only (Chrome, Edge, Opera). Firefox/Safari lack this API and just skip it;
-// server falls back to UA-string parsing for those.
 if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues){
 try{
 const hints=await navigator.userAgentData.getHighEntropyValues(['platformVersion']);
 payload.platformVersion=hints.platformVersion;
-}catch(err){/* hint just won't be sent */}
+}catch(err){}
 }
 socket.emit('screen-info',payload);
 })();
@@ -234,7 +232,6 @@ socket.on('player-set',data=>{
 if(data?.player)console.log('[Chat] Joined as',data.player);
 });
 
-/* ===== MESSAGE DISPLAY ===== */
 function addChatMessage(data){
 if(!chatMessages)return;
 
@@ -258,7 +255,6 @@ chatMessages.scrollTop=chatMessages.scrollHeight;
 
 socket.on('chat-message',addChatMessage);
 
-/* ===== SEND MESSAGE ===== */
 function sendChatMessage(){
 if(!chatInput)return;
 
@@ -274,7 +270,6 @@ chatInput.value='';
 chatInput.focus();
 }
 
-/* ===== INPUT (NO HISTORY, NO ARROWS) ===== */
 if(chatInput){
 chatInput.maxLength=250;
 
