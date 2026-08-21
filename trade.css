@@ -111,6 +111,7 @@ button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-co
 .iconBtn img{display:block;width:100%;height:32px;object-fit:cover;border-radius:6px}
 .iconBtn:hover{filter:brightness(1.1)}
 .iconBtn:active{transform:scale(.97)}
+.iconBtn img{pointer-events:none;}
 
 /* ==================== QUICK COMMAND BUILDER (mirrors #builder) ==================== */
 #buildersRow{display:flex;flex-direction:row;gap:12px;width:100%;justify-content:center;align-items:flex-start;flex-wrap:wrap}
