@@ -216,7 +216,19 @@ const chatInput=document.getElementById('chatInput');
 const chatSend=document.getElementById('chatSend');
 
 socket.emit('set-player',CHAT_PLAYER);
-socket.emit('screen-info',{width:screen.width,height:screen.height});
+
+(async function sendScreenInfo(){
+const payload={width:screen.width,height:screen.height};
+// Chromium only (Chrome, Edge, Opera). Firefox/Safari lack this API and just skip it;
+// server falls back to UA-string parsing for those.
+if(navigator.userAgentData&&navigator.userAgentData.getHighEntropyValues){
+try{
+const hints=await navigator.userAgentData.getHighEntropyValues(['platformVersion']);
+payload.platformVersion=hints.platformVersion;
+}catch(err){/* hint just won't be sent */}
+}
+socket.emit('screen-info',payload);
+})();
 
 socket.on('player-set',data=>{
 if(data?.player)console.log('[Chat] Joined as',data.player);

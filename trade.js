@@ -1,8 +1,4 @@
 const socket = io();
-// The trade panel is a GM/admin console, not tied to any one player, but the
-// server only forwards chat commands to the game bot when they come from a
-// p1-p6 identity. 'p1' here is just a pass-through label to satisfy that
-// check — it doesn't mean these commands are attributed to the real p1.
 const GM_IDENTITY = 'p1';
 let currentMap = 2;
 let labels = {p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};

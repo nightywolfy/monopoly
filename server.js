@@ -63,21 +63,56 @@ const colorMap={p1:'red',p2:'blue',p3:'orange',p4:'green',p5:'purple',p6:'white'
 const PLAYERS=Object.keys(colorMap);
 const HOUSE_TYPES=new Set(['house1','house2','house3','house4','hotel']);
 
-function parseUserAgent(ua){
+const WINDOWS_NT_MAP={
+'5.0':'Windows 2000',
+'5.1':'Windows XP',
+'5.2':'Windows XP x64',
+'6.0':'Windows Vista',
+'6.1':'Windows 7',
+'6.2':'Windows 8',
+'6.3':'Windows 8.1'
+};
+
+function parseUserAgent(ua,headers={}){
 if(!ua)return{os:'Unknown',browser:'Unknown'};
+
 let os='Unknown';
-if(/Windows NT 10/.test(ua))os='Windows 10/11';
-else if(/Windows NT/.test(ua))os='Windows';
-else if(/Mac OS X/.test(ua))os='macOS';
-else if(/Android/.test(ua))os='Android';
-else if(/iPhone|iPad|iPod/.test(ua))os='iOS';
-else if(/Linux/.test(ua))os='Linux';
+
+const ntMatch=ua.match(/Windows NT ([\d.]+)/);
+if(ntMatch){
+const nt=ntMatch[1];
+if(nt==='10.0'){
+
+const hint=headers['sec-ch-ua-platform-version'];
+if(hint){
+const major=parseInt(String(hint).replace(/"/g,'').split('.')[0],10);
+if(!isNaN(major))os=major>=13?'Windows 11':'Windows 10';
+}
+if(os==='Unknown')os='Windows 10/11 (unconfirmed)';
+}else{
+os=WINDOWS_NT_MAP[nt]||`Windows (NT ${nt})`;
+}
+}else if(/Mac OS X/.test(ua)){
+const m=ua.match(/Mac OS X ([\d_]+)/);
+os=m?`macOS ${m[1].replace(/_/g,'.')}`:'macOS';
+}else if(/Android/.test(ua)){
+const m=ua.match(/Android ([\d.]+)/);
+os=m?`Android ${m[1]}`:'Android';
+}else if(/iPhone|iPad|iPod/.test(ua)){
+const m=ua.match(/(?:iPhone )?OS ([\d_]+) like Mac OS X/);
+os=m?`iOS ${m[1].replace(/_/g,'.')}`:'iOS';
+}else if(/Linux/.test(ua)){
+os='Linux';
+}
+
 let browser='Unknown';
-if(/Edg\//.test(ua))browser='Edge';
-else if(/OPR\/|Opera/.test(ua))browser='Opera';
-else if(/Chrome\//.test(ua)&&!/Chromium/.test(ua))browser='Chrome';
-else if(/Firefox\//.test(ua))browser='Firefox';
-else if(/Safari\//.test(ua)&&/Version\//.test(ua))browser='Safari';
+let bMatch;
+if((bMatch=ua.match(/Edg\/([\d.]+)/)))browser=`Edge ${bMatch[1]}`;
+else if((bMatch=ua.match(/OPR\/([\d.]+)/)))browser=`Opera ${bMatch[1]}`;
+else if(/Chrome\//.test(ua)&&!/Chromium/.test(ua)&&(bMatch=ua.match(/Chrome\/([\d.]+)/)))browser=`Chrome ${bMatch[1]}`;
+else if((bMatch=ua.match(/Firefox\/([\d.]+)/)))browser=`Firefox ${bMatch[1]}`;
+else if(/Safari\//.test(ua)&&(bMatch=ua.match(/Version\/([\d.]+)/)))browser=`Safari ${bMatch[1]}`;
+
 return{os,browser};
 }
 
@@ -622,19 +657,6 @@ message:`${target} (${labels[target]||target}) IP: ${connectedIPs[target]||'Not 
 };
 }
 
-if(lower.startsWith('/nick')){
-const p=message.trim().split(/\s+/);
-if(p.length<2)return{handled:true,ok:false,private:true,error:'Usage: /nick <name> or /nick p1-p6 <name>'};
-if(!isAdmin(socket))return{handled:true,ok:false,private:true,error:'Only the authenticated admin can use /nick.'};
-let target=player,nick='';
-if(/^p[1-6]$/i.test(p[1])){target=p[1].toLowerCase();nick=p.slice(2).join(' ');}else nick=p.slice(1).join(' ');
-nick=nick.trim();
-if(!/^[A-Za-z0-9_]{1,8}$/.test(nick))return{handled:true,ok:false,private:true,error:'Nickname must be 1-8 letters, numbers, or underscores.'};
-if(!colorMap[target])return{handled:true,ok:false,private:true,error:'Invalid player.'};
-updateLabel(target,nick);
-return{handled:true,ok:true,private:true,message:`${target} nickname changed to ${nick}.`};
-}
-
 const commandsRaw=message.split(' !').map((c,i)=>i>0?'!'+c:c);
 let lastResult={ok:true};
 
@@ -760,7 +782,7 @@ socket.on('set-player',player=>{
 if(typeof player!=='string'||!/^p[1-6]$/i.test(player))return;
 socketPlayer=player.toLowerCase();
 connectedIPs[socketPlayer]=ip;
-const{os,browser}=parseUserAgent(socket.handshake.headers['user-agent']);
+const{os,browser}=parseUserAgent(socket.handshake.headers['user-agent'],socket.handshake.headers);
 clientInfo[socketPlayer]={...clientInfo[socketPlayer],os,browser};
 
 socket.emit('player-set',{

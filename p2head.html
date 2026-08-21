@@ -14,6 +14,7 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 #nameInput::placeholder{color:#777}
 #startBtn{width:100%;padding:12px;border:0;border-radius:8px;background:#00d4ff;color:#000;font-weight:bold;font-size:16px;cursor:pointer}
 #startBtn:hover{filter:brightness(1.15)}
+#startBtn:disabled{opacity:.6;cursor:not-allowed}
 #error{display:none;color:#ff5555;margin-top:12px}
 </style>
 </head>
@@ -21,7 +22,7 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 <div id="loading">
 <div class="logo">MONOPOLY</div>
 <div class="title">Enter Your Name</div>
-<div class="message">Enter 1-6 letters</div>
+<div class="message">Enter 1-7 letters</div>
 <input id="nameInput" type="text" maxlength="7" autocomplete="off" placeholder="Enter name">
 <button id="startBtn">START</button>
 <div id="error"></div>
@@ -33,6 +34,7 @@ const socket=io();
 function startGame(){
 const input=document.getElementById('nameInput');
 const error=document.getElementById('error');
+const btn=document.getElementById('startBtn');
 const name=input.value.trim();
 
 if(!/^[A-Za-z]{1,7}$/.test(name)){
@@ -42,7 +44,15 @@ input.focus();
 return;
 }
 
+if(!socket.connected){
+error.textContent='Connection error. Try again.';
+error.style.display='block';
+return;
+}
+
 error.style.display='none';
+btn.disabled=true;
+btn.textContent='Starting...';
 
 socket.emit('sendMessage',{
 bot:'player1bot',
@@ -51,17 +61,19 @@ target:'##rento',
 msg:`!display p2 ${name}`
 });
 
-detectDevice();
+setTimeout(detectDevice,150);
 }
 
 function detectDevice(){
-const ua=navigator.userAgent;
-const mobile=/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
-const tablet=/iPad|Android(?!.*Mobile)|Tablet/i.test(ua);
+const w=window.innerWidth;
+const h=window.innerHeight;
+const isMobile=w<768;
+const isTablet=w>=768&&w<1024&&h>w;
+const isDesktop=w>=1024;
 
-if(tablet){
+if(isTablet){
 window.location.href='headt.html?p=2';
-}else if(mobile){
+}else if(isMobile){
 window.location.href='headm.html?p=2';
 }else{
 window.location.href='head.html?p=2';
@@ -69,10 +81,7 @@ window.location.href='head.html?p=2';
 }
 
 document.getElementById('startBtn').addEventListener('click',startGame);
-
-document.getElementById('nameInput').addEventListener('keydown',e=>{
-if(e.key==='Enter')startGame();
-});
+document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')startGame();});
 </script>
 </body>
 </html>

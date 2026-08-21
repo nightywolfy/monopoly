@@ -14,6 +14,7 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 #nameInput::placeholder{color:#777}
 #startBtn{width:100%;padding:12px;border:0;border-radius:8px;background:#00d4ff;color:#000;font-weight:bold;font-size:16px;cursor:pointer}
 #startBtn:hover{filter:brightness(1.15)}
+#startBtn:disabled{opacity:.6;cursor:not-allowed}
 #error{display:none;color:#ff5555;margin-top:12px}
 </style>
 </head>
@@ -26,53 +27,45 @@ body{display:flex;align-items:center;justify-content:center;overflow:hidden}
 <button id="startBtn">START</button>
 <div id="error"></div>
 </div>
-
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const socket=io();
 function startGame(){
 const input=document.getElementById('nameInput');
 const error=document.getElementById('error');
+const btn=document.getElementById('startBtn');
 const name=input.value.trim();
-
 if(!/^[A-Za-z]{1,7}$/.test(name)){
 error.textContent='Name must be 1-7 letters only.';
 error.style.display='block';
 input.focus();
 return;
 }
-
+if(!socket.connected){
+error.textContent='Connecting... try again in a second.';
+error.style.display='block';
+return;
+}
 error.style.display='none';
-
-socket.emit('sendMessage',{
-bot:'player1bot',
-from:'player1bot',
-target:'##rento',
-msg:`!display p2 ${name}`
-});
-
-detectDevice();
+btn.disabled=true;
+btn.textContent='Starting...';
+socket.emit('sendMessage',{bot:'player1bot',from:'player1bot',target:'##rento',msg:`!display p2 ${name}`});
+setTimeout(detectDevice,200);
 }
-
 function detectDevice(){
+const w=window.innerWidth;
+const h=window.innerHeight;
 const ua=navigator.userAgent;
-const mobile=/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
-const tablet=/iPad|Android(?!.*Mobile)|Tablet/i.test(ua);
-
-if(tablet){
-window.location.href='tablet.html?p=2';
-}else if(mobile){
-window.location.href='mobile.html?p=2';
-}else{
-window.location.href='computer.html?p=2';
+const isMobileUA=/Android|iPhone|iPod|IEMobile|Opera Mini/i.test(ua);
+const isTabletUA=/iPad|Tablet|Android(?!.*Mobile)/i.test(ua);
+const isMobile=(w<768)||isMobileUA;
+const isTablet=(w>=768&&w<1024&&h>w)||isTabletUA;
+if(isTablet){window.location.href='tablet.html?p=2';}
+else if(isMobile){window.location.href='mobile.html?p=2';}
+else{window.location.href='computer.html?p=2';}
 }
-}
-
 document.getElementById('startBtn').addEventListener('click',startGame);
-
-document.getElementById('nameInput').addEventListener('keydown',e=>{
-if(e.key==='Enter')startGame();
-});
+document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')startGame();});
 </script>
 </body>
 </html>

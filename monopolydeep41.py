@@ -248,7 +248,8 @@ class MonopolyBot:
             if not pl_key or pl_key not in self.players:return False,f"Player {pl_token} does not exist"
             if abs(amount)>500:return False,"Amount too large"
             self.players[pl_key]["money"]+=amount
-            return True,self.pname(f"{pl_key} balance: {self.players[pl_key]['money']}")
+            caller_name=self.pname(self.resolve_player(caller)) if self.resolve_player(caller) else caller
+            return True,f"{caller_name} used !add {pl_key} {amount} | {self.pname(f'{pl_key} balance: {self.players[pl_key]['money']}')}"
 
         if m:=re.match(r"!switch\s+(\w+)\s+(\w+)$",body):
             p1,p2=m.groups();k1=self.resolve_player(p1);k2=self.resolve_player(p2)
@@ -1123,7 +1124,7 @@ class MonopolyBot:
         if not self.go_active or user not in self.go_input_users:return
         if msg.lower().startswith("!go"):return
         if msg.startswith("!") and msg[1:].isdigit():msg=msg[1:]
-        if not msg.isdigit() or not 0<=int(msg)<=7:c.privmsg(user,"number must be 0-7");return
+        if not msg.isdigit() or not 0<=int(msg)<=7:return
         self.go_numbers[user]=int(msg)
         c.privmsg(user,f"number received for !go{self.go_active}")
         if user.lower() in ("p1","p2"):
