@@ -87,14 +87,14 @@ window.addEventListener('resize',scaleBoard);
 scaleBoard();
 
 document.addEventListener("DOMContentLoaded",()=>{
-document.querySelectorAll('#builder button[data-cmd]').forEach(btn=>{
-btn.addEventListener("click",()=>{
-const cmd=btn.dataset.cmd;
-socket.emit('sendMessage',{from:GM_IDENTITY,target:'##rento',msg:cmd});
+document.querySelectorAll('button[data-cmd],button[data-msg]').forEach(btn=>{
+btn.onclick=()=>{
+const msg=btn.dataset.cmd||btn.dataset.msg;
+socket.emit('sendMessage',{from:btn.dataset.from||GM_IDENTITY,target:btn.dataset.target||'##rento',msg:msg});
 const line=document.createElement('div');
-line.textContent=`Sent: ${cmd}`;
+line.textContent=`Sent: ${msg}`;
 cmdLog.prepend(line);
-});
+};
 });
 });
 
