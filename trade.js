@@ -383,11 +383,12 @@ const qcSendBtn=document.getElementById('qcSendBtn');
 
 let qcCommand=null,qcPlayer=null;
 
+const qcLabels={'!status':'status','!insert':'insert','!remove':'Bankrupt'};
 ['!status','!insert','!remove'].forEach(cmd=>{
 const b=document.createElement('button');
 b.type='button';
 b.className='opt';
-b.textContent=cmd;
+b.textContent=qcLabels[cmd];
 b.addEventListener('click',()=>{
 qcCommand=cmd;
 qcCmdRow.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
