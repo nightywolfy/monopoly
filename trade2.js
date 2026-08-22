@@ -123,6 +123,13 @@ el.style.zIndex=20;
 }
 }
 
+if(!window.SOUND_LISTENER_LOCK){
+window.SOUND_LISTENER_LOCK=true;
+socket.on('play-sound',({file})=>{
+new Audio(file).play();
+});
+}
+
 const boardSpaceBtns={};
 const group1=[1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
 const group2=[11,12,13,14,15,16,17,19,31,33,34,35,37,38,39,47,50,51,59,63];
@@ -171,6 +178,7 @@ const entriesContainer=document.getElementById('entriesContainer');
 const cbPreview=document.getElementById('preview');
 const enterBtn=document.getElementById('enterBtn');
 const cmdLog=document.getElementById('cmdLog');
+cmdLog.style.display='none';
 
 /* ==================== RENDER ENTRIES ==================== */
 function renderEntries(){
@@ -383,7 +391,7 @@ const qcSendBtn=document.getElementById('qcSendBtn');
 
 let qcCommand=null,qcPlayer=null;
 
-const qcLabels={'!status':'status','!insert':'insert','!remove':'bankrupt'};
+const qcLabels={'!status':'status','!insert':'insert','!remove':'Bankrupt'};
 ['!status','!insert','!remove'].forEach(cmd=>{
 const b=document.createElement('button');
 b.type='button';
@@ -424,9 +432,11 @@ const p=btn.dataset.player;
 const hidden=restrict&&p!==restrictedPlayer;
 btn.style.display=hidden?'none':'';
 btn.disabled=hidden;
-if(hidden&&btn.classList.contains('selected'))btn.classList.remove('selected');
 });
-if(restrict&&qcPlayer!==restrictedPlayer)qcPlayer=null;
+if(restrict){
+qcPlayer=restrictedPlayer;
+qcPlayerRow.querySelectorAll('button').forEach(btn=>btn.classList.toggle('selected',btn.dataset.player===restrictedPlayer));
+}
 }
 
 qcAmount.addEventListener('input',()=>{

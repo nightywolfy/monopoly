@@ -249,6 +249,8 @@ class MonopolyBot:
             if abs(amount)>500:return False,"Amount too large"
             self.players[pl_key]["money"]+=amount
             caller_name=self.pname(self.resolve_player(caller)) if self.resolve_player(caller) else caller
+            try:self.sio.emit("cmd-sound",{"file":"add.mp3"})
+            except Exception:pass
             return True,f"{caller_name} used !add {pl_key} {amount} | {self.pname(f'{pl_key} balance: {self.players[pl_key]['money']}')}"
 
         if m:=re.match(r"!switch\s+(\w+)\s+(\w+)$",body):
@@ -259,6 +261,8 @@ class MonopolyBot:
             if bool(self.jailed.get(k1)) or bool(self.jailed.get(k2)):return True,"Cannot switch with a player in jail"
             self.players[k1]["pos"],self.players[k2]["pos"]=self.players[k2]["pos"],self.players[k1]["pos"]
             if self.switch_required:self.switch_required=False
+            try:self.sio.emit("cmd-sound",{"file":"switch.mp3"})
+            except Exception:pass
             return True,self.pname(f"{k1} and {k2} switched")
          
         if m:=re.match(r"!remove\s+(\w+)$",body):
@@ -287,6 +291,8 @@ class MonopolyBot:
             self.num_players=len(self.players)
             self.jailed[pl]=False
             try:self._handle_diceadd(self.connection,int(pl[1:]))
+            except Exception:pass
+            try:self.sio.emit("cmd-sound",{"file":"insert.mp3"})
             except Exception:pass
             return True,f"{pl} inserted with ${amt}"
 
@@ -352,8 +358,9 @@ class MonopolyBot:
                 loan=self.free_loans.get(p)
                 loan_txt=f"|Loan:{loan.get('owed',0)}" if loan and loan.get("owed",0)>0 else ""
                 lines.append(self.pname(f"{p}|{props}{go}{loan_txt}"))
-            for line in lines:
-                self.connection.privmsg(self.channel,line)
+            for line in lines:self.connection.privmsg(self.channel,line)
+            try:self.sio.emit("cmd-sound",{"file":"status.mp3"})
+            except Exception:pass
             return True,""
         
         if m:=re.match(r"!jailpay\s+(\w+)",body):
@@ -739,17 +746,12 @@ class MonopolyBot:
             if offerer not in self.players:return False,f"{offerer_token} is not in the game."
             if self.current_trade:return False,"A trade is already active. !accept or !reject it first."
             parts=text.split()
-            other_index=None
-            other=None
+            other_index=None;other=None
             for i,p in enumerate(parts):
                 temp=self.resolve_player(p)
-                if temp and temp!=offerer:
-                    other_index=i
-                    other=temp
-                    break
+                if temp and temp!=offerer:other_index=i;other=temp;break
             if not other:return False,"Other player not in game."
-            left_tokens=parts[:other_index]
-            right_tokens=parts[other_index+1:]
+            left_tokens=parts[:other_index];right_tokens=parts[other_index+1:]
             def parse_side(tokens):
                 props=[];money=0
                 for t in tokens:
@@ -760,11 +762,9 @@ class MonopolyBot:
                         for p in t.split(","):
                             if p.strip().isdigit():props.append(int(p.strip()))
                 return props,money
-            left_props,left_money=parse_side(left_tokens)
-            right_props,right_money=parse_side(right_tokens)
+            left_props,left_money=parse_side(left_tokens);right_props,right_money=parse_side(right_tokens)
             for pos in left_props+right_props:
-                if pos not in self.active_board or pos in self.non_property:
-                    return False,f"Property {pos} is not a valid property."
+                if pos not in self.active_board or pos in self.non_property:return False,f"Property {pos} is not a valid property."
             def validate_houses(prop_list):
                 for pos in prop_list:
                     if self.houses.get(pos,0)>0:
@@ -781,14 +781,15 @@ class MonopolyBot:
             for pos in right_props:
                 if self.properties.get(pos)!=other:return False,f"{self.pname(other)} does not own property {pos}"
             self.current_trade={"offerer":offerer,"other":other,"left_props":left_props,"left_money":left_money,"right_props":right_props,"right_money":right_money}
+            try:self.sio.emit("cmd-sound",{"file":"offer.mp3"})
+            except Exception:pass
             return True,self.pname(f"Trade offer created: {offerer} gives {[((self.board_regular.get(p) or self.board_deep.get(p) or str(p)).replace('x-','')) for p in left_props]} + ${left_money} for {other}'s {[((self.board_regular.get(p) or self.board_deep.get(p) or str(p)).replace('x-','')) for p in right_props]} + ${right_money}. {other} must !accept or !reject.")
-
+     
         if body.lower()=="!accept":
             if not self.current_trade:return False,"No active trade."
             t=self.current_trade
             acceptor=self.resolve_player(caller)
-            if acceptor!=t["other"]:
-                return False, f"Only {t['other']} can accept this trade."
+            if acceptor!=t["other"]:return False,f"Only {t['other']} can accept this trade."
             if t["left_money"]>0 and self.players[t["offerer"]]["money"]<t["left_money"]:return False,f"{self.pname(t['offerer'])} does not have enough money."
             if t["right_money"]>0 and self.players[t["other"]]["money"]<t["right_money"]:return False,f"{self.pname(t['other'])} does not have enough money."
             self.players[t["offerer"]]["money"]-=t["left_money"]
@@ -804,20 +805,20 @@ class MonopolyBot:
             transfer(t["left_props"],t["offerer"],t["other"])
             transfer(t["right_props"],t["other"],t["offerer"])
             self.current_trade=None
-            try:
-                self.handle_command("tradebot","!propertylist")
-                self.handle_command("tradebot","!housestatus")
-            except Exception:
-                pass
+            try:self.handle_command("tradebot","!propertylist");self.handle_command("tradebot","!housestatus")
+            except Exception:pass
+            try:self.sio.emit("cmd-sound",{"file":"accept.mp3"})
+            except Exception:pass
             return True,"Trade accepted and completed."
 
         if body.lower()=="!reject":
             if not self.current_trade:return False,"No active trade."
             t=self.current_trade
             rejector=self.resolve_player(caller)
-            if rejector!=t["other"]:
-                return False, f"Only {t['other']} can reject this trade."
+            if rejector!=t["other"]:return False,f"Only {t['other']} can reject this trade."
             self.current_trade=None
+            try:self.sio.emit("cmd-sound",{"file":"reject.mp3"})
+            except Exception:pass
             return True,"Trade rejected."
 
         return True,None
