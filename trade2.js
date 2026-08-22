@@ -1,5 +1,8 @@
 const socket=io();
 const GM_IDENTITY = 'p1';
+const urlParams=new URLSearchParams(window.location.search);
+const pParam=urlParams.get('p');
+const restrictedPlayer=(pParam&&/^[1-6]$/.test(pParam))?`p${pParam}`:null;
 let currentMap=2;
 let labels={p1:'P1',p2:'P2',p3:'P3',p4:'P4',p5:'P5',p6:'P6'};
 let activeDots={};
@@ -83,16 +86,14 @@ container.style.transform=`scale(${scale})`;
 window.addEventListener('resize',scaleBoard);
 scaleBoard();
 
-document.addEventListener("DOMContentLoaded",()=>{
-document.querySelectorAll('#builder button[data-cmd]').forEach(btn=>{
-btn.addEventListener("click",()=>{
+document.addEventListener("click",e=>{
+const btn=e.target.closest("button[data-cmd]");
+if(!btn)return;
 const cmd=btn.dataset.cmd;
-socket.emit('sendMessage',{from:GM_IDENTITY,target:'##rento',msg:cmd});
-const line=document.createElement('div');
+socket.emit("sendMessage",{from:btn.dataset.from||GM_IDENTITY,target:btn.dataset.target||"##rento",msg:cmd});
+const line=document.createElement("div");
 line.textContent=`Sent: ${cmd}`;
 cmdLog.prepend(line);
-});
-});
 });
 
 function updatePieces(data){
@@ -195,7 +196,11 @@ card.appendChild(playerLabel);
 const playerRow=document.createElement('div');
 playerRow.className='btn-row player-row';
 
+const isFirstEntry=idx===0;
+const lockedToOther=isFirstEntry&&restrictedPlayer;
+
 ['p1','p2','p3','p4','p5','p6'].forEach(p=>{
+if(lockedToOther&&p!==restrictedPlayer)return;
 const b=document.createElement('button');
 b.type='button';
 b.className=`opt ${p}`;
@@ -324,8 +329,8 @@ if(b)b.classList.remove('spacePicked',`entryColor${(entry.id%6)||6}`);
 });
 
 entries=[
-{id:1,players:['p1'],amount:'0',spaces:[],picking:false},
-{id:2,players:['p2'],amount:'0',spaces:[],picking:false}
+{id:1,players:[restrictedPlayer||'p1'],amount:'0',spaces:[],picking:false},
+{id:2,players:[restrictedPlayer==='p2'?'p1':'p2'],amount:'0',spaces:[],picking:false}
 ];
 nextEntryId=3;
 renderEntries();
