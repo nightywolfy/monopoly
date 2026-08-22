@@ -171,6 +171,7 @@ const entriesContainer=document.getElementById('entriesContainer');
 const cbPreview=document.getElementById('preview');
 const enterBtn=document.getElementById('enterBtn');
 const cmdLog=document.getElementById('cmdLog');
+cmdLog.style.display='none';
 
 /* ==================== RENDER ENTRIES ==================== */
 function renderEntries(){
@@ -383,7 +384,7 @@ const qcSendBtn=document.getElementById('qcSendBtn');
 
 let qcCommand=null,qcPlayer=null;
 
-const qcLabels={'!status':'status','!insert':'insert','!remove':'bankrupt'};
+const qcLabels={'!status':'status','!insert':'insert','!remove':'Bankrupt'};
 ['!status','!insert','!remove'].forEach(cmd=>{
 const b=document.createElement('button');
 b.type='button';
@@ -424,9 +425,11 @@ const p=btn.dataset.player;
 const hidden=restrict&&p!==restrictedPlayer;
 btn.style.display=hidden?'none':'';
 btn.disabled=hidden;
-if(hidden&&btn.classList.contains('selected'))btn.classList.remove('selected');
 });
-if(restrict&&qcPlayer!==restrictedPlayer)qcPlayer=null;
+if(restrict){
+qcPlayer=restrictedPlayer;
+qcPlayerRow.querySelectorAll('button').forEach(btn=>btn.classList.toggle('selected',btn.dataset.player===restrictedPlayer));
+}
 }
 
 qcAmount.addEventListener('input',()=>{

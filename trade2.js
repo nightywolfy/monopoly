@@ -378,21 +378,24 @@ const qcPlayerRow=document.getElementById('qcPlayerRow');
 const qcAmountRow=document.getElementById('qcAmountRow');
 const qcAmount=document.getElementById('qcAmount');
 const qcPreview=document.getElementById('qcPreview');
+qcPreview.style.display='none';
 const qcSendBtn=document.getElementById('qcSendBtn');
 
 let qcCommand=null,qcPlayer=null;
 
+const qcLabels={'!status':'status','!insert':'insert','!remove':'bankrupt'};
 ['!status','!insert','!remove'].forEach(cmd=>{
 const b=document.createElement('button');
 b.type='button';
 b.className='opt';
-b.textContent=cmd;
+b.textContent=qcLabels[cmd];
 b.addEventListener('click',()=>{
 qcCommand=cmd;
 qcCmdRow.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
 b.classList.add('selected');
 qcAmountRow.style.display=cmd==='!insert'?'block':'none';
 if(cmd==='!insert')qcAmount.value='1000';
+qcRefreshPlayerRow();
 qcUpdatePreview();
 });
 qcCmdRow.appendChild(b);
@@ -403,7 +406,9 @@ const b=document.createElement('button');
 b.type='button';
 b.className=`opt ${p}`;
 b.textContent=p.toUpperCase();
+b.dataset.player=p;
 b.addEventListener('click',()=>{
+if(b.disabled)return;
 qcPlayer=p;
 qcPlayerRow.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
 b.classList.add('selected');
@@ -411,6 +416,18 @@ qcUpdatePreview();
 });
 qcPlayerRow.appendChild(b);
 });
+
+function qcRefreshPlayerRow(){
+const restrict=qcCommand==='!remove'&&restrictedPlayer;
+qcPlayerRow.querySelectorAll('button').forEach(btn=>{
+const p=btn.dataset.player;
+const hidden=restrict&&p!==restrictedPlayer;
+btn.style.display=hidden?'none':'';
+btn.disabled=hidden;
+if(hidden&&btn.classList.contains('selected'))btn.classList.remove('selected');
+});
+if(restrict&&qcPlayer!==restrictedPlayer)qcPlayer=null;
+}
 
 qcAmount.addEventListener('input',()=>{
 if(qcAmount.value!==''&&parseFloat(qcAmount.value)<0)qcAmount.value='0';
@@ -523,6 +540,7 @@ auctionUpdatePreview();
 const switchPlayerRow1=document.getElementById('switchPlayerRow1');
 const switchPlayerRow2=document.getElementById('switchPlayerRow2');
 const switchPreview=document.getElementById('switchPreview');
+switchPreview.style.display='none';
 const switchSendBtn=document.getElementById('switchSendBtn');
 
 let switchPlayer1=null,switchPlayer2=null;
