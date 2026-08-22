@@ -38,8 +38,8 @@
 <h2>Trade Menu</h2>
 <button id="resetBtn" class="small-button" style="width:100%;margin-bottom:8px">RESET</button>
 <div style="display:flex;gap:8px;margin-bottom:8px;">
-<button type="button" class="small-button iconBtn" data-cmd="!accept" data-target="##rento" data-from="player1bot"><img src="accept.png"></button>
-<button type="button" class="small-button iconBtn" data-cmd="!reject" data-target="##rento" data-from="player1bot"><img src="reject.png"></button>
+<button type="button" class="small-button iconBtn" data-cmd="!accept" data-target="##rento" data-from="p1"><img src="accept.png"></button>
+<button type="button" class="small-button iconBtn" data-cmd="!reject" data-target="##rento" data-from="p1"><img src="reject.png"></button>
 </div>
 <div class="section">
 <div class="section-label">Entries</div>
@@ -79,7 +79,7 @@
 </div>
 <script>
 p=Math.min(6,Math.max(1,+(new URLSearchParams(location.search).get("p")||1)));
-document.querySelectorAll(".iconBtn").forEach(b=>b.dataset.from=`player${p}bot`);
+document.querySelectorAll(".iconBtn").forEach(b=>b.dataset.from=`p${p}`);
 </script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/trade.js"></script>
