@@ -384,7 +384,7 @@ const qcSendBtn=document.getElementById('qcSendBtn');
 
 let qcCommand=null,qcPlayer=null;
 
-const qcLabels={'!status':'status','!insert':'insert','!remove':'Bankrupt'};
+const qcLabels={'!status':'status','!insert':'insert','!remove':'bankrupt'};
 ['!status','!insert','!remove'].forEach(cmd=>{
 const b=document.createElement('button');
 b.type='button';
