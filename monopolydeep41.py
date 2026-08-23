@@ -191,23 +191,17 @@ class MonopolyBot:
             n,mode,money,timeout=int(m.group(1)),m.group(2)or"regular",int(m.group(3)or 1000),int(m.group(4)or 12)
             if not 2<=n<=6:return False,"Number of players must be 2-6"
             if not 1<=timeout<=30:return False,"Autofold timer must be between 1 and 30 seconds"
-            self.reset_state();self.num_players=n
-            self.auction_timeout=timeout
+            self.reset_state();self.num_players=n;self.auction_timeout=timeout
             self.players={f"p{i+1}":{"money":money,"pos":0}for i in range(n)}
-            self.active_board=self.board_regular.copy()if mode=="regular" else{**self.board_regular,**self.board_deep}
-            self.non_property=set(self.non_property_regular)if mode=="regular" else set(self.non_property_regular)|set(self.non_property_deep)
-            self.max_pos=39 if mode=="regular" else 63
+            self.active_board=self.board_regular.copy()if mode=="regular"else{**self.board_regular,**self.board_deep}
+            self.non_property=set(self.non_property_regular)if mode=="regular"else set(self.non_property_regular)|set(self.non_property_deep)
+            self.max_pos=39 if mode=="regular"else 63
             for i in range(n):self.aliases.setdefault(f"p{i+1}",set()).add(f"player{i+1}bot")
             try:
-                    self.sio.emit("cmd-cleardot")
-                    self.sio.emit("cmd-clear-buildings")
-                    self.sio.emit("cmd-dotlocation",1 if mode=="regular" else 2)
-                    self.sio.emit("cmd-map",1 if mode=="regular" else 2)
-                    self._handle_dicestart(self.connection,n)
-            except Exception as e:
-                    return False,f"Game started but failed to initialize board: {e}"
-            self.sio.emit("updateDisplay1",{"text":"Game has started"})
-            self.sio.emit("updateDisplay2",{"text":"P1's Turn to Roll"})
+                self.sio.emit("cmd-cleardot");self.sio.emit("cmd-clear-buildings");self.sio.emit("cmd-dotlocation",1 if mode=="regular"else 2);self.sio.emit("cmd-map",1 if mode=="regular"else 2)
+                self._handle_dicestart(self.connection,n);self.sio.emit("cmd-sound",{"file":"start.mp3"})
+            except Exception as e:return False,f"Game started but failed to initialize board: {e}"
+            self.sio.emit("updateDisplay1",{"text":"Game has started"});self.sio.emit("updateDisplay2",{"text":"P1's Turn to Roll"})
             return True,f"Game started with {n} players ({mode}) ${money} each, auction auto-fold in {timeout}s"
       
         if m:=re.match(r"!rename\s+(\S+)\s+(\S+)",body):
@@ -246,7 +240,7 @@ class MonopolyBot:
             pl_token,amount=m.groups();amount=int(amount)
             pl_key=self.resolve_player(pl_token)
             if not pl_key or pl_key not in self.players:return False,f"Player {pl_token} does not exist"
-            if abs(amount)>500:return False,"Amount too large"
+            if abs(amount)>1000:return False,"Amount too large"
             self.players[pl_key]["money"]+=amount
             caller_name=self.pname(self.resolve_player(caller)) if self.resolve_player(caller) else caller
             try:self.sio.emit("cmd-sound",{"file":"add.mp3"})
@@ -403,7 +397,7 @@ class MonopolyBot:
             self.free_loans[pl]["owed"]+=amount;self.free_loans[pl]["outer"]+=cut;self.free_loans[pl]["inner"]+=cut
             self.players[pl]["money"]+=amount
             return True,self.pname(f"{pl} received ${amount} free loan. Owes ${self.free_loans[pl]['owed']} (-${self.free_loans[pl]['outer']} outer GO / -${self.free_loans[pl]['inner']} inner GO each pass)")
-          
+
         if m:=re.match(r"!auction\s+(\d+)$",body):
             pos=int(m.group(1))
             if not self.players:return False,"No game in progress."
@@ -416,7 +410,9 @@ class MonopolyBot:
             self.current_auction={"pos":pos,"bids":{},"last_bidder":None,"bid_timer":None,"active":set(self.players.keys())}
             if self.auction_required:self.auction_required=False
             display_prop=prop[2:] if prop.startswith("x-") else prop
-            try:self.sio.emit("updateDisplay2",{"text":f"Auction started for {display_prop}"})
+            try:
+                self.sio.emit("updateDisplay2",{"text":f"Auction started for {display_prop}"})
+                self.sio.emit("playSound",{"file":"auction.mp3"})
             except Exception:pass
             return True,self.pname(f"Auction started for {display_prop}")
             
@@ -693,20 +689,33 @@ class MonopolyBot:
                 "dice_rolls":self.dice_rolls,
                 "passgo_bonus":self.passgo_bonus,
                 "free_loans":self.free_loans,
-                "go_jail_attempts":self.go_jail_attempts
+                "go_jail_attempts":self.go_jail_attempts,
+                "turn":self.turn,
+                "override_next_turn":self.override_next_turn,
+                "dice_mode":self.dice_mode,
+                "dice_players":self.dice_players,
+                "dice_order":self.dice_order,
+                "expected_player_index":self.expected_player_index,
+                "dice_override":self.dice_override,
+                "disabled_dice":list(self.disabled_dice),
+                "space62_mortgage_block":self.space62_mortgage_block,
+                "space62_mortgage_unlock_on_roll":self.space62_mortgage_unlock_on_roll,
+                "auction_timeout":self.auction_timeout
             }
             try:
                 with open(fn,"wb")as f:pickle.dump(state,f)
                 return True,self.pname(f"Game state saved to '{fn}'")
-            except Exception as e:return False,f"Failed to save game: {e}"
+            except Exception as e:
+                return False,f"Failed to save game: {e}"
 
         m=re.match(r"!restore\s*(\S+)?",body)
         if m:
             fn=m.group(1)or"1.pkl"
-            if not os.path.exists(fn):return False,f"File '{fn}' not found"
+            if not os.path.exists(fn):
+                return False,f"File '{fn}' not found"
             try:
-                with open(fn,"rb")as f:state=pickle.load(f)
-
+                with open(fn,"rb")as f:
+                    state=pickle.load(f)
                 self.players=state.get("players",{})
                 self.properties=state.get("properties",{})
                 self.houses=state.get("houses",{})
@@ -716,8 +725,7 @@ class MonopolyBot:
                 self.current_auction=state.get("current_auction")
                 self.current_trade=state.get("current_trade")
                 self.active_board=self.board_regular.copy()
-                if state.get("max_pos",39)>39:
-                    self.active_board.update(self.board_deep)
+                if state.get("max_pos",39)>39:self.active_board.update(self.board_deep)
                 self.non_property=state.get("non_property",set())
                 self.num_players=state.get("num_players",len(self.players))
                 self.max_pos=state.get("max_pos",39)
@@ -730,6 +738,17 @@ class MonopolyBot:
                 self.passgo_bonus=state.get("passgo_bonus",{})
                 self.free_loans=state.get("free_loans",{})
                 self.go_jail_attempts=state.get("go_jail_attempts",{})
+                self.turn=state.get("turn","p1")
+                self.override_next_turn=state.get("override_next_turn",False)
+                self.dice_mode=state.get("dice_mode",False)
+                self.dice_players=state.get("dice_players",None)
+                self.dice_order=state.get("dice_order",[])
+                self.expected_player_index=state.get("expected_player_index",0)
+                self.dice_override=state.get("dice_override",False)
+                self.disabled_dice=set(state.get("disabled_dice",[]))
+                self.space62_mortgage_block=state.get("space62_mortgage_block",False)
+                self.space62_mortgage_unlock_on_roll=state.get("space62_mortgage_unlock_on_roll",False)
+                self.auction_timeout=state.get("auction_timeout",12)
                 try:
                     self.handle_command("restorebot","!propertylist")
                     self.handle_command("restorebot","!housestatus")
@@ -737,7 +756,8 @@ class MonopolyBot:
                 except Exception:
                     pass
                 return True,f"Game state restored from '{fn}'"
-            except Exception as e:return False,f"Failed to restore game: {e}"
+            except Exception as e:
+                return False,f"Failed to restore game: {e}"
 
         m=re.match(r"!offer-(\w+)\s+(.+)",body)
         if m:
@@ -1043,7 +1063,6 @@ class MonopolyBot:
             r=self.dice_rolls.get(p)
             if r and r[0]!=r[1]:
                 self.expected_player_index=(self.expected_player_index+1)%len(self.dice_order)
-                
     def _handle_dice0(self,c,p):self._roll_and_handle(c,p,[1,2,3,4,5,6],[1,2,3,4,5,6],"dice0",True)
     def _handle_dice1(self,c,p):self._roll_and_handle(c,p,[1,1,2,2,3,3],[1,1,2,2,3,3],"dice1",True)
     def _handle_dice2(self,c,p):self._roll_and_handle(c,p,[1,1,2,2,3,3],[4,4,5,5,6,6],"dice2",True)

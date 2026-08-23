@@ -615,33 +615,6 @@ timestamp:Date.now()
 
 function isAdmin(socket){return !!socket?.adminAuthenticated}
 
-function resolvePlayer(socketPlayer,raw){
-const supplied=typeof raw==='string'?raw.toLowerCase():null;
-return socketPlayer||(/^p[1-6]$/.test(supplied||'')?supplied:'system');
-}
-
-function handleIncomingChat(socket,player,msg){
-const clean=cleanChatMessage(msg);
-if(!clean)return;
-if(clean.startsWith('!')||clean.startsWith('/')){
-const result=processChatCommand(player,clean,socket);
-if(result.private){
-socket.emit('cmd-ack',result);
-if(result.ok&&result.message){
-socket.emit('chat-message',{
-player:'system',
-name:BOT_NAME,
-message:result.message,
-type:'private',
-timestamp:Date.now()
-});
-}
-}
-return;
-}
-broadcastChat(player,clean,'chat');
-}
-
 function sendPrivateResponse(socket,player,result){
 socket.emit('private-message',{
 from:BOT_NAME,
@@ -827,12 +800,50 @@ clientInfo[socketPlayer]={...clientInfo[socketPlayer],resolution:`${w}x${h}`};
 
 socket.on('chat-message',payload=>{
 if(!payload||typeof payload!=='object')return;
-handleIncomingChat(socket,resolvePlayer(socketPlayer,payload.player),payload.msg);
+const supplied=typeof payload.player==='string'?payload.player.toLowerCase():null;
+const player=socketPlayer||(/^p[1-6]$/.test(supplied||'')?supplied:'system');
+const msg=cleanChatMessage(payload.msg);
+if(!msg)return;
+if(msg.startsWith('!')||msg.startsWith('/')){
+const result=processChatCommand(player,msg,socket);
+socket.emit('cmd-ack',result);
+if(result.private&&result.ok&&result.message){
+socket.emit('chat-message',{
+player:'system',
+name:BOT_NAME,
+message:result.message,
+type:'private',
+timestamp:Date.now()
+});
+}
+return;
+}
+broadcastChat(player,msg,'chat');
 });
 
 socket.on('sendMessage',payload=>{
 if(!payload||typeof payload!=='object')return;
-handleIncomingChat(socket,resolvePlayer(socketPlayer,payload.from??payload.bot),payload.msg);
+const supplied=typeof payload.from==='string'
+?payload.from.toLowerCase()
+:(typeof payload.bot==='string'?payload.bot.toLowerCase():null);
+const player=socketPlayer||(/^p[1-6]$/.test(supplied||'')?supplied:'system');
+const msg=cleanChatMessage(payload.msg);
+if(!msg)return;
+if(msg.startsWith('!')||msg.startsWith('/')){
+const result=processChatCommand(player,msg,socket);
+socket.emit('cmd-ack',result);
+if(result.private&&result.ok&&result.message){
+socket.emit('chat-message',{
+player:'system',
+name:BOT_NAME,
+message:result.message,
+type:'private',
+timestamp:Date.now()
+});
+}
+return;
+}
+broadcastChat(player,msg,'chat');
 });
 
 socket.on('private-message',payload=>{
