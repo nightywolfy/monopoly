@@ -12,12 +12,14 @@ const app=express();
 const server=http.createServer(app);
 const io=new Server(server,{maxHttpBufferSize:1e6});
 const BOT_NAME='player1bot';
+
 app.set('trust proxy',true);
 app.use(express.urlencoded({extended:true}));
 app.use(express.json({limit:'100kb'}));
 
 const ADMIN_USERNAME='admin';
 const ADMIN_PASSWORD_HASH='4ac134964872c4b0e2027c2be20aa440fa4e699ba9c5b9f1929bdab52824e424';
+
 function hashPassword(password){
 return createHash('sha256').update(String(password)).digest('hex');
 }
@@ -39,16 +41,16 @@ const display2File=path.join(__dirname,'display2.json');
 const dotsFile=path.join(__dirname,'dots.json');
 const labelsFile=path.join(__dirname,'labels.json');
 
-function safeReadJSON(file,fallback={}){try{if(!existsSync(file))return fallback;return JSON.parse(readFileSync(file,'utf-8'))}catch(err){console.error(`Error reading ${file}:`,err);return fallback}}
-function safeWriteJSON(file,data){const tmpFile=`${file}.tmp`,json=JSON.stringify(data,null,2);try{writeFileSync(tmpFile,json,'utf-8');renameSync(tmpFile,file)}catch(err){console.error(`Error writing ${file}:`,err)}}
+function safeReadJSON(file,fallback={}){try{if(!existsSync(file))return fallback;return JSON.parse(readFileSync(file,'utf-8'))}catch(err){return fallback}}
+function safeWriteJSON(file,data){const tmp=`${file}.tmp`;try{writeFileSync(tmp,JSON.stringify(data,null,2),'utf-8');renameSync(tmp,file)}catch(err){}}
 
-let money=safeReadJSON(moneyFile,Object.fromEntries(['p1','p2','p3','p4','p5','p6'].map(p=>[p,10])));
-let pieces=safeReadJSON(piecesFile,Object.fromEntries(['p1','p2','p3','p4','p5','p6'].map(p=>[p,{x:825,y:755}])));
+let money=safeReadJSON(moneyFile,{p1:10,p2:10,p3:10,p4:10,p5:10,p6:10});
+let pieces=safeReadJSON(piecesFile,{});
 let display1=safeReadJSON(display1File,{text:""});
 let display2=safeReadJSON(display2File,{text:""});
 let activeDots=safeReadJSON(dotsFile,{});
 let buildings=safeReadJSON(buildingsFile,{});
-let labels=safeReadJSON(labelsFile,{p1:'player1',p2:'player2',p3:'player3',p4:'player4',p5:'player5',p6:'player6'});
+let labels=safeReadJSON(labelsFile,{p1:'p1',p2:'p2',p3:'p3',p4:'p4',p5:'p5',p6:'p6'});
 
 const saveMoney=()=>safeWriteJSON(moneyFile,money);
 const saveBuildings=()=>safeWriteJSON(buildingsFile,buildings);
@@ -643,11 +645,12 @@ broadcastChat(player,clean,'chat');
 }
 
 function sendPrivateResponse(socket,player,result){
-socket.emit('private-message',{
-from:BOT_NAME,
-to:player,
-message:result.error||result.message||(result.ok?'Command executed successfully.':'Command failed.'),
-type:result.ok?'response':'error',
+if(!result.message)return;
+socket.emit('chat-message',{
+player:'system',
+name:BOT_NAME,
+message:result.message,
+type:'private',
 timestamp:Date.now()
 });
 }
@@ -800,8 +803,6 @@ return{handled:true,...lastResult};
 io.on('connection',socket=>{
 try{
 const ip=socket.handshake.headers['x-forwarded-for']?.split(',')[0]?.trim()||socket.handshake.address;
-console.log(`[Socket] Frontend connected: ${ip}`);
-
 let socketPlayer=null;
 socket.adminAuthenticated=false;
 
@@ -902,12 +903,7 @@ socket.emit('buildingsUpdate',buildings);
 socket.emit('displayUpdate1',{text:display1.text});
 socket.emit('displayUpdate2',{text:display2.text});
 
-socket.on('disconnect',()=>{
-if(socketPlayer&&connectedIPs[socketPlayer]===ip)delete connectedIPs[socketPlayer];
-console.log(`[Socket] Frontend disconnected: ${ip}`);
-});
-}catch(err){console.error('[Socket] Error:',err)}
-});
+socket.on('disconnect',()=>{if(socketPlayer&&connectedIPs[socketPlayer]===ip)delete connectedIPs[socketPlayer]});}catch(err){console.error('[Socket] Error:',err)}})
 
 app.use(express.static(__dirname));
 app.get('/pieces.json',(_,res)=>res.json(pieces));

@@ -55,4 +55,3 @@ Rarely used commands:
 !diceoverride (use this command to override someone's turn once)
 !gobonus p2 50 250 (bank owes you total of $250 which will be paid everytime you pass go of 50 x 5)
 !save (save game)
-!status ( example: !status p1 | !status p3 )  

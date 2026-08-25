@@ -23,20 +23,49 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 .white{background:#ffffff;border-color:#cccccc;color:black}
 .hotel,.house{width:29px;height:29px;position:absolute}
 .dot{width:14px;height:14px;border-radius:50%;position:absolute;z-index:30;border:2px solid black;box-shadow:0 0 1px 1px white}
-#playerContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:15px;box-shadow:inset 0 0 40px rgba(0,212,255,.3);padding:10px;box-sizing:border-box;overflow-y:auto}
-.playerSection{width:100%;max-width:260px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:10px;text-align:center;box-shadow:0 0 25px rgba(0,0,0,.4)}
-.playerSection h2{color:#FFD700;margin:0 0 10px;font-size:16px;text-shadow:0 0 8px black}
-.playerGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.playerBtn{display:flex;align-items:center;justify-content:center;text-decoration:none;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;padding:10px 6px;border-radius:8px;font-size:15px;font-weight:bold;cursor:pointer;transition:.2s;min-height:35px}
-.playerBtn:hover{transform:scale(1.05);box-shadow:0 0 20px #00d4ff,0 0 30px #6a0dad}
+
+#playerContainer{
+--blush:#fdf1ee;
+--card:#fbe9e6;
+--line:#e9c0be;
+--wine:#5c2438;
+--wine-soft:#a85c63;
+width:50%;height:100%;background:var(--blush);display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:22px;padding:28px 16px;box-sizing:border-box;overflow-y:auto;font-family:'Poppins',sans-serif}
+
+/* ---------- BRAND HEADER ---------- */
+.brandHeader{width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center}
+.brandLogo{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--wine-soft)}
+.brandIcon{width:56px;height:34px}
+.brandWordmark{font-family:'Playfair Display',serif;font-weight:700;font-size:19px;letter-spacing:6px;color:var(--wine);text-transform:uppercase;margin-left:6px}
+.brandDivider{width:100%;height:1px;background:var(--line);margin:14px 0 16px}
+.quickLinks{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.iconPill{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--wine-soft);color:var(--wine-soft);background:#fbe3e1;display:flex;align-items:center;justify-content:center;text-decoration:none;transition:.2s;flex-shrink:0}
+.iconPill:hover{background:#f6d2ce;transform:scale(1.05)}
+.linkPill{text-decoration:none;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;padding:10px 22px;border-radius:999px;text-align:center;transition:.2s}
+.linkPill--light{background:#f6d9d6;color:#c97d82}
+.linkPill--light:hover{background:#f1c8c4}
+.linkPill--solid{background:#dd6f85;color:#fff;box-shadow:0 4px 10px rgba(198,90,110,.35)}
+.linkPill--solid:hover{transform:scale(1.03)}
+
+/* ---------- PLAYER CARDS ---------- */
+.playerSection{width:100%;max-width:340px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px 18px;text-align:center;box-shadow:0 8px 22px rgba(150,60,70,.08)}
+.playerSection h2{color:var(--wine);margin:0;font-family:'Playfair Display',serif;font-weight:700;font-size:19px;letter-spacing:3px;text-transform:uppercase}
+.sectionDivider{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 20px}
+.sectionDivider span{width:70px;height:1px;background:var(--line)}
+.sectionDivider i{width:5px;height:5px;background:var(--wine-soft);transform:rotate(45deg);display:inline-block}
+.playerGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+
+/* WINE / BLUSH GRADIENT BUTTONS */
+.playerBtn{display:flex;align-items:center;justify-content:center;text-decoration:none;color:#fff;padding:16px 6px;border-radius:12px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.2s;min-height:60px;text-shadow:0 1px 3px rgba(0,0,0,.15);border:1px solid rgba(255,255,255,.35);box-shadow:0 6px 14px rgba(150,50,70,.18)}
+.playerBtn:hover{transform:scale(1.03)}
 .playerBtn:active{transform:scale(.97)}
-.sixPlayerSection{width:100%;max-width:320px;padding:10px}
+.playerBtn--1,.playerBtn--2,.playerBtn--3,.playerBtn--4,.playerBtn--5,.playerBtn--6{background:linear-gradient(135deg,#dd8093,#c15169)}
+
+.sixPlayerSection{max-width:340px}
 .sixPlayerSection .playerGrid{grid-template-columns:repeat(2,1fr);gap:14px}
-.sixPlayerSection .playerBtn{font-size:22px;padding:20px 10px;min-height:65px}
-.mobilePlayers{display:none;width:100%;max-width:320px}
-.mobilePlayers .playerGrid{grid-template-columns:repeat(2,1fr);gap:10px}
-.mobilePlayers .playerBtn{font-size:16px;padding:12px;min-height:45px}
+.sixPlayerSection .playerBtn{font-size:14px;padding:20px 10px;min-height:65px}
 .mobileOnly,.desktopOnly{display:block}
+
 @media screen and (max-width:1366px){
 html,body{margin:0;padding:0;width:100%;min-height:100%;height:auto;background:#000;display:block;overflow-x:hidden}
 #boardWrapper{width:100%;height:100vw;display:flex;justify-content:center;align-items:center;background:#000;overflow:hidden}
@@ -44,29 +73,30 @@ html,body{margin:0;padding:0;width:100%;min-height:100%;height:auto;background:#
 #board{position:relative;width:900px;height:900px;flex-shrink:0}
 #boardImg{width:900px;height:900px;display:block}
 #centralDisplayContainer{transform:translate(-50%,-50%) scale(1.1);transform-origin:center}
-#playerContainer{width:100%;height:auto;min-height:100vh;background:#111;padding:15px 10px;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:15px;box-sizing:border-box;overflow:visible}
-#playerContainer>div:first-child{position:relative!important;width:100%!important;height:auto!important;margin:0 0 5px 0!important;display:flex!important;justify-content:center!important;align-items:center!important}
-#playerContainer>div:first-child>div{position:static!important;left:auto!important;top:auto!important;width:100%!important;height:auto!important;display:flex!important;flex-direction:row!important;justify-content:center!important;align-items:center!important;gap:8px!important}
-#playerContainer>div:first-child img{width:60px!important;height:auto!important}
-#playerContainer>div:first-child a{width:auto!important;padding:8px 10px!important;font-size:13px!important;box-sizing:border-box}
-.playerSection{width:100%!important;max-width:400px!important;padding:15px!important;box-sizing:border-box}
-.playerSection h2{font-size:20px!important;margin:0 0 12px!important}
-.playerGrid{display:grid!important;grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
-.playerBtn{width:100%!important;min-height:55px!important;padding:15px 8px!important;box-sizing:border-box;font-size:18px!important}
-.sixPlayerSection{width:100%!important;max-width:400px!important;padding:15px!important}
-.sixPlayerSection .playerGrid{grid-template-columns:repeat(2,1fr)!important;gap:10px!important}
-.sixPlayerSection .playerBtn{font-size:20px!important;min-height:65px!important;padding:18px 8px!important}
+#playerContainer{width:100%;height:auto;min-height:100vh;background:var(--blush,#fdf1ee);padding:24px 14px;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:18px;box-sizing:border-box;overflow:visible}
+.brandHeader{max-width:400px!important}
+.quickLinks{flex-wrap:wrap!important;justify-content:center!important}
+
+/* MOBILE BUTTON SIZING (colors inherited from .playerBtn--N) */
+.playerBtn{width:100%!important;min-height:55px!important;padding:15px 8px!important;box-sizing:border-box;font-size:15px!important}
+
+.sixPlayerSection{width:100%!important;max-width:400px!important;padding:20px 15px!important}
+.sixPlayerSection .playerGrid{grid-template-columns:repeat(2,1fr)!important;gap:12px!important}
+.sixPlayerSection .playerBtn{font-size:15px!important;min-height:65px!important;padding:18px 8px!important}
 .desktopOnly{display:block!important}
 .mobileOnly{display:block!important}
 }
+
 @media screen and (min-width:701px) and (max-width:1024px){
-#playerContainer>div:first-child img{width:80px!important}
-#playerContainer>div:first-child a{padding:12px 16px!important;font-size:17px!important}
-.playerSection{max-width:600px!important;padding:22px!important}
-.playerSection h2{font-size:26px!important;margin:0 0 16px!important}
+.brandHeader{max-width:480px!important}
+.playerSection{max-width:480px!important;padding:26px!important}
+.playerSection h2{font-size:22px!important}
 .playerGrid{gap:16px!important}
-.playerBtn{min-height:70px!important;padding:20px 10px!important;font-size:24px!important}
-.sixPlayerSection{max-width:600px!important;padding:22px!important}
+
+/* MEDIUM BUTTON SIZING (colors inherited from .playerBtn--N) */
+.playerBtn{min-height:70px!important;padding:20px 10px!important;font-size:16px!important}
+
+.sixPlayerSection{max-width:480px!important;padding:26px!important}
 .sixPlayerSection .playerGrid{gap:16px!important}
-.sixPlayerSection .playerBtn{font-size:26px!important;min-height:80px!important;padding:22px 10px!important}
+.sixPlayerSection .playerBtn{font-size:16px!important;min-height:80px!important;padding:22px 10px!important}
 }

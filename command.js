@@ -15,16 +15,7 @@ card.className='entryCard';
 const top=document.createElement('div');
 top.className='entryTop';
 
-const label=document.createElement('span');
-label.textContent=`Entry ${idx+1}`;
-top.appendChild(label);
-
 card.appendChild(top);
-
-const playerLabel=document.createElement('div');
-playerLabel.className='section-label';
-playerLabel.textContent='Player';
-card.appendChild(playerLabel);
 
 const playerRow=document.createElement('div');
 playerRow.className='btn-row player-row';
@@ -54,12 +45,6 @@ playerRow.appendChild(b);
 });
 
 card.appendChild(playerRow);
-
-const amountLabel=document.createElement('div');
-amountLabel.className='section-label';
-amountLabel.style.marginTop='4px';
-amountLabel.textContent='Amount';
-card.appendChild(amountLabel);
 
 const amountInput=document.createElement('input');
 amountInput.type='number';
@@ -217,7 +202,8 @@ const qcSendBtn=document.getElementById('qcSendBtn');
 let qcCommand=null,qcPlayer=null;
 
 const qcLabels={'!status':'status','!insert':'insert','!remove':'bankrupt'};
-['!status','!insert','!remove'].forEach(cmd=>{
+let qcBankruptBtn=null;
+['!remove','!status','!insert'].forEach(cmd=>{
 const b=document.createElement('button');
 b.type='button';
 b.className='opt';
@@ -232,6 +218,7 @@ qcRefreshPlayerRow();
 qcUpdatePreview();
 });
 qcCmdRow.appendChild(b);
+if(cmd==='!remove')qcBankruptBtn=b;
 });
 
 ['p1','p2','p3','p4','p5','p6'].forEach(p=>{
@@ -250,17 +237,43 @@ qcUpdatePreview();
 qcPlayerRow.appendChild(b);
 });
 
+const qcAllBtn=document.createElement('button');
+qcAllBtn.type='button';
+qcAllBtn.className='opt';
+qcAllBtn.textContent='ALL';
+qcAllBtn.dataset.player='ALL';
+qcAllBtn.addEventListener('click',()=>{
+if(qcAllBtn.disabled)return;
+qcPlayer='ALL';
+qcPlayerRow.querySelectorAll('button').forEach(btn=>btn.classList.remove('selected'));
+qcAllBtn.classList.add('selected');
+qcUpdatePreview();
+});
+qcPlayerRow.appendChild(qcAllBtn);
+
+qcBankruptBtn.click();
+
 function qcRefreshPlayerRow(){
-const restrict=qcCommand==='!remove'&&restrictedPlayer;
-qcPlayerRow.querySelectorAll('button').forEach(btn=>{
+const isStatus=qcCommand==='!status';
+const restrict=(qcCommand==='!remove'||isStatus)&&restrictedPlayer;
+qcPlayerRow.querySelectorAll('button[data-player]').forEach(btn=>{
 const p=btn.dataset.player;
+if(p==='ALL'){
+const hidden=!isStatus;
+btn.style.display=hidden?'none':'';
+btn.disabled=hidden;
+return;
+}
 const hidden=restrict&&p!==restrictedPlayer;
 btn.style.display=hidden?'none':'';
 btn.disabled=hidden;
 });
 if(restrict){
 qcPlayer=restrictedPlayer;
-qcPlayerRow.querySelectorAll('button').forEach(btn=>btn.classList.toggle('selected',btn.dataset.player===restrictedPlayer));
+qcPlayerRow.querySelectorAll('button[data-player]').forEach(btn=>btn.classList.toggle('selected',btn.dataset.player===restrictedPlayer));
+}else if(qcCommand==='!insert'){
+qcPlayer=null;
+qcPlayerRow.querySelectorAll('button[data-player]').forEach(btn=>btn.classList.remove('selected'));
 }
 }
 
@@ -275,6 +288,7 @@ if(qcCommand==='!insert'){
 if(qcAmount.value===''||qcAmount.value==null)return null;
 return `${qcCommand} ${qcPlayer} ${qcAmount.value}`;
 }
+if(qcPlayer==='ALL')return qcCommand;
 return `${qcCommand} ${qcPlayer}`;
 }
 
@@ -302,7 +316,6 @@ cmdLog.prepend(line);
 /* ==================== AUCTION MENU BUILDER ==================== */
 const auctionPickBtn=document.getElementById('auctionPickBtn');
 const auctionSpacesLabel=document.getElementById('auctionSpacesLabel');
-const auctionPreview=document.getElementById('auctionPreview');
 const auctionSendBtn=document.getElementById('auctionSendBtn');
 
 let auctionPicking=false,auctionSpace=null;
@@ -344,7 +357,6 @@ return `!auction ${auctionSpace}`;
 function auctionUpdatePreview(){
 auctionSpacesLabel.textContent=auctionSpace!==null?`Space: ${auctionSpace}`:'';
 const cmd=auctionBuildCommand();
-auctionPreview.textContent=cmd||'(pick a space to auction)';
 auctionSendBtn.disabled=!cmd;
 }
 
@@ -379,6 +391,8 @@ switchPreview.style.display='none';
 const switchSendBtn=document.getElementById('switchSendBtn');
 
 let switchPlayer1=null,switchPlayer2=null;
+let switchPlayer1DefaultBtn=null;
+const switchDefaultPlayer=`p${new URLSearchParams(location.search).get('p')||1}`;
 
 function switchRefreshDisabled(){
 switchPlayerRow1.querySelectorAll('button').forEach(btn=>{
@@ -409,6 +423,7 @@ switchRefreshDisabled();
 switchUpdatePreview();
 });
 switchPlayerRow1.appendChild(b);
+if(p===switchDefaultPlayer)switchPlayer1DefaultBtn=b;
 });
 
 ['p1','p2','p3','p4','p5','p6'].forEach(p=>{
@@ -426,6 +441,8 @@ switchUpdatePreview();
 });
 switchPlayerRow2.appendChild(b);
 });
+
+switchPlayer1DefaultBtn?.click();
 
 function switchBuildCommand(){
 if(!switchPlayer1||!switchPlayer2)return null;
