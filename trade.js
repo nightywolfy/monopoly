@@ -52,7 +52,6 @@ board.appendChild(el);
 }
 }
 
-
 document.addEventListener("click",e=>{
 const btn=e.target.closest("button[data-cmd]");
 if(!btn)return;
@@ -62,7 +61,6 @@ const line=document.createElement("div");
 line.textContent=`Sent: ${cmd}`;
 cmdLog.prepend(line);
 });
-
 
 const boardSpaceBtns={};
 const group1=[1,3,4,5,6,8,9,21,22,24,25,26,27,28,29,41,42,44,45,53,56,57];
