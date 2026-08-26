@@ -35,7 +35,7 @@ modeButtons.forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
 currentMode=btn.dataset.mode;
 boardButtonsContainer.querySelectorAll('button').forEach(b=>{
-b.title=`${currentMode[0].toUpperCase()+currentMode.slice(1)} space ${b.textContent}`;
+b.title=`${currentMode[0].toUpperCase()+currentMode.slice(1)} ${b.textContent}`;
 });
 });
 });
