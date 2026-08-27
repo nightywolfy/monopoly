@@ -50,4 +50,4 @@ Update Changelog:
 48. Removed the plus/minus house buttons and replaced them with AddHouse/RemoveHouse mode toggles.
 49. Replaced the Libera.Chat iframe with a fully integrated custom chat system.
 50. Added sound effects that play whenever a command is executed, providing immediate confirmation that the command was received and processed.
-51. Updated the design of the main index page.
+51. Updated the design of the main index page and trade-menu page.

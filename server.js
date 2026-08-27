@@ -928,5 +928,5 @@ setTimeout(()=>{console.warn('[Server] Forcing shutdown after 5 seconds.');proce
 }
 ['SIGINT','SIGTERM'].forEach(sig=>process.on(sig,()=>gracefulShutdown(sig)));
 
-const PORT=process.env.PORT||3000;
+const PORT=process.env.PORT||80;
 server.listen(PORT,'0.0.0.0',()=>console.log(`[Server] ${BOT_NAME} running at http://0.0.0.0:${PORT}`));

@@ -3,6 +3,9 @@
 <head>
 <title>Trade Menu</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/trade-tablet.css">
 </head>
 <body>
@@ -36,8 +39,9 @@
 </div>
 <div id="buildersRow">
 <div id="builder">
-<h2>Trade Menu</h2>
+<h2>Trade Menu<span class="hdr-line"></span></h2>
 <button id="resetBtn" class="small-button" style="width:100%;margin-bottom:8px">RESET</button>
+<div style="display:flex;gap:8px;margin-bottom:8px;">
 <button type="button" class="small-button iconBtn" data-cmd="!accept" data-target="##rento" data-from="p1"><img src="accept.png"></button>
 <button type="button" class="small-button iconBtn" data-cmd="!reject" data-target="##rento" data-from="p1"><img src="reject.png"></button>
 </div>
@@ -47,9 +51,10 @@
 <div id="preview">(select players and enter amounts)</div>
 <button id="enterBtn" disabled>Send</button>
 </div>
+</div>
 <div id="quickAuctionColumn">
 <div id="quickBuilder">
-<h2>Quick Command</h2>
+<h2>Quick Command<span class="hdr-line"></span></h2>
 <div id="qcCmdRow" class="btn-row"></div>
 <div id="qcPlayerRow" class="btn-row player-row"></div>
 <div id="qcAmountRow" style="display:none;margin-top:6px">
@@ -59,14 +64,14 @@
 <button id="qcSendBtn" disabled style="width:100%;margin-top:6px">Send</button>
 </div>
 <div id="auctionBuilder">
-<h2>Auction Menu</h2>
+<h2>Auction Menu<span class="hdr-line"></span></h2>
 <button id="auctionPickBtn" type="button" class="opt" style="width:100%">Pick space for this entry</button>
 <div id="auctionSpacesLabel" class="spacesLabel" style="margin-top:6px"></div>
 <div id="auctionPreview" style="margin-top:6px">(pick a space to auction)</div>
 <button id="auctionSendBtn" disabled style="width:100%;margin-top:6px">Send</button>
 </div>
 <div id="switchBuilder">
-<h2>Switch Menu</h2>
+<h2>Switch Menu<span class="hdr-line"></span></h2>
 <div id="switchPlayerRow1" class="btn-row player-row"></div>
 <div id="switchPlayerRow2" class="btn-row player-row" style="margin-top:6px"></div>
 <div id="switchPreview" style="margin-top:6px">(select two players)</div>

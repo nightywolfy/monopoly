@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
+
 /* ==================== GLOBAL ==================== */
-html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family:sans-serif;display:flex;overflow:hidden;color:white}
+html,body{margin:0;padding:0;height:100%;width:100%;background:linear-gradient(160deg,#f7dfe3 0%,#fbeef0 45%,#f3d9de 100%);font-family:sans-serif;display:flex;overflow:hidden;color:#5c2333}
 
 /* ==================== BOARD ==================== */
 #boardWrapper{width:50%;height:100%;display:flex;justify-content:center;align-items:center;position:relative;background:black}
@@ -27,7 +29,7 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #displayContainer{display:flex;flex-direction:column;gap:15px;align-items:center}
 .displayBox{padding:8px 14px;border-radius:12px;width:300px;text-align:center;font-weight:bold;font-size:22px;background:linear-gradient(135deg,#6a0dad,#00d4ff);color:white;box-shadow:0 0 12px #6a0dad,0 0 18px #00d4ff;word-wrap:break-word}
 /* ==================== PLAYER PANEL ==================== */
-#playerContainer{width:50%;height:100%;background:#111;display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:10px;box-shadow:inset 0 0 40px rgba(0,212,255,.3);padding:8px;box-sizing:border-box;overflow-y:auto}
+#playerContainer{width:50%;height:100%;background:linear-gradient(160deg,#f7dfe3 0%,#fbeef0 45%,#f3d9de 100%);display:flex;flex-direction:column;justify-content:flex-start;align-items:center;gap:10px;padding:16px;box-sizing:border-box;overflow-y:auto}
 .playerSection{width:100%;max-width:260px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:14px;padding:10px;text-align:center;box-shadow:0 0 25px rgba(0,0,0,.4)}
 .playerGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .playerSection h2{color:#FFD700;margin:0 0 10px;font-size:16px;text-shadow:0 0 8px black}
@@ -51,39 +53,40 @@ html,body{margin:0;padding:0;height:100%;width:100%;background:black;font-family
 #quickButtons button:hover{transform:scale(1.08);filter:brightness(1.25)}
 
 /* ==================== MODE BUTTONS ==================== */
-.mode-btn{padding:6px 12px;font-size:.9em;border-radius:5px;border:1px solid #555;background:#111;color:#eee;cursor:pointer;text-align:center;transition:.2s}
-.mode-btn.active{background:#0077ff!important;color:#fff!important;border-color:#00aaff!important}
-.mode-btn:hover{background:#333}
-.mode-btn.active:hover{background:#0077ff!important}
+.mode-btn{padding:6px 12px;font-size:.9em;border-radius:10px;border:1px solid rgba(190,110,130,.3);background:#fdf2f4;color:#7a3346;cursor:pointer;text-align:center;transition:.2s;font-weight:600}
+.mode-btn.active{background:linear-gradient(135deg,#e2647f,#f2a3b3)!important;color:#fff!important;border-color:#e2647f!important}
+.mode-btn:hover{background:#f8dee3}
+.mode-btn.active:hover{background:linear-gradient(135deg,#e2647f,#f2a3b3)!important}
 
 /* ==================== COMMAND BUILDER ==================== */
-#builder{width:100%;max-width:280px;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:10px;box-shadow:0 0 18px rgba(0,0,0,.4);box-sizing:border-box}
-#builder h2{margin:0 0 10px;text-align:center;color:#FFD700;text-shadow:0 0 8px black;font-size:14px}
+#builder{width:100%;max-width:280px;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.8);border-radius:26px;padding:16px;box-shadow:0 10px 30px rgba(180,90,110,.15),inset 0 1px 0 rgba(255,255,255,.6);box-sizing:border-box}
+#builder h2,#quickBuilder h2,#auctionBuilder h2,#switchBuilder h2{margin:0 0 4px;text-align:center;color:#7a2e3a;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-size:20px;letter-spacing:.5px;text-shadow:none}
+#builder h2::after,#quickBuilder h2::after,#auctionBuilder h2::after,#switchBuilder h2::after{content:'\25C6';display:block;font-size:9px;color:#e0a3b2;margin-top:6px;margin-bottom:12px}
 .section{margin-bottom:10px}
-.section-label{font-size:11px;color:#aaa;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.section-label{font-size:11px;color:#a97a86;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
 .btn-row{display:grid;gap:6px}
 .cmd-row{grid-template-columns:repeat(2,1fr)}
 .player-row{grid-template-columns:repeat(3,1fr)}
 .amount-row{grid-template-columns:repeat(3,1fr)}
-button.opt{padding:7px 4px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-weight:bold;font-size:12px;cursor:pointer;transition:.15s}
-button.opt:hover{filter:brightness(1.2)}
-button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-color:#00d4ff;box-shadow:0 0 10px #6a0dad}
+button.opt{padding:9px 4px;border-radius:12px;border:1px solid rgba(190,110,130,.25);background:#fdf2f4;color:#7a3346;font-weight:700;font-size:12px;cursor:pointer;transition:.15s;box-shadow:0 1px 3px rgba(150,80,100,.08)}
+button.opt:hover{background:#f8dee3;box-shadow:0 2px 6px rgba(150,80,100,.15)}
+button.opt.selected{background:linear-gradient(135deg,#e2647f,#f2a3b3);border-color:#e2647f;color:#fff;box-shadow:0 4px 12px rgba(200,90,120,.35)}
 .player-row button.p1.selected{background:linear-gradient(135deg,#ff4d4d,#ff8080);color:black}
 .player-row button.p2.selected{background:linear-gradient(135deg,#3399ff,#66a3ff)}
 .player-row button.p3.selected{background:linear-gradient(135deg,goldenrod,#ffde59);color:black}
 .player-row button.p4.selected{background:linear-gradient(135deg,limegreen,#aaffaa);color:black}
 .player-row button.p5.selected{background:linear-gradient(135deg,#9933ff,#cc99ff)}
 .player-row button.p6.selected{background:#fff;color:black}
-#customAmount{width:100%;box-sizing:border-box;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-size:12px;margin-top:6px}
-#customAmount::placeholder{color:#777}
-#preview{background:#000;border:1px solid #6a0dad;border-radius:7px;padding:7px 8px;font-family:monospace;font-size:12px;color:#00ffae;min-height:15px;margin-bottom:8px;word-break:break-all}
-#enterBtn{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s}
-#enterBtn:hover{filter:brightness(1.1)}
-#enterBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}
-#cmdLog{margin-top:10px;max-height:80px;overflow-y:auto;font-family:monospace;font-size:10px;color:#888;border-top:1px solid rgba(255,255,255,.1);padding-top:6px}
+#customAmount{width:100%;box-sizing:border-box;padding:9px 10px;border-radius:12px;border:1px solid rgba(200,140,155,.35);background:#fff;color:#5c2333;font-size:12px;margin-top:6px}
+#customAmount::placeholder{color:#c98a9a}
+#preview{background:rgba(255,255,255,.5);border:1px dashed rgba(200,120,140,.45);border-radius:12px;padding:8px 10px;font-family:'Courier New',monospace;font-size:12px;color:#7a3346;min-height:15px;margin-bottom:8px;word-break:break-all}
+#enterBtn{width:100%;padding:10px;border:none;border-radius:14px;background:#e2647f;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s;box-shadow:0 6px 16px rgba(200,90,120,.35)}
+#enterBtn:hover{filter:brightness(1.08)}
+#enterBtn:disabled{opacity:.45;cursor:not-allowed;filter:none;box-shadow:none}
+#cmdLog{margin-top:10px;max-height:80px;overflow-y:auto;font-family:monospace;font-size:10px;color:#a97a86;border-top:1px solid rgba(200,140,155,.25);padding-top:6px}
 #cmdLog div{padding:2px 0}
-#pickSpaceBtn{width:100%;margin-top:6px;background:#1a1a1a}
-#pickSpaceBtn.selected{background:linear-gradient(135deg,#00c853,#69f0ae)!important;color:black;box-shadow:0 0 10px #00c853}
+#pickSpaceBtn{width:100%;margin-top:6px;background:#fdf2f4}
+#pickSpaceBtn.selected{background:linear-gradient(135deg,#e2647f,#f2a3b3)!important;color:#fff;box-shadow:0 4px 12px rgba(200,90,120,.35)}
 
 /* ==================== COMMAND BUILDER ENTRIES ==================== */
 .spacePicked{outline:3px solid #00ffae!important;outline-offset:-3px;z-index:101!important}
@@ -93,13 +96,13 @@ button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-co
 .spacePicked.entryColor4{outline-color:limegreen!important}
 .spacePicked.entryColor5{outline-color:#9933ff!important}
 .spacePicked.entryColor6{outline-color:#ffffff!important}
-.entryCard{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:7px;margin-bottom:7px}
+.entryCard{background:rgba(255,255,255,.5);border:1px solid rgba(230,150,165,.35);border-radius:16px;padding:10px;margin-bottom:10px;box-shadow:0 4px 10px rgba(180,90,110,.08)}
 .entryCard .entryTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.entryCard .entryTop span{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.5px}
-.removeEntryBtn{background:#3a1010;color:#ff8080;border:1px solid #661a1a;border-radius:5px;padding:2px 6px;font-size:10px;cursor:pointer}
-.removeEntryBtn:hover{background:#551515;color:#fff}
-.entryCard input.amountInput{width:100%;box-sizing:border-box;padding:6px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-size:12px;margin-top:5px}
-.entryCard .spacesLabel{font-size:10px;color:#00ffae;margin-top:5px;min-height:12px;word-break:break-all}
+.entryCard .entryTop span{font-size:10px;color:#b16a7c;text-transform:uppercase;letter-spacing:.5px}
+.removeEntryBtn{background:#fbe0e5;color:#c14d68;border:1px solid #f0b8c4;border-radius:8px;padding:2px 6px;font-size:10px;cursor:pointer}
+.removeEntryBtn:hover{background:#f6c6d1;color:#7a2e3a}
+.entryCard input.amountInput{width:100%;box-sizing:border-box;padding:7px 9px;border-radius:10px;border:1px solid rgba(200,140,155,.35);background:#fff;color:#5c2333;font-size:12px;margin-top:5px}
+.entryCard .spacesLabel{font-size:10px;color:#c15570;margin-top:5px;min-height:12px;word-break:break-all}
 
 /* ==================== ACCEPT / REJECT ==================== */
 #builder .actionButtons{display:flex;gap:6px;margin-bottom:8px}
@@ -116,28 +119,29 @@ button.opt.selected{background:linear-gradient(135deg,#6a0dad,#00d4ff);border-co
 /* ==================== QUICK COMMAND BUILDER (mirrors #builder) ==================== */
 #buildersRow{display:flex;flex-direction:row;gap:12px;width:100%;justify-content:center;align-items:flex-start;flex-wrap:wrap}
 #quickAuctionColumn{display:flex;flex-direction:column;gap:12px;width:100%;max-width:280px}
-#quickBuilder{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:10px;box-shadow:0 0 18px rgba(0,0,0,.4);box-sizing:border-box}
-#quickBuilder h2{margin:0 0 10px;text-align:center;color:#FFD700;text-shadow:0 0 8px black;font-size:14px}
+#quickBuilder{width:100%;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.8);border-radius:26px;padding:16px;box-shadow:0 10px 30px rgba(180,90,110,.15),inset 0 1px 0 rgba(255,255,255,.6);box-sizing:border-box}
 #qcCmdRow{grid-template-columns:repeat(3,1fr);margin-bottom:10px}
-#qcAmount{width:100%;box-sizing:border-box;padding:7px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.15);background:#1a1a1a;color:white;font-size:12px}
-#qcAmount::placeholder{color:#777}
-#qcPreview{background:#000;border:1px solid #6a0dad;border-radius:7px;padding:7px 8px;font-family:monospace;font-size:12px;color:#00ffae;min-height:15px;word-break:break-all}
-#qcSendBtn{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s}
-#qcSendBtn:hover{filter:brightness(1.1)}
-#qcSendBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+#qcAmount{width:100%;box-sizing:border-box;padding:9px 10px;border-radius:12px;border:1px solid rgba(200,140,155,.35);background:#fff;color:#5c2333;font-size:12px}
+#qcAmount::placeholder{color:#c98a9a}
+#qcPreview{background:rgba(255,255,255,.5);border:1px dashed rgba(200,120,140,.45);border-radius:12px;padding:8px 10px;font-family:'Courier New',monospace;font-size:12px;color:#7a3346;min-height:15px;word-break:break-all}
+#qcSendBtn{width:100%;padding:10px;border:none;border-radius:14px;background:#e2647f;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s;box-shadow:0 6px 16px rgba(200,90,120,.35)}
+#qcSendBtn:hover{filter:brightness(1.08)}
+#qcSendBtn:disabled{opacity:.45;cursor:not-allowed;filter:none;box-shadow:none}
 
 /* ==================== AUCTION MENU (mirrors #builder) ==================== */
-#auctionBuilder{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:10px;box-shadow:0 0 18px rgba(0,0,0,.4);box-sizing:border-box}
-#auctionBuilder h2{margin:0 0 10px;text-align:center;color:#FFD700;text-shadow:0 0 8px black;font-size:14px}
-#auctionPreview{background:#000;border:1px solid #6a0dad;border-radius:7px;padding:7px 8px;font-family:monospace;font-size:12px;color:#00ffae;min-height:15px;word-break:break-all}
-#auctionSendBtn{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s}
-#auctionSendBtn:hover{filter:brightness(1.1)}
-#auctionSendBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+#auctionBuilder{width:100%;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.8);border-radius:26px;padding:16px;box-shadow:0 10px 30px rgba(180,90,110,.15),inset 0 1px 0 rgba(255,255,255,.6);box-sizing:border-box}
+#auctionPreview{background:rgba(255,255,255,.5);border:1px dashed rgba(200,120,140,.45);border-radius:12px;padding:8px 10px;font-family:'Courier New',monospace;font-size:12px;color:#7a3346;min-height:15px;word-break:break-all}
+#auctionSendBtn{width:100%;padding:10px;border:none;border-radius:14px;background:#e2647f;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s;box-shadow:0 6px 16px rgba(200,90,120,.35)}
+#auctionSendBtn:hover{filter:brightness(1.08)}
+#auctionSendBtn:disabled{opacity:.45;cursor:not-allowed;filter:none;box-shadow:none}
 
 /* ==================== SWITCH MENU (mirrors #builder) ==================== */
-#switchBuilder{width:100%;background:rgba(255,255,255,.03);border:1px solid rgba(0,212,255,.25);border-radius:12px;padding:10px;box-shadow:0 0 18px rgba(0,0,0,.4);box-sizing:border-box}
-#switchBuilder h2{margin:0 0 10px;text-align:center;color:#FFD700;text-shadow:0 0 8px black;font-size:14px}
-#switchPreview{background:#000;border:1px solid #6a0dad;border-radius:7px;padding:7px 8px;font-family:monospace;font-size:12px;color:#00ffae;min-height:15px;word-break:break-all}
-#switchSendBtn{width:100%;padding:9px;border:none;border-radius:8px;background:linear-gradient(135deg,#00c853,#69f0ae);color:black;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s}
-#switchSendBtn:hover{filter:brightness(1.1)}
-#switchSendBtn:disabled{opacity:.4;cursor:not-allowed;filter:none}
+#switchBuilder{width:100%;background:rgba(255,255,255,.55);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.8);border-radius:26px;padding:16px;box-shadow:0 10px 30px rgba(180,90,110,.15),inset 0 1px 0 rgba(255,255,255,.6);box-sizing:border-box}
+#switchPreview{background:rgba(255,255,255,.5);border:1px dashed rgba(200,120,140,.45);border-radius:12px;padding:8px 10px;font-family:'Courier New',monospace;font-size:12px;color:#7a3346;min-height:15px;word-break:break-all}
+#switchSendBtn{width:100%;padding:10px;border:none;border-radius:14px;background:#e2647f;color:#fff;font-weight:bold;font-size:14px;cursor:pointer;transition:.15s;box-shadow:0 6px 16px rgba(200,90,120,.35)}
+#switchSendBtn:hover{filter:brightness(1.08)}
+#switchSendBtn:disabled{opacity:.45;cursor:not-allowed;filter:none;box-shadow:none}
+
+/* ==================== RESET BUTTON ==================== */
+#resetBtn{width:100%;margin-bottom:8px;padding:10px;border-radius:14px;border:1px solid rgba(190,110,130,.3);background:#fdf2f4;color:#7a3346;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+#resetBtn:hover{background:#f8dee3}

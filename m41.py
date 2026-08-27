@@ -44,7 +44,7 @@ class MonopolyBot:
         self.space62_mortgage_block=False
         self.space62_mortgage_unlock_on_roll=False
         self.connection = ChatConnection(self)
-        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "https://monopoly-production-ef33.up.railway.app")
+        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "http://192.168.1.67")
         self.sio = socketio.Client(reconnection=True, reconnection_delay=2, reconnection_delay_max=10)
         self._setup_ws_handlers()
         self.ws_thread = threading.Thread(target=self._run_ws_client, daemon=True)
@@ -101,14 +101,14 @@ class MonopolyBot:
         if re.match(r"!go[1-4](?:\s+\d+)?",msg.strip()):self.handle_go_command(c,msg.strip(),nick);return
         success,r=self.handle_command(nick,msg)
         if r:
-            if low.startswith(("!bidadd","!fold","!addonehouse","!removeonehouse","!jailpay")):c.privmsg(self.channel,r)
+            if low.startswith(("!bidadd","!fold","!addonehouse","!removeonehouse","!jailpay","!payjail")):c.privmsg(self.channel,r)
             else:c.privmsg(nick,r)
         if success and low.startswith(("!addonehouse","!removeonehouse")):self.auto_up()
         self.handle_go_privmsg(c,nick,msg)
     def handle_channel_message(self,c,nick,msg):
         success,r=self.handle_command(nick,msg)
         if r:
-            if success and msg.lower().startswith(("!start","!move","!add","!teleport","!addonehouse","!removeonehouse","!remove","!freeloan","!gobonus","!jailpay","!switch","!insert","!accept","!restore")):self.auto_up()
+            if success and msg.lower().startswith(("!start","!move","!add","!teleport","!addonehouse","!removeonehouse","!remove","!freeloan","!gobonus","!jailpay","!payjail","!switch","!insert","!accept","!restore")):self.auto_up()
             c.privmsg(self.channel,r)
         self.handle_go_session_command(c,nick,msg)
         self.override_turn(c,nick,msg)
@@ -203,9 +203,6 @@ class MonopolyBot:
                 self._handle_dicestart(self.connection,n);self.sio.emit("cmd-sound",{"file":"start.mp3"})
             except Exception as e:return False,f"Game started but failed to initialize board: {e}"
             self.sio.emit("updateDisplay1",{"text":"Game has started"});self.sio.emit("updateDisplay2",{"text":"P1's Turn to Roll"})
-            if n==2:
-                self.go_enabled=True;self.turn='p1';self.override_next_turn=False
-                self.msg_queue.put((self.channel,f"GO session started. Turn: {self.turn}"))
             return True,f"Game started with {n} players ({mode}) ${money} each, auction auto-fold in {timeout}s"
       
         if m:=re.match(r"!rename\s+(\S+)\s+(\S+)",body):
@@ -365,14 +362,10 @@ class MonopolyBot:
             pl_token=m.group(1);pl=self.resolve_player(pl_token)
             if not pl or pl not in self.players:return False,f"Player {pl_token} is not in the game"
             if not self.jailed.get(pl,False):return False,f"{self.pname(pl)} is not in jail"
-            if self.dice_mode and self.dice_order:
-                if self.expected_player_index>=len(self.dice_order):return False,"Invalid dice turn order"
-                pn=int(pl[1:]);exp=self.dice_order[self.expected_player_index]
-                if pn!=exp:return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(f'p{exp}')}"
-            elif self.go_enabled:
-                if self.turn!=pl:
-                    other='p2' if pl=='p1' else 'p1'
-                    return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(other)}"
+            if not (self.dice_mode and self.dice_order):return False,"!jailpay only works in dice mode. Use !payjail in GO mode."
+            if self.expected_player_index>=len(self.dice_order):return False,"Invalid dice turn order"
+            pn=int(pl[1:]);exp=self.dice_order[self.expected_player_index]
+            if pn!=exp:return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(f'p{exp}')}"
             turn=max(self.go_jail_attempts.get(pl,0),self.dice4_streak.get(pl,0))
             cost=[100,50,25][min(turn,2)]
             if self.players[pl]["money"]<cost:return False,f"{self.pname(pl)} does not have enough money to pay bail ({cost})"
@@ -381,7 +374,24 @@ class MonopolyBot:
             try:self.sio.emit("cmd-sound",{"file":"key.mp3"})
             except Exception:pass
             return True,self.pname(f"{pl} paid ${cost} bail (turn {turn+1}) and is now out of jail. Balance: {self.players[pl]['money']}")
-            
+
+        if m:=re.match(r"!payjail\s+(\w+)",body):
+            pl_token=m.group(1);pl=self.resolve_player(pl_token)
+            if not pl or pl not in self.players:return False,f"Player {pl_token} is not in the game"
+            if not self.jailed.get(pl,False):return False,f"{self.pname(pl)} is not in jail"
+            if not self.go_enabled:return False,"!payjail only works in GO mode. Use !jailpay in dice mode."
+            if self.turn!=pl:
+                other='p2' if pl=='p1' else 'p1'
+                return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(other)}"
+            turn=max(self.go_jail_attempts.get(pl,0),self.dice4_streak.get(pl,0))
+            cost=[100,50,25][min(turn,2)]
+            if self.players[pl]["money"]<cost:return False,f"{self.pname(pl)} does not have enough money to pay bail ({cost})"
+            self.players[pl]["money"]-=cost;self.jailed[pl]=False
+            self.go_jail_attempts[pl]=0;self.dice4_streak[pl]=0
+            try:self.sio.emit("cmd-sound",{"file":"key.mp3"})
+            except Exception:pass
+            return True,self.pname(f"{pl} paid ${cost} bail (turn {turn+1}) and is now out of jail. Balance: {self.players[pl]['money']}")
+
         if m:=re.match(r"!gobonus\s+(\w+)\s+(\d+)\s+(\d+)$",body):
             pl_token,bonus,cap=m.groups();bonus=int(bonus);cap=int(cap)
             pl=self.resolve_player(pl_token)
@@ -416,7 +426,7 @@ class MonopolyBot:
             display_prop=prop[2:] if prop.startswith("x-") else prop
             try:
                 self.sio.emit("updateDisplay2",{"text":f"Auction started for {display_prop}"})
-                self.sio.emit("playSound",{"file":"auction1.mp3"})
+                self.sio.emit("cmd-sound",{"file":"auction1.mp3"})
             except Exception:pass
             return True,self.pname(f"Auction started for {display_prop}")
             
@@ -1003,6 +1013,7 @@ class MonopolyBot:
             self.expected_player_index=0
             self.dice_override=False
             self.disabled_dice.clear()
+        self.go_enabled=False;self.override_next_turn=False
         c.privmsg(self.channel,f"Dice mode started for {n} players. Order: {', '.join(self.pname(f'p{x}') for x in self.dice_order)}")
     def _handle_dicestop(self,c):
         with self.dice_lock:self.dice_mode=False;self.dice_players=None;self.dice_order=[];self.expected_player_index=0;self.dice_override=False;self.disabled_dice.clear()
@@ -1110,6 +1121,9 @@ class MonopolyBot:
         if msg.startswith('!gostart'):
             if self.go_enabled:c.privmsg(self.channel,"GO session already started");return
             self.go_enabled=True;self.turn='p1';self.override_next_turn=False
+            with self.dice_lock:
+                self.dice_mode=False;self.dice_players=None;self.dice_order=[]
+                self.expected_player_index=0;self.dice_override=False;self.disabled_dice.clear()
             c.privmsg(self.channel,f"GO session started. Turn: {self.turn}")
         elif msg.startswith('!gostop'):
             if not self.go_enabled:c.privmsg(self.channel,"No active GO session");return
@@ -1146,7 +1160,7 @@ class MonopolyBot:
         jail=self.jailed.get(p,False)
         if cmd in ('1','2') and jail:
             other=3 if p=='p1' else 4
-            c.privmsg(self.channel,f"{nick}, you are in jail. Use !go{other} or !jailpay {p}");return
+            c.privmsg(self.channel,f"{nick}, you are in jail. Use !go{other} or !payjail {p}");return
         if cmd in ('3','4') and not jail:
             other=1 if p=='p1' else 2
             c.privmsg(self.channel,f"{nick}, not in jail. Use !go{other}");return
@@ -1195,8 +1209,11 @@ class MonopolyBot:
                     try:self.sio.emit("cmd-sound",{"file":"key.mp3"})
                     except:pass
             else:self.go_jail_attempts[p]=0
-            if jail and not double and not freed_this_turn:
-                c.privmsg(self.channel,f"Command !go{self.go_active} requires doubles. Dice: {nums[0]} and {nums[1]}")
+            if jail and not double:
+                if freed_this_turn:
+                    c.privmsg(self.channel,f"{self.pname(p)} is released from jail but did not roll doubles, so no move this turn.")
+                else:
+                    c.privmsg(self.channel,f"Command !go{self.go_active} requires doubles. Dice: {nums[0]} and {nums[1]}")
                 self.turn='p2' if p=='p1' else 'p1'
                 c.privmsg(self.channel,f"Turn switched to {self.turn}")
                 self.announce_go_turn(c,self.turn)

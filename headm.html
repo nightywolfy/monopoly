@@ -23,7 +23,7 @@
 <div class="button-row" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;">
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!go1"><img src="dice.png"></button>
 <button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!go3"><img src="jail.png"></button>
-<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!jailpay p1"><img src="key.png"></button>
+<button type="button" class="small-button" data-target="rentobot" data-from="player1bot" data-msg="!payjail p1"><img src="key.png"></button>
 <a id="tradeLink" href="trade-mobile.html?p=1" target="_blank"><button type="button" class="small-button"><img src="p1.png"></button></a>
 </div>
 <div class="button-row" style="display:flex;flex-wrap:wrap;gap:4px;justify-content:center;align-items:center;">
@@ -68,26 +68,16 @@
 </div>
 <script>
 (function(){
-const p=parseInt(new URLSearchParams(location.search).get("p"))||1,
-bot=`player${p}bot`;
-
+const p=+(new URLSearchParams(location.search).get("p"))||1,bot=`player${p}bot`;
 document.body.dataset.bot=bot;
 document.querySelectorAll("[data-from]").forEach(e=>e.dataset.from=bot);
 
-const jail=document.querySelector('[data-msg="!jailpay p1"]');
-if(jail) jail.dataset.msg=`!jailpay p${p}`;
+const j=document.querySelector('[data-msg^="!payjail"]');j&&(j.dataset.msg=`!payjail p${p}`);
+const t=document.getElementById("tradeLink");t&&(t.href=t.href.replace(/p=\d+/,`p=${p}`));
+const i=document.querySelector('img[src="p1.png"]');i&&(i.src=`p${p}.png`);
 
-const img=document.querySelector('img[src="p1.png"]');
-if(img) img.src=`p${p}.png`;
-
-const t=document.getElementById("tradeLink");
-if(t)t.href=`trade-mobile.html?p=${p}`;
-
-const go1=document.querySelector('[data-msg="!go1"]');
-const go3=document.querySelector('[data-msg="!go3"]');
-
-if(go1)go1.dataset.msg=`!go${p}`;
-if(go3)go3.dataset.msg=`!go${p+2}`;
+const g1=document.querySelector('[data-msg="!go1"]');g1&&(g1.dataset.msg=`!go${p}`);
+const g3=document.querySelector('[data-msg="!go3"]');g3&&(g3.dataset.msg=`!go${p+2}`);
 })();
 </script>
 <script src="/socket.io/socket.io.js"></script>
