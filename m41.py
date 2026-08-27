@@ -365,14 +365,14 @@ class MonopolyBot:
             pl_token=m.group(1);pl=self.resolve_player(pl_token)
             if not pl or pl not in self.players:return False,f"Player {pl_token} is not in the game"
             if not self.jailed.get(pl,False):return False,f"{self.pname(pl)} is not in jail"
-            if self.go_enabled:
-                if self.turn!=pl:
-                    other='p2' if pl=='p1' else 'p1'
-                    return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(other)}"
-            elif self.dice_mode and self.dice_order:
+            if self.dice_mode and self.dice_order:
                 if self.expected_player_index>=len(self.dice_order):return False,"Invalid dice turn order"
                 pn=int(pl[1:]);exp=self.dice_order[self.expected_player_index]
                 if pn!=exp:return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(f'p{exp}')}"
+            elif self.go_enabled:
+                if self.turn!=pl:
+                    other='p2' if pl=='p1' else 'p1'
+                    return False,f"Not {self.pname(pl)}'s turn. Next: {self.pname(other)}"
             turn=max(self.go_jail_attempts.get(pl,0),self.dice4_streak.get(pl,0))
             cost=[100,50,25][min(turn,2)]
             if self.players[pl]["money"]<cost:return False,f"{self.pname(pl)} does not have enough money to pay bail ({cost})"
@@ -416,7 +416,7 @@ class MonopolyBot:
             display_prop=prop[2:] if prop.startswith("x-") else prop
             try:
                 self.sio.emit("updateDisplay2",{"text":f"Auction started for {display_prop}"})
-                self.sio.emit("playSound",{"file":"auction.mp3"})
+                self.sio.emit("playSound",{"file":"auction1.mp3"})
             except Exception:pass
             return True,self.pname(f"Auction started for {display_prop}")
             
@@ -888,6 +888,7 @@ class MonopolyBot:
                     self.current_auction={"pos":new,"bids":{},"last_bidder":None,"bid_timer":None,"active":set(self.players.keys())}
                     raw=self.active_board.get(new,"")
                     msg+=f"Auction started for {raw[2:] if raw.startswith('x-') else raw}."
+                    self.sio.emit("cmd-sound",{"file":"auction2.mp3"})
                 elif owner and owner!=p:
                     if new in self.mortgaged:msg+="Property is mortgaged, no rent"
                     elif self.jailed.get(owner,False):msg+="Owner in jail, no rent"
@@ -959,6 +960,8 @@ class MonopolyBot:
             raw=self.active_board.get(new,"")
             prop=raw[2:] if raw.startswith("x-") else raw
             try:self.sio.emit("updateDisplay2",{"text":f"Auction started for {prop}"})
+            except:pass
+            try:self.sio.emit("cmd-sound",{"file":"auction3.mp3"})
             except:pass
             return name,""
         if msg:

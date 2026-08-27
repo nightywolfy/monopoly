@@ -48,5 +48,6 @@ Update Changelog:
 46. Added a configurable autofold timer in seconds to the !start command, with a maximum setting of 30 seconds.
 47. Updated the mortgage system to apply the 10% penalty when unmortgaging, in accordance with the official Monopoly rules, rather than when mortgaging.
 48. Removed the plus/minus house buttons and replaced them with AddHouse/RemoveHouse mode toggles.
-49. Replaced the Libera.Chat iframe with a fully built-in custom chat system.
-50. Added a sound effect for every command execution to provide immediate feedback that the command has been used.
+49. Replaced the Libera.Chat iframe with a fully integrated custom chat system.
+50. Added sound effects that play whenever a command is executed, providing immediate confirmation that the command was received and processed.
+51. Updated the design of the main index page.
