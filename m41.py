@@ -44,7 +44,7 @@ class MonopolyBot:
         self.space62_mortgage_block=False
         self.space62_mortgage_unlock_on_roll=False
         self.connection = ChatConnection(self)
-        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "http://192.168.1.67")
+        self.ws_url = ws_url or os.environ.get("RENTO_WS_URL", "https://monopoly-production-ef33.up.railway.app")
         self.sio = socketio.Client(reconnection=True, reconnection_delay=2, reconnection_delay_max=10)
         self._setup_ws_handlers()
         self.ws_thread = threading.Thread(target=self._run_ws_client, daemon=True)
